@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name='viewport'
+        content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no' />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+    <title>SETE Software Eletrônico de Gestão do Transporte Escolar</title>
+
+    <!-- Fonts CSS -->
+    <link rel="stylesheet" href="../../node_modules/typeface-poppins/index.css" />
+    <link rel="stylesheet" href="../../node_modules/typeface-roboto/index.css" />
+    <link rel="stylesheet" href="../../node_modules/typeface-roboto-condensed/index.css" />
+    <link rel="stylesheet" href="../../node_modules/typeface-montserrat/index.css" />
+    <link rel="stylesheet" href="../../node_modules/typeface-patrick-hand/index.css" />
+    <link rel="stylesheet" href="css/all.css" />
+    <link rel="stylesheet" href="css/font-awesome.css" />
+
+    <!-- Bootstrap and Related CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/datatables.css" />
+    <link rel="stylesheet" href="css/dataTables.checkboxes.css" />
+
+    <!-- Map CSS -->
+    <link rel="stylesheet" href="css/ol.css" />
+    <link rel="stylesheet" href="css/ol-ext.css" />
+    <link rel="stylesheet" href="../../node_modules/ol-geocoder/dist/ol-geocoder.min.css" />
+
+    <!-- Template CSS -->
+    <link rel="stylesheet" href="css/light-bootstrap-dashboard.css?v=2.0.1" />
+    <link rel="stylesheet" href="css/dashboard.css" />
+    <link rel="stylesheet" href="css/custo.css" />
+    <link rel="stylesheet" href="css/ol-fixes.css">
+    <link rel="stylesheet" href="css/fixes.css" />
+    <link rel="stylesheet" href="css/datatables.fixes.css">
+    <link rel="stylesheet" href="css/network.css" />
+
+    <!-- Icons -->
+    <link rel="apple-touch-icon" sizes="76x76" href="img/icones/setelogosmall.png">
+    <link rel="icon" type="image/png" href="img/icones/setelogosmall.png">
+</head>
+
+<body class="bgentry">
+    <div class="preload">
+        <img src="img/icones/loading-gears2.gif">
+    </div>
+
+    <div class="wrapper">
+        <!-- <div id="sidebar" class="sidebar" data-color="black" data-image="file://img/sidebar-5.jpg"></div> -->
+        <div id="hmbmenu">
+            <a href="#" id="toggleHamburguerMenu">
+                <i class="fa fa-bars"></i>
+                SETE
+            </a>
+        </div>
+        <div id="sidebar" class="sidebar"></div>
+        <div class="main-panel">
+            <div id="content" class="content"></div>
+            <footer id="footer" class="footer p-1"></footer>
+        </div>
+    </div>
+
+</body>
+<!-- Carregamento das bibliotecas núcleo (diferente no Electron/Web) -->
+<script>
+    // Verifica se estamos ou não no Electron
+    var isElectron = window.process != null;
+
+    if (isElectron) {
+        // Carregamento via require
+        
+        // Bibliotecas Básicas do JS
+        window.$ = window.jQuery = require("jquery");
+        window.Tether = require("tether");
+        window.Bootstrap = require("bootstrap");
+
+        require("jquery-validation");
+        require("jquery-mask-plugin");
+    } else {
+        // Carregamento normal
+        document.write('<script src="../../node_modules/jquery/dist/jquery.min.js"><\/script>');
+        document.write('<script src="../../node_modules/tether/dist/js/tether.js"><\/script>');
+        document.write('<script src="../../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"><\/script>');
+        document.write('<script src="../../node_modules/jquery-validation/dist/jquery.validate.min.js"><\/script>');
+        document.write('<script src="../../node_modules/jquery-mask-plugin/dist/jquery.mask.min.js"><\/script>');
+    }
+
+    // SweetAlert (Alertas), Axios (HTTP) e Versão do sistema
+    document.write('<script src="../../node_modules/sweetalert2/dist/sweetalert2.all.min.js"><\/script>');
+    document.write('<script src="../../node_modules/axios/dist/axios.min.js"><\/script>');
+    document.write('<script src="../../node_modules/platform/platform.js"><\/script>');
+
+    // Bibliotecas adicionais específicas
+    document.write('<script src="js/common.js"><\/script>');
+</script>
+
+<!-- Bibliotecas comuns -->
+
+<!-- Inputs adicionais (Validação, MD5) -->
+<script src="../../node_modules/jquery-validation/dist/additional-methods.js"></script>
+<script src="../../node_modules/md5/dist/md5.min.js"></script>
+<script src="js/jquery.validate.extra.js"></script>
+<script src="js/plugins/jquery.validate.file.js"></script>
+<script src="js/plugins/cidades-estados-utf8.js"></script>
+
+<!-- Biblioteca para lidar com data -->
+<script src="../../node_modules/moment/min/moment-with-locales.min.js"></script>
+
+<!-- Biblioteca para lidar com imagens -->
+<script src="../../node_modules/dom-to-image/dist/dom-to-image.min.js"></script>
+
+<!-- Scripts para lidar com banco de dados -->
+<script src="js/db_rest.js"></script>
+<script src="js/db.js"></script>
+
+<!-- Scripts para lidar com dados geográficos -->
+<script src="js/geo.js"></script>
+
+<!-- Scripts dashboard -->
+<script src="js/state.js"></script>
+<script src="js/jquery.validate.extra.js"></script>
+
+<!-- Scripts de Mapa -->
+<script src="js/core/ol.6.5.0.js"></script>
+<script src="js/core/ol-ext.js"></script>
+<script src="js/mapa.js"></script>
+<script src="../../node_modules/ol-geocoder/dist/ol-geocoder.js"></script>
+<script src="../../node_modules/geojson-vt/geojson-vt.js"></script>
+<script src="../../node_modules/osmtogeojson/osmtogeojson.js"></script>
+<script src="../../node_modules/jsts/dist/jsts.js"></script>
+<script src="../../node_modules/turf/turf.min.js"></script>
+<script src="../../node_modules/@mapbox/togeojson/togeojson.js"></script>
+
+<script>
+    // Verifica se estamos ou não no Electron
+    if (isElectron) {
+        document.write('<script src="js/geo_libs.js"><\/script>');
+    } else {
+        document.write('<script src="js/geo_browser.js"><\/script>');
+    }
+</script>
+
+<!-- Plugins -->
+<script src="js/plugins/js-brasil.js"></script>
+<script src="js/plugins/dual-list-box.min.js"></script>
+<script src="js/plugins/cidades-estados-utf8.js"></script>
+<script src="js/plugins/ibge-estados.js"></script>
+<script src="js/plugins/ibge-municipios.js"></script>
+<script src="js/plugins/bootstrap-selectpicker.js"></script>
+<script src="js/plugins/bootstrap-seletpicker-pt_BR.js"></script>
+
+<!-- Datatables -->
+<script src="js/datatables.js"></script>
+<script src="js/datatable.extra.js"></script>
+<script src="js/plugins/dataTables.checkboxes.min.js"></script>
+<script src="js/pdf-utils.js"></script>
+
+<!-- Parsers -->
+<script>
+    // Verifica se estamos ou não no Electron
+    if (isElectron) {
+        var Papa = require("papaparse");
+        var readXlsxFile = require('read-excel-file/node');
+    } else {
+        document.write('<script src="../../node_modules/papaparse/papaparse.min.js"><\/script>');
+        document.write('<script src="../../node_modules/read-excel-file/bundle/read-excel-file.min.js"><\/script>');
+    }
+</script>
+
+<!--  Chartist Plugin  -->
+<script src="js/plugins/chartist.min.js"></script>
+<script src="js/plugins/chartist-bar-labels.js"></script>
+
+<!-- Google/Apex/Charts -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+<!--  Notifications Plugin    -->
+<script src="js/plugins/bootstrap-notify.js"></script>
+
+<!--  Bootstrap Plugins -->
+<!--  Plugin for the Wizard, full documentation here: https://github.com/VinceG/twitter-bootstrap-wizard -->
+<script src="js/plugins/bootstrap-switch.js"></script>
+<script src="js/plugins/bootstrap-tagsinput.js"></script>
+<script src="js/plugins/nouislider.js"></script>
+<script src="js/plugins/jquery.bootstrap-wizard.js"></script>
+<script src="js/plugins/bootstrap-table.js"></script>
+
+<!--  Full Calendar   -->
+<script src="js/plugins/fullcalendar.min.js"></script>
+
+<!-- Control Center for Now Ui Dashboard: parallax effects, scripts for the example pages etc -->
+<script src="js/light-bootstrap-dashboard.js?v=2.0.1" type="text/javascript"></script>
+
+<!-- PDF -->
+<script src="../../node_modules/jspdf/dist/jspdf.umd.min.js"></script>
+<script src="../../node_modules/file-saver/dist/FileSaver.min.js"></script>
+
+
+<!-- MathJax -->
+<script type="text/javascript">
+    MathJax = {
+        tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\[', '\]']],
+            processEscapes: true
+        },
+        svg: {
+            fontCache: 'global'
+        }
+    };
+</script>
+
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<script type="text/javascript">
+    var firstAcess = true;
+    $(() => {
+        $("#sidebar").load("dashboard-menu.html");
+        $("#content").load("dashboard-main.html");
+        $("#footer").load("footer.html");
+    });
+</script>
+</html>

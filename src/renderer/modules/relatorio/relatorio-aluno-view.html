@@ -1,0 +1,71 @@
+<div class="container-fluid">
+    <div class="row justify-content-center mb-3">
+        <img id="pageIcon" src="./img/icones/aluno-listar.png">
+        <p class="pageTitle">Relatório de Alunos</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-10 ml-auto mr-auto">
+            <div class="card card-wizard wiz-fixes">
+                <div class="card-body ">
+                    <ul class="nav nav-tabs singletab">
+                        <li class="nav-item col-12 tab-2-fix">
+                            <a class="nav-link active" href="#tab-resumo" data-toggle="tab" role="tab">
+                                <img src="./img/icones/tab-resumo.png" class="wiz-icon">
+                                Resumo
+                            </a>
+                        </li>
+                    </ul>
+                    <!-- Abas -->
+                    <div class="tab-content">
+                        <div class="tab-pane tab-wiz fade show active" id="tab-resumo" role="tabpanel">
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="row">
+                                        <h6 class="mb-2">Resumo de alunos atendidos por:</h6>
+                                    </div>
+                                    <div id="menuRelatorio" class="row list-group">
+                                    </div>
+                                </div>
+                                <div class="col-8">
+                                    <div class="card card-report">
+                                        <div class="card-header ">
+                                            <h4 class="card-title card-title-relatorio"></h4>
+                                        </div>
+                                        <div class="card-body ">
+                                            <div id="grafico">
+                                            </div>
+                                        </div>
+                                        <div class="card-footer ">
+                                            <div id="legendPlace" class="legend">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-2">
+                                <div class="col-12 text-center">
+                                    <button type="button" id="btnExpJPEG" class="btn btnSalvar m-2">
+                                        Exportar Imagem (JPEG)
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer text-center">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+</div>
+
+<script src="./modules/escola/escola-model.js" type="text/javascript"></script>
+<script src="./modules/aluno/aluno-model.js" type="text/javascript"></script>
+<script src="./modules/relatorio/relatorio-ctrl.js" type="text/javascript"></script>
+<script src="./modules/relatorio/relatorio-aluno-ctrl.js" type="text/javascript"></script>

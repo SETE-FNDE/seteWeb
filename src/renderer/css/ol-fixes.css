@@ -1,0 +1,122 @@
+/* popup style */
+.ol-popup
+{	max-width:300px;
+    min-width:100px;
+    min-height:1em;
+}
+/* Image on popup */
+.ol-popup img 
+{	float: left;
+    margin: 0 0.5em 0 0;
+    max-width: 100px;
+    max-height: 100px;
+}
+/* no image content tooltips */
+.ol-popup.tooltips img
+{	display:none;
+}
+
+/* Custom orange style (tips) */
+.ol-popup.tips.orange
+{	border-color:#da7;
+    background-color:#eca;
+}
+.ol-popup.tips.orange .anchor::before
+{	border-color: #da7 transparent;
+}
+.ol-popup-middle.tips.orange .anchor::before
+{	border-color: transparent #da7;
+}
+
+/* orange style (default) */
+.ol-popup.default.orange
+{	border:4px solid #f96;
+}
+.ol-popup.default.orange .anchor {
+    margin: -15px 18px;
+}
+.ol-popup.default.orange .anchor::after
+{	margin: 6px /*border:4 +2 px */ -9px; 
+}
+.ol-popup-middle.default.orange .anchor::after
+{	margin: -9px 6px /*border:4 +2 px */; 
+}
+.ol-popup.default.orange .anchor::before
+{	border-color: #f96 transparent;
+}
+.ol-popup-middle.default.orange .anchor::before
+{	border-color: transparent #da7;
+}
+.ol-popup.default.orange .closeBox
+{	background-color: rgba(255, 153, 102, 0.7);
+}
+.ol-popup.default.orange .closeBox:hover
+{	background-color: rgba(255, 153, 102, 1);
+}
+
+.ol-popupfeature h1 {
+    font-size: 1.2em;
+    text-align: center;
+    margin: 15px;
+    font-weight: 400;
+}
+
+.ol-popup .ol-popupfeature table td {
+    font-size: 0.8em;
+    padding: 5px;
+}
+
+
+.ol-tooltip {
+    position: relative;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    color: white;
+    padding: 4px 8px;
+    opacity: 0.7;
+    white-space: nowrap;
+    font-size: 12px;
+}
+
+.ol-tooltip-measure {
+    opacity: 1;
+    font-weight: bold;
+}
+.ol-tooltip-static {
+    background-color: #ffcc33;
+    color: black;
+    border: 1px solid white;
+}
+
+.ol-tooltip-measure:before, .ol-tooltip-static:before {
+    border-top: 6px solid rgba(0, 0, 0, 0.5);
+    border-right: 6px solid transparent;
+    border-left: 6px solid transparent;
+    content: "";
+    position: absolute;
+    bottom: -6px;
+    margin-left: -7px;
+    left: 50%;
+}
+
+.ol-tooltip-static:before {
+    border-top-color: #ffcc33;
+}
+
+.ol-measure-control {
+    right: .5em;
+    top: 3em;
+}
+
+.ol-ext-print-dialog .ol-print-param {
+    width: 20em !important;
+}
+
+.ol-ext-print-dialog > form .ol-closebox {
+    left: 18em !important;
+}
+
+/* Rotas sidebar fix */
+.sugpanel .ol-layerswitcher span {
+    font-size: 1em;
+}
