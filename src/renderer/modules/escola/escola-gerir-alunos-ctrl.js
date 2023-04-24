@@ -26,7 +26,7 @@ $("#mostrarApenasSem").on("click", () => {
         let outrosOptions = $("#alunosOutros").find("option");
         $.each(outrosOptions, function (i) {
             let opt = outrosOptions[i];
-            if (naoAtendidosPorNenhuma.has(opt.value)) {
+            if (!naoAtendidosPorNenhuma.has(opt.value)) {
                 $(opt).hide();
             }
         });
