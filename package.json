@@ -35,14 +35,14 @@
         {
           "name": "@electron-forge/maker-wix",
           "config": {
-            "iconPath": "C:\\projects\\sete\\src\\renderer\\img\\icones\\setelogo.ico",
+            "iconPath": "C:\\projects\\seteWeb\\src\\renderer\\img\\icones\\setelogo.ico",
             "name": "SETE",
             "ui": {
               "enabled": true,
               "chooseDirectory": true,
               "images": {
-                "background": "C:\\projects\\sete\\src\\renderer\\img\\installer-bg.jpg",
-                "banner": "C:\\projects\\sete\\src\\renderer\\img\\top-bg.jpg"
+                "background": "C:\\projects\\seteWeb\\src\\renderer\\img\\installer-bg.jpg",
+                "banner": "C:\\projects\\seteWeb\\src\\renderer\\img\\top-bg.jpg"
               }
             },
             "manufacturer": "CECATE UFG",

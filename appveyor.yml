@@ -23,7 +23,7 @@ for:
       only:
         - image: macos
     init:
-      - sh: cd $HOME/projects/sete
+      - sh: cd $HOME/projects/seteWeb
   - 
     matrix:
       only:
@@ -82,16 +82,14 @@ install:
   # - npm install sqlite3 --build-from-source --runtime=electron --target=11.2.2 --dist-url=https://electronjs.org/headers
   
 build_script:
-  - cmd: set PATH=C:\projects\sete\node_modules\.bin;%PATH%
+  - cmd: set PATH=C:\projects\seteWeb\node_modules\.bin;%PATH%
   - npm run make
 
 artifacts:
-  - path: "\\out\\make\\wix\\x64\\sete.msi"
+  - path: "\\out\\make\\wix\\x64\\sete*"
     name: WinBinaries
   - path: "\\out\\make\\deb\\x64\\sete*"
-    name: DebBinaries
-  - path: "\\out\\make\\rpm\\x64\\sete*"
-    name: RpmBinaries
+    name: UbuntuBinaries
   - path: "\\out\\make\\sete*"
     name: MacBinaries
 
@@ -102,8 +100,8 @@ deploy:
   provider: GitHub
   draft: true
   auth_token: 
-    secure: 7HN67saSTjfsfOL7pPkVAJ+o/QfMFR5I7OFbOYgDBi6liWtPRijfO3O/tXB4ekh5
-  artifact: WinBinaries, DebBinaries, RpmBinaries, MacBinaries
+    secure: o9FnGoA7kIQPmz6pI/uzpPbOrolyu2jgAzTVV7Ld6TdbmM3pSh60UR7PU2B9FzpF
+  artifact: WinBinaries, UbuntuBinaries, MacBinaries
   on:
     branch: master
     APPVEYOR_REPO_TAG: true
