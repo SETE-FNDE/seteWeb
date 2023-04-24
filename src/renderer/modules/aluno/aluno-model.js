@@ -16,6 +16,7 @@ function GetAlunoFromForm() {
         "da_colchete": $("#temColchete").is(":checked") ? "S" : "N", // str
         "da_atoleiro": $("#temAtoleiro").is(":checked") ? "S" : "N", // str
         "da_ponterustica": $("#temPonte").is(":checked") ? "S" : "N", // str
+        "grau_responsavel": Number($("#listareggrauresp").val())
     }
 
     if ($("#reglat").val()) data["loc_latitude"] = $("#reglat").val();
@@ -27,13 +28,8 @@ function GetAlunoFromForm() {
 
     if ($("#regcpf").val()) data["cpf"] = String($("#regcpf").val()).replace(/\D/g, '');
     if ($("#regtelresp").val()) data["telefone_responsavel"] = $("#regtelresp").val()
-    if ($("#listareggrauresp").val() != "-1") {
-        data["grau_responsavel"] = Number($("#listareggrauresp").val());
-    } else {
-        data["grau_responsavel"] = 0;
-    }
 
-    return data
+    return data;
 }
 
 function PopulateAlunoFromState(estadoAlunoJSON) {
@@ -52,9 +48,10 @@ function PopulateAlunoFromState(estadoAlunoJSON) {
     $("#regnome").val(estadoAlunoJSON["NOME"]);
     $("#regcpf").val(estadoAlunoJSON["CPF"]);
     $("#regdata").val(estadoAlunoJSON["DATA_NASCIMENTO"]);
+    
     if (estadoAlunoJSON["NOME_RESPONSAVEL"]) $("#regnomeresp").val(estadoAlunoJSON["NOME_RESPONSAVEL"]);
     if (estadoAlunoJSON["TELEFONE_RESPONSAVEL"]) $("#regtelresp").val(estadoAlunoJSON["TELEFONE_RESPONSAVEL"]);
-    if (estadoAlunoJSON["GRAU_RESPONSAVEL"]) $("#listareggrauresp").val(estadoAlunoJSON["GRAU_RESPONSAVEL"]);
+    $("#listareggrauresp").val(estadoAlunoJSON["GRAU_RESPONSAVEL"]);
 
     $("input[name='modoSexo']").val([estadoAlunoJSON["SEXO"]]);
     $("input[name='corAluno']").val([estadoAlunoJSON["COR"]]);
