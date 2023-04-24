@@ -357,4 +357,9 @@ $('.card-wizard').bootstrapWizard({
     }
 });
 
+Swal2.fire({
+    title: "Erros no Sistema de Importação",
+    text: "As mudanças de política de privacidade de dados (LGPD - Lei Geral de Proteção de Dados) têm dificultado a realização da importação de dados. Desta forma, você pode encontrar error ao tentar importar a sua base de dados do CENSO.",
+    icon: "warning",
+})
 action = "importarCenso";
