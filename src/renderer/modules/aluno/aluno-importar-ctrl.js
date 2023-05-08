@@ -114,11 +114,131 @@ function ExcelDateToJSDate(date) {
     return new Date(Math.round((date - 25569) * 86400 * 1000));
 }
 
+var dicionarioSexo = [
+    { label: "masculino", value: 1 },
+    { label: "MASCULINO", value: 1 },
+    { label: "M", value: 1 },
+    
+    { label: "feminino", value: 2 },
+    { label: "FEMININO", value: 2 },
+    { label: "F", value: 2 },
+
+    { label: "nenhum", value: 3 },
+    { label: "NENHUM", value: 3 },
+    { label: "não definido", value: 3}
+]
+
+var dicionarioCor = [
+    { label: "amarelo", value: 4 },
+    { label: "AMARELO", value: 4 },
+
+    { label: "branco", value: 1 },
+    { label: "BRANCO", value: 1 },
+
+    { label: "indigena", value: 5 },
+    { label: "INDIGENA", value: 5 },
+
+    { label: "pardo", value: 3 },
+    { label: "PARDO", value: 3 },
+
+    { label: "preto", value: 2 },
+    { label: "PRETO", value: 2 },
+
+    { label: "não declarada", value: 0 },
+    { label: "NÃO DECLARADA", value: 0 }
+]
+
+var dicionarioLocalizacao = [
+    { label: "rural", value: 2 },
+    { label: "RURAL", value: 2 },
+    { label: "Área Rural", value: 2 },
+
+    { label: "urbana", value: 1 },
+    { label: "URBANA", value: 1 },
+    { label: "Área Urbana", value: 1 },
+]
+
+var dicionarioNivel = [
+    { label: "creche", value: 1 },
+    { label: "CRECHE", value: 1 },
+    { label: "pré-escola", value: 1 },
+    { label: "PRÉ-ESCOLA", value: 1 },
+    { label: "infantil", value: 1 },
+    { label: "INFANTIL", value: 1 },
+    { label: "ensino infantil", value: 1 },
+    { label: "ENSINO INFANTIL", value: 1 },
+
+    { label: "fundamental", value: 2 },
+    { label: "FUNDAMENTAL", value: 2 },
+    { label: "ensino fundamental", value: 2 },
+    { label: "ENSINO FUNDAMENTAL", value: 2 },
+
+
+    { label: "médio", value: 3 },
+    { label: "medio", value: 3 },
+    { label: "ensino medio", value: 3 },
+    { label: "MÉDIO", value: 3 },
+    { label: "MEDIO", value: 3 },
+    { label: "ENSINO MÉDIO", value: 3 },
+
+    { label: "superior", value: 4 },
+    { label: "SUPERIOR", value: 4 },
+    { label: "ensino superior", value: 4 },
+    { label: "ENSINO superior", value: 4 },
+
+    { label: "outro", value: 5 },
+    { label: "EJA", value: 5 }
+]
+
+var dicionarioGrauParentesco = [
+    { label: "pai", value: 0 },
+    { label: "PAI", value: 0 },
+    { label: "mãe", value: 0 },
+    { label: "MÃE", value: 0 },
+    { label: "padrasto", value: 0 },
+    { label: "madrasta", value: 0 },
+    { label: "PADRASTO", value: 0 },
+    { label: "MADRASTA", value: 0 },
+
+    { label: "avó", value: 1 },
+    { label: "avô", value: 1 },
+    { label: "AVÓ", value: 1 },
+    { label: "AVÔ", value: 1 },
+    
+    { label: "irmão", value: 2 },
+    { label: "irmã", value: 2 },
+    { label: "IRMÃO", value: 2 },
+    { label: "IRMÃ", value: 2 },
+
+    { label: "outro", value: 4 },
+    { label: "OUTRO", value: 4 },
+]
+
+var dicionarioTurno = [
+    { label: "manhã", value: 1 },
+    { label: "MANHÃ", value: 1 },
+    { label: "matutino", value: 1 },
+    { label: "MATUTINO", value: 1 },
+
+    { label: "tarde", value: 2 },
+    { label: "TARDE", value: 2 },
+    { label: "vespertino", value: 2 },
+    { label: "VESPERTINO", value: 2 },
+
+    { label: "integral", value: 3 },
+    { label: "INTEGRAL", value: 3 },
+
+    { label: "noturno", value: 4 },
+    { label: "NOTURNO", value: 4 },
+    { label: "noite", value: 4 },
+    { label: "NOITE", value: 4 },
+]
 
 async function parsePlanilha(arquivo) {
     readXlsxFile(arquivo).then((rows) => {
         let dadosLinhas = [];
         let cabecalho = rows[0];
+        
         for (let i = 1; i < rows.length; i++) {
             let dado = {}
             for (let j = 0; j < cabecalho.length; j++) {
@@ -135,6 +255,14 @@ async function parsePlanilha(arquivo) {
         let numErros = 0;
 
         alunos = [];
+
+        fuseSexo = new Fuse(dicionarioSexo, { keys: ["label"], includeScore: true })
+        fuseCor = new Fuse(dicionarioCor, { keys: ["label"], includeScore: true })
+        fuseLocalizacao = new Fuse(dicionarioLocalizacao, { keys: ["label"], includeScore: true })
+        fuseNivel = new Fuse(dicionarioNivel, { keys: ["label"], includeScore: true })
+        fuseGrauParentesco = new Fuse(dicionarioGrauParentesco, { keys: ["label"], includeScore: true })
+        fuseTurno = new Fuse(dicionarioTurno, { keys: ["label"], includeScore: true })
+
         for (let linha of dadosLinhas) {
             let alunoJSON = {};
 
@@ -153,63 +281,12 @@ async function parsePlanilha(arquivo) {
                         alunoJSON["data_nascimento"] = moment(linha["OBRIGATORIO_DATA_NASCIMENTO"].trim(), "DD-MM-YYYY").format("DD/MM/YYYY");
                     }
 
-                    var alunoSexo = linha["OBRIGATORIO_SEXO"].toLowerCase().trim();
-                    var alunoCor = linha["OBRIGATORIO_COR"].toLowerCase().trim();
-                    var alunoLocalizacao = linha["OBRIGATORIO_LOCALIZACAO"].toLowerCase().trim();
-                    var alunoNivel = linha["OBRIGATORIO_NIVEL_ENSINO"].toLowerCase().trim();
-                    var alunoTurno = linha["OBRIGATORIO_TURNO_ENSINO"].toLowerCase().trim();
-
-                    if (alunoSexo.includes("masculino")) {
-                        alunoJSON["sexo"] = 1;
-                    } else if (alunoSexo.includes("feminino")) {
-                        alunoJSON["sexo"] = 2;
-                    } else {
-                        alunoJSON["sexo"] = 3;
-                    }
-
-                    if (alunoCor.includes("amarelo")) {
-                        alunoJSON["cor"] = 4;
-                    } else if (alunoCor.includes("branco")) {
-                        alunoJSON["cor"] = 1;
-                    } else if (alunoCor.includes("indígena") || alunoCor.includes("indigena")) {
-                        alunoJSON["cor"] = 5;
-                    } else if (alunoCor.includes("pardo")) {
-                        alunoJSON["cor"] = 3;
-                    } else if (alunoCor.includes("preto")) {
-                        alunoJSON["cor"] = 2;
-                    } else {
-                        alunoJSON["cor"] = 0;
-                    }
-
-                    if (alunoLocalizacao.includes("urbana")) {
-                        alunoJSON["mec_tp_localizacao"] = 1;
-                    } else if (alunoLocalizacao.includes("rural")) {
-                        alunoJSON["mec_tp_localizacao"] = 2;
-                    }
-
-                    if (alunoNivel.includes("infantil")) {
-                        alunoJSON["nivel"] = 1;
-                    } else if (alunoNivel.includes("fundamental")) {
-                        alunoJSON["nivel"] = 2;
-                    } else if (alunoNivel.includes("médio") || alunoNivel.includes("medio")) {
-                        alunoJSON["nivel"] = 3;
-                    } else if (alunoNivel.includes("superior")) {
-                        alunoJSON["nivel"] = 4;
-                    } else if (alunoNivel.includes("outro")) {
-                        alunoJSON["nivel"] = 5;
-                    }
-
-                    if (alunoTurno.includes("manhã") || alunoTurno.includes("manha")) {
-                        alunoJSON["turno"] = 1;
-                    } else if (alunoTurno.includes("tarde")) {
-                        alunoJSON["turno"] = 2;
-                    } else if (alunoTurno.includes("integral")) {
-                        alunoJSON["turno"] = 3;
-                    } else if (alunoTurno.includes("noturno") || alunoTurno.includes("noite")) {
-                        alunoJSON["turno"] = 4;
-                    }
-
-
+                    alunoJSON["sexo"] = fuseSexo.search(linha?.OBRIGATORIO_SEXO)[0]?.item?.value;
+                    alunoJSON["cor"] = fuseCor.search(linha?.OBRIGATORIO_COR)[0]?.item?.value;
+                    alunoJSON["mec_tp_localizacao"] = fuseLocalizacao.search(linha?.OBRIGATORIO_LOCALIZACAO)[0]?.item?.value;
+                    alunoJSON["nivel"] = fuseNivel.search(linha?.OBRIGATORIO_NIVEL_ENSINO)[0]?.item?.value;
+                    alunoJSON["turno"] = fuseTurno.search(linha?.OBRIGATORIO_TURNO_ENSINO)[0]?.item?.value;
+   
                     ////////////////////////////////////////////////////////////
                     // TRATAMENTO DOS CAMPOS OPTATIVOS
                     ////////////////////////////////////////////////////////////
@@ -222,17 +299,8 @@ async function parsePlanilha(arquivo) {
                     }
 
                     if (linha["OPTATIVO_GRAU_PARENTESCO"]) {
-                        let alunoGrauResp = linha["OPTATIVO_GRAU_PARENTESCO"].toLowerCase();
-
-                        if (alunoGrauResp.includes("pai") || alunoGrauResp.includes("mãe") ||
-                            alunoGrauResp.includes("padrasto") || alunoGrauResp.includes("madrasta")) {
-                            alunoJSON["grau_responsavel"] = 0;
-                        } else if (alunoGrauResp.includes("avó") || alunoGrauResp.includes("avô")) {
-                            alunoJSON["grau_responsavel"] = 1;
-                        } else if (alunoGrauResp.includes("irmão") || alunoGrauResp.includes("irmã")) {
-                            alunoJSON["grau_responsavel"] = 2;
-                        } else if (alunoCor.includes("outro")) {
-                            alunoJSON["grau_responsavel"] = 4;
+                        if (fuseGrauParentesco.search(linha.OPTATIVO_GRAU_PARENTESCO)) {
+                            alunoJSON["grau_responsavel"] = fuseGrauParentesco.search(linha.OPTATIVO_GRAU_PARENTESCO)[0]?.item?.value;    
                         } else {
                             alunoJSON["grau_responsavel"] = -1;
                         }
