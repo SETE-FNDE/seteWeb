@@ -146,35 +146,61 @@ $("#finishconfig").on('click', () => {
             "email": $("#regemail").val().trim(),
             "cpf": String($("#regcpf").val()).replace(/\D/g, ''),
             "telefone": $("#regtel").val(),
-            "tipo_permissao": userconfig.get("TIPO_PERMISSAO")
+            "tipo_permissao": userconfig.get("TIPO_PERMISSAO"),
+            "nivel_permissao": userconfig.get("TIPO_PERMISSAO"),
         };
-        
+
+        let precisaMudarSenha = false;
+        let nova_senha = "";
         if ($("#regpassword").val() != senhaAtual) {
             // Precisa mudar a senha
             dadosUsuario["password"] = MD5($("#regpassword").val());
+            precisaMudarSenha = true;
+            nova_senha = $("#regpassword").val();
         } else {
             dadosUsuario["password"] = MD5(senhaAtual);
         }
 
         restImpl.dbPUT(DB_TABLE_USUARIOS, "/" + userconfig.get("ID"), dadosUsuario)
-        .then(() => Swal2.fire({
-            title: "Sucesso!",
-            text: "Usuário alterado com sucesso.",
-            icon: "success",
-            button: "Fechar"
-        }))
-        .then(() => navigateDashboard("./dashboard-main.html"))
-        .catch((err) => {
-            console.log(err);
-            if (err != null) {
-                var errmsg = err.message;
-                if (err.code == "auth/user-not-found") {
-                    errmsg = "Usuário não encontrado."
-                } else if (err.code == "auth/network-request-failed") {
-                    errmsg = "Erro de conexão com a Internet."
+            .then(() => {
+                if (precisaMudarSenha) {
+                    return restImpl.dbPUT(DB_TABLE_USUARIOS, "/alterar-senha",
+                        {
+                            "id_usuario": userconfig.get("ID"),
+                            "senha_atual": MD5(senhaAtual),
+                            "nova_senha": MD5(nova_senha)
+                        })
+                } else {
+                    return true;
                 }
-                errorFn(errmsg)
-            }
-        })
+            })
+            .then(() => {
+                if (precisaMudarSenha) {
+                    let dadoUSUARIO = JSON.parse(userconfig.get("DADO_USUARIO"));
+                    dadoUSUARIO.PASSWORD = nova_senha;
+
+                    userconfig.set("DADO_USUARIO", JSON.stringify(dadoUSUARIO));
+                    userconfig.set("PASSWORD", nova_senha)
+                }
+            })
+            .then(() => Swal2.fire({
+                title: "Sucesso!/",
+                text: "Usuário alterado com sucesso.",
+                icon: "success",
+                button: "Fechar"
+            }))
+            .then(() => navigateDashboard("./dashboard-main.html"))
+            .catch((err) => {
+                console.log(err);
+                if (err != null) {
+                    var errmsg = err.message;
+                    if (err.code == "auth/user-not-found") {
+                        errmsg = "Usuário não encontrado."
+                    } else if (err.code == "auth/network-request-failed") {
+                        errmsg = "Erro de conexão com a Internet."
+                    }
+                    errorFn(errmsg)
+                }
+            })
     }
 });
