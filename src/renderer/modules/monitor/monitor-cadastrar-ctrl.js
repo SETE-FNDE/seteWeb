@@ -21,7 +21,7 @@ $('.money').mask('#.##0,00', { reverse: true });
 
 var validadorFormulario = $("#wizardCadastrarMonitorForm").validate({
     // Estrutura comum de validação dos nossos formulários (mostrar erros, mostrar OK)
-    ...configMostrarResultadoValidacao(),
+    ...templateWizardValidacao(),
     ...{
         rules: {
             regdata: {
@@ -124,7 +124,7 @@ $("#salvarMonitor").on('click', async () => {
                 '', "Ops... CPF duplicado")
         } else {
             if (estaEditando) {
-                loadingFn("Editando o monitor ...")
+                criarModalLoading("Editando o monitor ...")
 
                 try {
                     var novasRotas = new Set($("#tipoRota").val());
@@ -151,7 +151,7 @@ $("#salvarMonitor").on('click', async () => {
                     errorFn("Erro ao atualizar o monitor.", err);
                 }
             } else {
-                loadingFn("Cadastrando o monitor ...")
+                criarModalLoading("Cadastrando o monitor ...")
 
                 try {
                     await restImpl.dbPOST(DB_TABLE_MONITOR, "", monitorJSON);
@@ -217,7 +217,7 @@ function verificaEdicao() {
                     $("#regsalario").trigger('input');
 
                     $("#cancelarAcao").on('click', () => {
-                        cancelDialog()
+                        criarModalConfirmarCancelar()
                             .then((result) => {
                                 if (result.value) {
                                     navigateDashboard(lastPage);

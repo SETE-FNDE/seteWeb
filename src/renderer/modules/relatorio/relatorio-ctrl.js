@@ -178,7 +178,7 @@ $("#btnExpJPEG").on('click', async () => {
     try {
         let imgConteudo = await graficoAtual.dataURI({ scale: 5 })
         window.saveAs(imgConteudo.imgURI)
-        successDialog();
+        criarModalSucesso();
 
         // let link = document.createElement('a');
         // link.download = 'imagemRelatorio.jpeg';

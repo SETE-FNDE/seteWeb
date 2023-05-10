@@ -71,7 +71,7 @@ mapaOL.on('singleclick', function (evt) {
 
 var validadorFormulario = $("#wizardCadastrarFornecedorForm").validate({
     // Estrutura comum de validação dos nossos formulários (mostrar erros, mostrar OK)
-    ...configMostrarResultadoValidacao(),
+    ...templateWizardValidacao(),
     ...{
         rules: {
             regnome: {
@@ -150,11 +150,11 @@ $("#salvarfornecedor").on('click', () => {
         let promessaInsercaoDados;
 
         if (estaEditando) {
-            loadingFn("Editando o fornecedor ...")
+            criarModalLoading("Editando o fornecedor ...")
 
             promessaInsercaoDados = restImpl.dbPUT(DB_TABLE_FORNECEDOR, `/${estadoFornecedor.ID}`, fornecedorJSON);
         } else {
-            loadingFn("Cadastrando o fornecedor ...")
+            criarModalLoading("Cadastrando o fornecedor ...")
 
             promessaInsercaoDados = restImpl.dbPOST(DB_TABLE_FORNECEDOR, "", fornecedorJSON);
         }
@@ -187,7 +187,7 @@ if (estaEditando) {
         $(".cnpj").trigger('input');
     
         $("#cancelarAcao").on('click', () => {
-            cancelDialog()
+            criarModalConfirmarCancelar()
                 .then((result) => {
                     if (result.value) {
                         navigateDashboard(lastPage);

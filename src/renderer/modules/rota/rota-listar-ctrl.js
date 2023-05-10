@@ -101,7 +101,7 @@ var dataTablesRotas = $("#datatables").DataTable({
 
                                     Promise.all(promiseArray)
                                         .then(() => {
-                                            successDialog(text = msgConclusao);
+                                            criarModalSucesso(text = msgConclusao);
                                             dataTablesRotas.rows('.selected').remove();
                                             dataTablesRotas.draw();
                                         })
@@ -176,7 +176,7 @@ dataTablesRotas.on('click', '.rotaRemove', function () {
     let $tr = getRowOnClick(this);
     estadoRota = dataTablesRotas.row($tr).data();
     action = "apagarRota";
-    confirmDialog("Remover essa rota?",
+    criarModalConfirmacaoAcao("Remover essa rota?",
         "Ao remover essa rota ela será retirado do sistema e os alunos e "
         + "escolas que possuir vínculo deverão ser rearranjadas novamente."
     ).then((res) => {

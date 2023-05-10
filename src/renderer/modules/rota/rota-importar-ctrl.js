@@ -199,7 +199,7 @@ var completeForm = () => {
 }
 
 $('#rota-salvar-rota').on('click', () => {
-    loadingFn("Importando o percurso da Rota");
+    criarModalLoading("Importando o percurso da Rota");
 
     let idRota = $("#listarota").val();
     let shape = JSON.parse(new ol.format.GeoJSON().writeFeatures(malhaSource.getFeatures()));

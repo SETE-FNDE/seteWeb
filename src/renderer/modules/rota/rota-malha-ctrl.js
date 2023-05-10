@@ -35,7 +35,7 @@ way['highway']['highway'!='footway']['highway'!='pedestrian']['-highway'!='path'
 relation['highway']['highway'!='footway']['highway'!='pedestrian']['-highway'!='path'](${latstr});)
 ;(._;>;);out meta;`
 
-    loadingFn("Baixando a malha...", "Aguarde alguns minutinhos...");
+    criarModalLoading("Baixando a malha...", "Aguarde alguns minutinhos...");
     http.get(url, function (response) {
         if (response.statusCode != 200) {
             errorFn("Erro ao baixar a malha")
@@ -72,7 +72,7 @@ $("#baixarMalha").on('click', () => {
 });
 
 $('#rota-malha-salvarNovaMalha').on('click', () => {
-    loadingFn("Processando a malha...")
+    criarModalLoading("Processando a malha...")
 
     let osmFilePath = $("#novaMalhaOSM")[0].files[0].path;
     ipcRenderer.send('start:malha-update', osmFilePath);
@@ -81,7 +81,7 @@ $('#rota-malha-salvarNovaMalha').on('click', () => {
 if (isElectron) {
     ipcRenderer.on("end:malha-update", function (event, status) {
         if (status) {
-            successDialog("Malha atualizada com sucesso",
+            criarModalSucesso("Malha atualizada com sucesso",
                 "Clique em OK para retornar a visão geral do sistema.")
         } else {
             errorFn("Erro ao atualizar a malha")

@@ -176,7 +176,7 @@ function editarEscola(escolaID) {
 }
 // Rotina para remover escola (verifica se usuário tem ctz antes)
 function removerEscola(escolaID) {
-    return confirmDialog('Remover essa escola?',
+    return criarModalConfirmacaoAcao('Remover essa escola?',
         "Ao remover esse escola, ela será retirada do sistema das rotas e os alunos perderão o vínculo com a mesma no sistema."
     ).then((result) => {
         let listaPromisePraRemover = [];
@@ -314,7 +314,7 @@ function editarAluno(alunoID) {
 }
 // Rotina para remover aluno (verifica se usuário tem ctz antes)
 function removerAluno(alunoID) {
-    return confirmDialog('Remover esse aluno?',
+    return criarModalConfirmacaoAcao('Remover esse aluno?',
         "Ao remover esse aluno, ele será retirado do sistema das rotas e das escolas que possuir vínculo."
     ).then((result) => {
         let listaPromisePraRemover = [];
@@ -513,7 +513,7 @@ $("#btnExpJPEG").on('click', () => {
         domtoimage.toBlob(document.getElementById("mapaCanvas"))
             .then(function (blob) {
                 window.saveAs(blob, 'mapa-escola.png');
-                successDialog();
+                criarModalSucesso();
             });
     }
 

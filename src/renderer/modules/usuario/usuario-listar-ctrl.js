@@ -59,7 +59,7 @@ dataTablesUsuario.on('click', '.usuarioRemove', function () {
     }
 
     action = "apagarUsuario";
-    confirmDialog('Remover esse usuário?',
+    criarModalConfirmacaoAcao('Remover esse usuário?',
                   "Ao confirmar essa operação não será mais possível desfazer a exclusão.",
     ).then(async (result) => {
         let listaPromisePraRemover = []
@@ -97,7 +97,7 @@ var errorFnUsuario = (err) => {
 // Botão para tratar caso de inserção de usuário
 $("#btIncluirUsuario").on('click', () => navigateDashboard("./modules/usuario/usuario-cadastrar-view.html"))
 
-loadingFn("Buscando os usuários...")
+criarModalLoading("Buscando os usuários...")
 
 restImpl.dbGETColecao(DB_TABLE_USUARIOS)
 .then((usuarios) => processaUsuarios(usuarios))

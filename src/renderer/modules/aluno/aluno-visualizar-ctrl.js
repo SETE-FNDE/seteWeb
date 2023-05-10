@@ -43,7 +43,7 @@ function editarAluno(alunoID) {
 }
 // Rotina para remover aluno (verifica se usuário tem ctz antes)
 function removerAluno(alunoID) {
-    return confirmDialog('Remover esse aluno?',
+    return criarModalConfirmacaoAcao('Remover esse aluno?',
         "Ao remover esse aluno, ele será retirado do sistema das rotas e das escolas que possuir vínculo."
     ).then((result) => {
         let listaPromisePraRemover = [];
@@ -338,7 +338,7 @@ $("#btnExpJPEG").on('click', () => {
         domtoimage.toBlob(document.getElementById("mapaCanvas"))
             .then(function (blob) {
                 window.saveAs(blob, 'mapa-aluno.png');
-                successDialog();
+                criarModalSucesso();
             });
     }
 

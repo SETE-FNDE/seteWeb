@@ -120,7 +120,7 @@ var processarGaragem = async (res) => {
 
 var validadorFormulario = $("#wizardCadastrarGaragemForm").validate({
     // Estrutura comum de validação dos nossos formulários (mostrar erros, mostrar OK)
-    ...configMostrarResultadoValidacao(),
+    ...templateWizardValidacao(),
     ...{
         rules: {
             reglat: {
@@ -173,13 +173,13 @@ $("#salvargaragem").on('click', () => {
         garagemJSON["loc_cep"] = $("#regcep").val();
 
         if (action == "editarGaragem") {
-            loadingFn("Atualizando os dados da garagem...")
+            criarModalLoading("Atualizando os dados da garagem...")
 
             restImpl.dbPUT(DB_TABLE_GARAGEM, `/${idGaragem}`, garagemJSON)
                 .then(() => completeForm())
                 .catch((err) => errorFn("Erro ao atualizar a escola.", err))
         } else {
-            loadingFn("Cadastrando a garagem ...")
+            criarModalLoading("Cadastrando a garagem ...")
 
             restImpl.dbPOST(DB_TABLE_GARAGEM, "", garagemJSON)
                 .then(() => completeForm())
@@ -189,7 +189,7 @@ $("#salvargaragem").on('click', () => {
 });
 
 $("#cancelarAcao").on('click', () => {
-    cancelDialog()
+    criarModalConfirmarCancelar()
         .then((result) => {
             if (result.value) {
                 action = "visualizarGaragem";

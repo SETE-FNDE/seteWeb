@@ -254,7 +254,7 @@ var configTable = {
             className: "btnApagar",
             action: function (e, dt, node, config) {
                 action = "apagarRota";
-                confirmDialog("Remover essa rota?",
+                criarModalConfirmacaoAcao("Remover essa rota?",
                     "Ao remover essa rota ela será retirado do sistema e os alunos e "
                     + "escolas que possuir vínculo deverão ser rearranjadas novamente."
                 ).then((res) => {
@@ -472,7 +472,7 @@ estadoRota["ESCOLAS"].forEach(escola => {
 
 restImpl.dbGETEntidade(DB_TABLE_ROTA, `/${estadoRota.ID}`)
     .then((rotaRaw) => {
-        loadingFn("Carregando...")
+        criarModalLoading("Carregando...")
 
         let detalhesDaRota = parseRotaDBREST(rotaRaw);
         Object.assign(estadoRota, detalhesDaRota);

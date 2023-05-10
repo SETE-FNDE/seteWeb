@@ -94,7 +94,7 @@ $("#importarEscolasBtn").on('click', () => {
                                      .then(() => updateProgress()))
                 })
                 return Promise.all(promiseArray)
-                       .then(() => successDialog(text = "As escolas foram importadas com sucesso."))
+                       .then(() => criarModalSucesso(text = "As escolas foram importadas com sucesso."))
             }
         })
         .catch((err) => {

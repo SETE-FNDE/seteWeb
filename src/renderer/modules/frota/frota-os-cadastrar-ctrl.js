@@ -14,7 +14,7 @@ var antFornecedor;
 
 var validadorFormulario = $("#wizardCadastrarOSForm").validate({
     // Estrutura comum de validação dos nossos formulários (mostrar erros, mostrar OK)
-    ...configMostrarResultadoValidacao(),
+    ...templateWizardValidacao(),
     ...{
         rules: {
             tipoServico: {
@@ -96,14 +96,14 @@ $("#salvaros").click(() => {
             osJSON["termino"] = estadoOS["TERMINO"]
             let osID = estadoOS["ID"]
             
-            loadingFn("Atualizando a ordem de serviço ...")
+            criarModalLoading("Atualizando a ordem de serviço ...")
 
             dbAtualizarPromise(DB_TABLE_ORDEM_DE_SERVICO, osJSON, osID)
             .then(() => dbAtualizaVersao())
             .then(() => completeForm())
             .catch((err) => errorFn("Erro ao atualizar a ordem de serviço.", err))
         } else {
-            loadingFn("Cadastrando a ordem de serviço ...")
+            criarModalLoading("Cadastrando a ordem de serviço ...")
 
             restImpl.dbPOST(DB_TABLE_ORDEM_DE_SERVICO, "", osJSON)
             .then(() => completeForm())
@@ -151,7 +151,7 @@ var verificaEdicao = () => {
         PopulateOSFromState(estadoOS);
 
         $("#cancelarAcao").click(() => {
-            cancelDialog()
+            criarModalConfirmarCancelar()
             .then((result) => {
                 if (result.value) {
                     navigateDashboard(lastPage);

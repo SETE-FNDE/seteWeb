@@ -65,7 +65,7 @@ var dataTableVeiculo = $("#dataTableDadosVeiculo").DataTable({
             className: "btnApagar",
             action: function(e, dt, node, config) {
                 action = "apagarVeiculo";
-                confirmDialog("Remover esse veículo?",
+                criarModalConfirmacaoAcao("Remover esse veículo?",
                   "Ao remover esse veículo ele será retirado do sistema das "
                 + "rotas e das escolas que possuir vínculo."
                 ).then((res) => {

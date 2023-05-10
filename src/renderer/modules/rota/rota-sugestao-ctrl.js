@@ -64,7 +64,7 @@ function startTool() {
         }).then(() => navigateDashboard(lastPage))
     } else {
         // Rodando no electron
-        loadingFn("Preparando a ferramenta")
+        criarModalLoading("Preparando a ferramenta")
         loadOSMFile()
         .then(dataOSM => convertOSMToGeoJSON(dataOSM))
         .then(osmGeoJSON => plotMalha(osmGeoJSON))
@@ -935,7 +935,7 @@ mapaRotaGerada["map"].addOverlay(popup);
 
 // Trigger para Iniciar Simulação
 function initSimulation() {
-    loadingFn("Simulando...")
+    criarModalLoading("Simulando...")
 
     // Juntar dados em um objeto
     let routeGenerationInputData = {

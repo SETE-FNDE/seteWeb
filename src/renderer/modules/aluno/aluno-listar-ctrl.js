@@ -77,7 +77,7 @@ var defaultTableConfig = {
 
                                 Promise.all(promiseArray)
                                 .then((res) => {
-                                    successDialog(text = msgConclusao);
+                                    criarModalSucesso(text = msgConclusao);
                                     dataTablesAlunos.rows('.selected').remove();
                                     dataTablesAlunos.draw();
 
@@ -205,7 +205,7 @@ dataTablesAlunos.on('click', '.alunoRemove', function () {
 
     estadoAluno = dataTablesAlunos.row($tr).data();
     action = "apagarAluno";
-    confirmDialog('Remover esse aluno?',
+    criarModalConfirmacaoAcao('Remover esse aluno?',
         "Ao remover esse aluno ele será retirado do sistema das rotas " +
         "e das escolas que possuir vínculo."
     ).then((result) => {

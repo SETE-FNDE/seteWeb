@@ -100,7 +100,7 @@ var dataTablesMotoristas = $("#datatables").DataTable({
 
                                 Promise.all(promiseArray)
                                 .then(() => {
-                                    successDialog(text = msgConclusao);
+                                    criarModalSucesso(text = msgConclusao);
                                     dataTablesMotoristas.rows('.selected').remove();
                                     dataTablesMotoristas.draw();
                                 })
@@ -176,7 +176,7 @@ dataTablesMotoristas.on('click', '.motoristaRemove', function () {
     var idMotorista = estadoMotorista["CPF"];
 
     action = "apagarMotorista";
-    confirmDialog('Remover esse motorista?',
+    criarModalConfirmacaoAcao('Remover esse motorista?',
                   "Ao remover esse motorista ele será retirado do sistema das  " + 
                   "rotas e das escolas que possuir vínculo."
     ).then((res) => {

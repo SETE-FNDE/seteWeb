@@ -93,7 +93,7 @@ var dataTablesFornecedores = $("#datatables").DataTable({
 
                                 Promise.all(promiseArray)
                                 .then(() => {
-                                    successDialog(text = msgConclusao);
+                                    criarModalSucesso(text = msgConclusao);
                                     dataTablesFornecedores.rows('.selected').remove();
                                     dataTablesFornecedores.draw();
                                 })
@@ -162,7 +162,7 @@ dataTablesFornecedores.on('click', '.fornecedorRemove', function () {
     var idFornecedor = estadoFornecedor["ID"];
 
     action = "apagarFornecedor";
-    confirmDialog('Remover esse fornecedor?',
+    criarModalConfirmacaoAcao('Remover esse fornecedor?',
                   "Ao remover esse fornecedor ele será retirado do sistema e dos " +
                   "serviços que possuir vínculo."
     ).then((res) => {

@@ -90,7 +90,7 @@ $("#regcidade").trigger("change");
 // Validador
 var validadorFormulario = $("#wizardCadastrarEscolaForm").validate({
     // Estrutura comum de validação dos nossos formulários (mostrar erros, mostrar OK)
-    ...configMostrarResultadoValidacao(),
+    ...templateWizardValidacao(),
     ...{
         rules: {
             reglat: {
@@ -270,7 +270,7 @@ if (estaEditando) {
 
             // Adiciona ação de cancelamento
             $("#cancelarAcao").on('click', () => {
-                cancelDialog()
+                criarModalConfirmarCancelar()
                     .then((result) => {
                         if (result.value) {
                             navigateDashboard(lastPage);
@@ -296,13 +296,13 @@ $("#salvarescola").on('click', () => {
         if (estaEditando) {
             var idEscola = estadoEscola["ID"];
 
-            loadingFn("Atualizando os dados da escola...")
+            criarModalLoading("Atualizando os dados da escola...")
             
             restImpl.dbPUT(DB_TABLE_ESCOLA, "/" + idEscola, escolaJSON)
             .then(() => completeForm())
             .catch((err) => errorFn("Erro ao atualizar a escola.", err))
         } else {
-            loadingFn("Cadastrando a escola ...")
+            criarModalLoading("Cadastrando a escola ...")
 
             restImpl.dbPOST(DB_TABLE_ESCOLA, "", escolaJSON)
             .then(() => completeForm())

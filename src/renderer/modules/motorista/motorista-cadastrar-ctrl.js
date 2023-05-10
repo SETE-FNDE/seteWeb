@@ -22,7 +22,7 @@ $('.money').mask('#.##0,00', { reverse: true });
 
 var validadorFormulario = $("#wizardCadastrarMotoristaForm").validate({
     // Estrutura comum de validação dos nossos formulários (mostrar erros, mostrar OK)
-    ...configMostrarResultadoValidacao(),
+    ...templateWizardValidacao(),
     ...{
         rules: {
             regdata: {
@@ -235,7 +235,7 @@ function verificaEdicao() {
                     $("#regsalario").trigger('input');
 
                     $("#cancelarAcao").on('click', () => {
-                        cancelDialog()
+                        criarModalConfirmarCancelar()
                             .then((result) => {
                                 if (result.value) {
                                     navigateDashboard(lastPage);

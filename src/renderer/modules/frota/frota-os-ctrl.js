@@ -98,7 +98,7 @@ var dataTablesOS = $("#datatables").DataTable({
 
                                     return Promise.all(promiseArray)
                                         .then(() => {
-                                            successDialog(text = msgConclusao);
+                                            criarModalSucesso(text = msgConclusao);
                                             dataTablesOS.rows('.selected').remove();
                                             dataTablesOS.draw();
                                         })
@@ -241,7 +241,7 @@ dataTablesOS.on('click', '.osRemove', function () {
     var idOS = estadoOS["ID"];
 
     action = "apagarOS";
-    confirmDialog("Remover essa ordem de serviço?", "Deseja prosseguir?")
+    criarModalConfirmacaoAcao("Remover essa ordem de serviço?", "Deseja prosseguir?")
         .then((res) => {
             let listaPromisePraRemover = []
             if (res.value) {

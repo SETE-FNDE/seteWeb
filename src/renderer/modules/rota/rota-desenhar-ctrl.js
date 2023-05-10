@@ -1005,7 +1005,7 @@ $("#rota-malha-salvarNovaMalha").on('click', () => {
 });
 
 $("#cancelarAcao").on('click', () => {
-    cancelDialog()
+    criarModalConfirmarCancelar()
         .then((result) => {
             if (result.value) {
                 navigateDashboard(lastPage);
