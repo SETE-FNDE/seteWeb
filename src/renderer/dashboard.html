@@ -3,8 +3,8 @@
 
 <head>
     <meta charset="utf-8" />
-    <meta name='viewport'
-        content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no' />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 
     <title>SETE Software Eletrônico de Gestão do Transporte Escolar</title>
@@ -32,19 +32,19 @@
     <link rel="stylesheet" href="css/light-bootstrap-dashboard.css?v=2.0.1" />
     <link rel="stylesheet" href="css/dashboard.css" />
     <link rel="stylesheet" href="css/custo.css" />
-    <link rel="stylesheet" href="css/ol-fixes.css">
+    <link rel="stylesheet" href="css/ol-fixes.css" />
     <link rel="stylesheet" href="css/fixes.css" />
-    <link rel="stylesheet" href="css/datatables.fixes.css">
+    <link rel="stylesheet" href="css/datatables.fixes.css" />
     <link rel="stylesheet" href="css/network.css" />
 
     <!-- Icons -->
-    <link rel="apple-touch-icon" sizes="76x76" href="img/icones/setelogosmall.png">
-    <link rel="icon" type="image/png" href="img/icones/setelogosmall.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="img/icones/setelogosmall.png" />
+    <link rel="icon" type="image/png" href="img/icones/setelogosmall.png" />
 </head>
 
 <body class="bgentry">
     <div class="preload">
-        <img src="img/icones/loading-gears2.gif">
+        <img src="img/icones/loading-gears2.gif" />
     </div>
 
     <div class="wrapper">
@@ -61,42 +61,29 @@
             <footer id="footer" class="footer p-1"></footer>
         </div>
     </div>
-
 </body>
+
+<!--                                                                 -->
 <!-- Carregamento das bibliotecas núcleo (diferente no Electron/Web) -->
-<script>
-    // Verifica se estamos ou não no Electron
-    var isElectron = window.process != null;
+<!--                                                                 -->
+<script src="../../node_modules/jquery/dist/jquery.min.js"></script>
+<script src="../../node_modules/tether/dist/js/tether.js"></script>
+<script src="js/core/popper.min.js"></script>
+<script src="js/core/bootstrap.min.js"></script>
+<script src="../../node_modules/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="../../node_modules/jquery-mask-plugin/dist/jquery.mask.min.js"></script>
 
-    if (isElectron) {
-        // Carregamento via require
-        
-        // Bibliotecas Básicas do JS
-        window.$ = window.jQuery = require("jquery");
-        window.Tether = require("tether");
-        window.Bootstrap = require("bootstrap");
+<!-- SweetAlert (Alertas) e Axios (HTTP) -->
+<script src="../../node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
+<script src="../../node_modules/axios/dist/axios.min.js"></script>
 
-        require("jquery-validation");
-        require("jquery-mask-plugin");
-    } else {
-        // Carregamento normal
-        document.write('<script src="../../node_modules/jquery/dist/jquery.min.js"><\/script>');
-        document.write('<script src="../../node_modules/tether/dist/js/tether.js"><\/script>');
-        document.write('<script src="../../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"><\/script>');
-        document.write('<script src="../../node_modules/jquery-validation/dist/jquery.validate.min.js"><\/script>');
-        document.write('<script src="../../node_modules/jquery-mask-plugin/dist/jquery.mask.min.js"><\/script>');
-    }
+<!-- Variáveis básicas do SETE (REST_URL, SUPORTE_URL, etc) -->
+<script src="../../config.js"></script>
+<script src="js/common.js"></script>
 
-    // SweetAlert (Alertas), Axios (HTTP) e Versão do sistema
-    document.write('<script src="../../node_modules/sweetalert2/dist/sweetalert2.all.min.js"><\/script>');
-    document.write('<script src="../../node_modules/axios/dist/axios.min.js"><\/script>');
-    document.write('<script src="../../node_modules/platform/platform.js"><\/script>');
-
-    // Bibliotecas adicionais específicas
-    document.write('<script src="js/common.js"><\/script>');
-</script>
-
+<!--                                                                 -->
 <!-- Bibliotecas comuns -->
+<!--                                                                 -->
 
 <!-- Inputs adicionais (Validação, MD5) -->
 <script src="../../node_modules/jquery-validation/dist/additional-methods.js"></script>
@@ -132,15 +119,7 @@
 <script src="../../node_modules/jsts/dist/jsts.js"></script>
 <script src="../../node_modules/turf/turf.min.js"></script>
 <script src="../../node_modules/@mapbox/togeojson/togeojson.js"></script>
-
-<script>
-    // Verifica se estamos ou não no Electron
-    if (isElectron) {
-        document.write('<script src="js/geo_libs.js"><\/script>');
-    } else {
-        document.write('<script src="js/geo_browser.js"><\/script>');
-    }
-</script>
+<script src="js/geo_browser.js"></script>
 
 <!-- Plugins -->
 <script src="js/plugins/js-brasil.js"></script>
@@ -158,16 +137,8 @@
 <script src="js/pdf-utils.js"></script>
 
 <!-- Parsers -->
-<script>
-    // Verifica se estamos ou não no Electron
-    if (isElectron) {
-        var Papa = require("papaparse");
-        var readXlsxFile = require('read-excel-file/node');
-    } else {
-        document.write('<script src="../../node_modules/papaparse/papaparse.min.js"><\/script>');
-        document.write('<script src="../../node_modules/read-excel-file/bundle/read-excel-file.min.js"><\/script>');
-    }
-</script>
+<script src="../../node_modules/papaparse/papaparse.min.js"></script>
+<script src="../../node_modules/read-excel-file/bundle/read-excel-file.min.js"></script>
 
 <!--  Chartist Plugin  -->
 <script src="js/plugins/chartist.min.js"></script>
@@ -197,18 +168,23 @@
 <script src="../../node_modules/jspdf/dist/jspdf.umd.min.js"></script>
 <script src="../../node_modules/file-saver/dist/FileSaver.min.js"></script>
 
-
 <!-- MathJax -->
 <script type="text/javascript">
     MathJax = {
         tex: {
-            inlineMath: [['$', '$'], ['\\(', '\\)']],
-            displayMath: [['$$', '$$'], ['\[', '\]']],
-            processEscapes: true
+            inlineMath: [
+                ["$", "$"],
+                ["\\(", "\\)"],
+            ],
+            displayMath: [
+                ["$$", "$$"],
+                ["\[", "\]"],
+            ],
+            processEscapes: true,
         },
         svg: {
-            fontCache: 'global'
-        }
+            fontCache: "global",
+        },
     };
 </script>
 
@@ -223,4 +199,5 @@
         $("#footer").load("footer.html");
     });
 </script>
+
 </html>
