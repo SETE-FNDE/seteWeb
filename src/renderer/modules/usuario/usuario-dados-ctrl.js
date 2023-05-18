@@ -133,8 +133,8 @@ $(function () {
 $("#finishconfig").on('click', () => {
     // Verifica se está válido
     var valido = validadorFormulario.valid();
-
-    if (valido) {
+    
+    if (valido && $("#regpassword").val().length >= 6) {
         loadingFn("Atualizando o cadastro...")
 
         // Pega o ID e usuário do firebase
@@ -146,7 +146,7 @@ $("#finishconfig").on('click', () => {
             "email": $("#regemail").val().trim(),
             "cpf": String($("#regcpf").val()).replace(/\D/g, ''),
             "telefone": $("#regtel").val(),
-            "tipo_permissao": userconfig.get("TIPO_PERMISSAO"),
+            // "tipo_permissao": userconfig.get("TIPO_PERMISSAO"),
             "nivel_permissao": userconfig.get("TIPO_PERMISSAO"),
         };
 
@@ -162,18 +162,18 @@ $("#finishconfig").on('click', () => {
         }
 
         restImpl.dbPUT(DB_TABLE_USUARIOS, "/" + userconfig.get("ID"), dadosUsuario)
-            .then(() => {
-                if (precisaMudarSenha) {
-                    return restImpl.dbPUT(DB_TABLE_USUARIOS, "/alterar-senha",
-                        {
-                            "id_usuario": userconfig.get("ID"),
-                            "senha_atual": MD5(senhaAtual),
-                            "nova_senha": MD5(nova_senha)
-                        })
-                } else {
-                    return true;
-                }
-            })
+            // .then(() => {
+            //     if (precisaMudarSenha) {
+            //         return restImpl.dbPUT(DB_TABLE_USUARIOS, "/alterar-senha",
+            //             {
+            //                 "id_usuario": userconfig.get("ID"),
+            //                 "senha_atual": MD5(senhaAtual),
+            //                 "nova_senha": MD5(nova_senha)
+            //             })
+            //     } else {
+            //         return true;
+            //     }
+            // })
             .then(() => {
                 if (precisaMudarSenha) {
                     let dadoUSUARIO = JSON.parse(userconfig.get("DADO_USUARIO"));
@@ -202,5 +202,7 @@ $("#finishconfig").on('click', () => {
                     errorFn(errmsg)
                 }
             })
+    } else {
+        errorFn("Dados incompletos. ", "Dados incompletos. ");
     }
 });
