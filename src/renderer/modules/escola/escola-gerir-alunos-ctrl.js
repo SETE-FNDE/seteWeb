@@ -13,14 +13,15 @@ var naoAtendidosPorNenhuma = new Set();
 var mostrarNaoAtendidosPorNenhuma = false;
 
 // Filtros
-$('#alunosOutros').textFilter($('#filtroOutrosAlunos'));
-$('#alunosAtendidos').textFilter($('#filtroTxtAtendidos'));
+$("#alunosOutros").textFilter($("#filtroOutrosAlunos"));
+$("#alunosAtendidos").textFilter($("#filtroTxtAtendidos"));
 
 // Título da escola sendo gerida
 $(".tituloSecao span").text(estadoEscola["NOME"]);
 
 // Funções que lidam com alunos não atendidos por nenhuma escola
 $("#mostrarApenasSem").on("click", () => {
+    let totalAlunos = 0;
     mostrarNaoAtendidosPorNenhuma = !mostrarNaoAtendidosPorNenhuma;
     if (mostrarNaoAtendidosPorNenhuma) {
         let outrosOptions = $("#alunosOutros").find("option");
@@ -28,6 +29,8 @@ $("#mostrarApenasSem").on("click", () => {
             let opt = outrosOptions[i];
             if (!naoAtendidosPorNenhuma.has(opt.value)) {
                 $(opt).hide();
+            } else {
+                totalAlunos++;
             }
         });
     } else {
@@ -35,9 +38,12 @@ $("#mostrarApenasSem").on("click", () => {
         $.each(outrosOptions, function (i) {
             let opt = outrosOptions[i];
             $(opt).show();
+            totalAlunos++;
         });
     }
-})
+
+    $("#totalNumAlunosRestantes").text(totalAlunos);
+});
 
 async function carregarDados() {
     try {
@@ -80,17 +86,17 @@ async function carregarDados() {
         console.log("ERROR", err);
     }
 
-    return Promise.resolve(listaDeAlunos)
+    return Promise.resolve(listaDeAlunos);
 }
 
 carregarDados()
     .then(() => adicionaDadosNaTela())
-    .catch(err => errorFn("Erro ao detalhar alunos atendidos pela escola: " + estadoEscola["NOME"], err))
+    .catch((err) => errorFn("Erro ao detalhar alunos atendidos pela escola: " + estadoEscola["NOME"], err));
 
 // Adiciona dados na tela
 var adicionaDadosNaTela = () => {
     // Alunos atendidos por esta escola
-    let alunosAtendidos = []
+    let alunosAtendidos = [];
     for (aID of antAlunosAtendidos) {
         alunosAtendidos.push(listaDeAlunos.get(aID));
     }
@@ -99,48 +105,71 @@ var adicionaDadosNaTela = () => {
     alunosAtendidos.forEach((aluno) => {
         let aID = aluno["ID"];
         let aNome = aluno["NOME"].toUpperCase();
-        $('#alunosAtendidos').append(`<option value="${aID}">${aNome}</option>`);
-    })
+        $("#alunosAtendidos").append(`<option value="${aID}">${aNome}</option>`);
+    });
 
     // Alunos atendidos por outras escolas
-    let outrosAlunos = []
+    let outrosAlunos = [];
 
     for (aID of atendidoPorOutraEscola) {
         outrosAlunos.push(listaDeAlunos.get(aID));
     }
 
-    outrosAlunos = outrosAlunos.sort((a, b) => a["NOME"].toLowerCase().localeCompare(b["NOME"].toLowerCase(), "pt-BR"))
+    outrosAlunos = outrosAlunos.sort((a, b) => a["NOME"].toLowerCase().localeCompare(b["NOME"].toLowerCase(), "pt-BR"));
     outrosAlunos.forEach((aluno) => {
         let aID = aluno["ID"];
         let aNome = aluno["NOME"].toUpperCase();
-        $('#alunosOutros').append(`<option value="${aID}">${aNome}</option>`);
-    })
+        $("#alunosOutros").append(`<option value="${aID}">${aNome}</option>`);
+    });
+
+    $("#totalNumAlunosRestantes").text(atendidoPorOutraEscola.size);
+    $("#totalNumAlunosAtendidos").text(novoAlunosAtendidos.size);
+};
+
+$("#colocarAluno").on("click", () => {
+    for (var aID of $("#alunosOutros").val()) {
+        var aNome = $(`#alunosOutros option[value="${aID}"]`).text();
+        $(`#alunosOutros option[value="${aID}"]`).remove();
+        $("#alunosAtendidos").append(`<option value="${aID}">${aNome}</option>`);
+        novoAlunosAtendidos.add(aID);
+        atendidoPorOutraEscola.delete(aID);
+    }
+
+    $("#totalNumAlunosRestantes").text(atendidoPorOutraEscola.size);
+    $("#totalNumAlunosAtendidos").text(novoAlunosAtendidos.size);
+
+    ordenarOptions(document.getElementById("alunosAtendidos"));
+    ordenarOptions(document.getElementById("alunosOutros"));
+
+});
+
+$("#tirarAluno").on("click", () => {
+    for (var aID of $("#alunosAtendidos").val()) {
+        var aNome = $(`#alunosAtendidos option[value="${aID}"]`).text();
+        $(`#alunosAtendidos option[value="${aID}"]`).remove();
+        $("#alunosOutros").append(`<option value="${aID}">${aNome}</option>`);
+        novoAlunosAtendidos.delete(aID);
+        atendidoPorOutraEscola.add(aID);
+    }
+
+    $("#totalNumAlunosRestantes").text(atendidoPorOutraEscola.size);
+    $("#totalNumAlunosAtendidos").text(novoAlunosAtendidos.size);
+
+    ordenarOptions(document.getElementById("alunosAtendidos"));
+    ordenarOptions(document.getElementById("alunosOutros"));
+});
+
+// https://stackoverflow.com/questions/278089/javascript-to-sort-contents-of-select-element
+function ordenarOptions(selectNode) {
+    const optionNodes = Array.from(selectNode.children);
+    const comparator = new Intl.Collator("pt-BR").compare;
+
+    optionNodes.sort((a, b) => comparator(a.textContent, b.textContent));
+    optionNodes.forEach((option) => selectNode.appendChild(option));
 }
 
-$("#colocarAluno").on('click', () => {
-    for (var aID of $("#alunosOutros").val()) {
-        var aNome = $(`option[value="${aID}"]`).text();
-        $(`option[value="${aID}"]`).remove();
-        $('#alunosAtendidos').append(`<option value="${aID}">${aNome}</option>`);
-        novoAlunosAtendidos.add(aID);
-    }
-
-    $("#totalNumAlunos").text($("#alunosAtendidos option").length);
-});
-
-$("#tirarAluno").on('click', () => {
-    for (var aID of $("#alunosAtendidos").val()) {
-        var aNome = $(`option[value="${aID}"]`).text();
-        $(`option[value="${aID}"]`).remove();
-        $('#alunosOutros').append(`<option value="${aID}">${aNome}</option>`);
-        novoAlunosAtendidos.delete(aID);
-    }
-
-    $("#totalNumAlunos").text($("#alunosAtendidos option").length);
-});
-
 // Salvar alunos
-$("#btnSalvar").on('click', async () => {
+$("#btnSalvar").on("click", async () => {
     Swal2.fire({
         title: "Aguarde, fazendo alteração nos dados da escola...",
         imageUrl: "img/icones/processing.gif",
@@ -155,10 +184,10 @@ $("#btnSalvar").on('click', async () => {
                  style="width: 0%;">
             </div>
         </div>
-        `
-    })
-    let alunosAdicionar = new Set([...novoAlunosAtendidos].filter(x => !antAlunosAtendidos.has(x)));
-    let alunosRemover = new Set([...antAlunosAtendidos].filter(x => !novoAlunosAtendidos.has(x)));
+        `,
+    });
+    let alunosAdicionar = new Set([...novoAlunosAtendidos].filter((x) => !antAlunosAtendidos.has(x)));
+    let alunosRemover = new Set([...antAlunosAtendidos].filter((x) => !novoAlunosAtendidos.has(x)));
 
     // Número de operações a serem realizadas (barra de progresso)
     var totalOperacoes = alunosAdicionar.size + alunosAdicionar.size + alunosRemover.size;
@@ -166,9 +195,9 @@ $("#btnSalvar").on('click', async () => {
 
     function updateProgresso() {
         progresso++;
-        let progressoPorcentagem = Math.round(100 * (progresso / totalOperacoes))
-        $('.progress-bar').css('width', progressoPorcentagem + "%")
-        $('.progress-bar').text(progressoPorcentagem + "%")
+        let progressoPorcentagem = Math.round(100 * (progresso / totalOperacoes));
+        $(".progress-bar").css("width", progressoPorcentagem + "%");
+        $(".progress-bar").text(progressoPorcentagem + "%");
     }
 
     // Primeiro, remover relações que mudaram, isto é, tirar as escolas antigas dos alunos que vão entrar e daqueles que sairam
@@ -189,45 +218,48 @@ $("#btnSalvar").on('click', async () => {
     let novosAlunosParaEscola = [];
     alunosAdicionar.forEach((aID) => {
         novosAlunosParaEscola.push({
-            "id_aluno": aID
-        })
-    })
+            id_aluno: aID,
+        });
+    });
 
     let eID = estadoEscola["ID_ESCOLA"];
     if (eID == null || eID == undefined) {
         eID = estadoEscola["ID"];
     }
 
-    return restImpl.dbPOST(DB_TABLE_ESCOLA, `/${eID}/alunos`, {
-        "alunos": novosAlunosParaEscola
-    }).then(() => Swal2.fire({
-        title: "Alunos salvos com sucesso",
-        text: "Clique abaixo para retornar ao painel administrativo.",
-        type: "success",
-        icon: "success",
-        showCancelButton: false,
-        confirmButtonClass: "btn-success",
-        confirmButtonText: "Retornar ao painel",
-        closeOnConfirm: false,
-        closeOnClickOutside: false,
-        allowOutsideClick: false,
-        showConfirmButton: true
-    }))
+    return restImpl
+        .dbPOST(DB_TABLE_ESCOLA, `/${eID}/alunos`, {
+            alunos: novosAlunosParaEscola,
+        })
+        .then(() =>
+            Swal2.fire({
+                title: "Alunos salvos com sucesso",
+                text: "Clique abaixo para retornar ao painel administrativo.",
+                type: "success",
+                icon: "success",
+                showCancelButton: false,
+                confirmButtonClass: "btn-success",
+                confirmButtonText: "Retornar ao painel",
+                closeOnConfirm: false,
+                closeOnClickOutside: false,
+                allowOutsideClick: false,
+                showConfirmButton: true,
+            })
+        )
         .then(() => navigateDashboard("./modules/escola/escola-listar-view.html"))
         .catch((err) => {
-            debugger
+            debugger;
             Swal2.close();
-            errorFn("Erro ao associar os alunos a escola!", err)
-        })
+            errorFn("Erro ao associar os alunos a escola!", err);
+        });
 });
 
-$("#btnCancelar").on('click', () => {
-    criarModalConfirmarCancelar()
-        .then((result) => {
-            if (result.value) {
-                navigateDashboard(lastPage);
-            }
-        })
+$("#btnCancelar").on("click", () => {
+    criarModalConfirmarCancelar().then((result) => {
+        if (result.value) {
+            navigateDashboard(lastPage);
+        }
+    });
 });
 
-action = "gerirEscola"
+action = "gerirEscola";
