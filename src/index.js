@@ -96,7 +96,7 @@ contextMenu({
 // Ref global para a janela, senão o garbage colector apaga a janela
 let appWindow;
 
-const createEntryWindow = () => {
+function createEntryWindow() {
     // Cria a janela do navegador
     appWindow = new BrowserWindow({
         width: 1250,
@@ -168,7 +168,7 @@ const createEntryWindow = () => {
         // Dereferencia a variável que armazena o navegador
         appWindow = null;
     });
-};
+}
 
 // /////////////////////////////////////////////////////////////////////////////
 // Rotinas do processo principal
@@ -183,6 +183,106 @@ const RouteOptimization = require("./main/routing/routing-optimization.js");
 // Carrega módulo de configuração do Proxy
 const Proxy = require("./main/proxy/proxy.js");
 
+// Worker que vai lidar com a parte de roteirização
+let routeOptimizer = new RouteOptimization(app, dbPath);
+
+// /////////////////////////////////////////////////////////////////////////////
+// Funções para lidar com eventos do SETE
+// On == funções que chamam o processo main, mas não esperam retorno
+// Handle == funções que chamam o processo main e esperam um retorno
+// /////////////////////////////////////////////////////////////////////////////
+
+// Evento chamado para abrir uma página externa
+function onAbrirSite(event, site) {
+    shell.openExternal(site);
+}
+
+// Evento chamado que permite o usuário salvar a planilha modelo de importação de alunos
+function handleSalvarPlanilhaModelo(event) {
+    let salvou = false;
+
+    let arqDestino = dialog.showSaveDialogSync(win, {
+        title: "Salvar Planilha Exemplo",
+        buttonLabel: "Salvar",
+        filters: [{ name: "XLSX", extensions: ["xlsx"] }],
+    });
+
+    if (arqDestino != "" && arqDestino != undefined) {
+        let arqOrigem = path.join(__dirname, "templates", "FormatoImportacaoAluno.xlsx");
+        fs.copySync(arqOrigem, arqDestino);
+        Swal2.fire({
+            icon: "success",
+            title: "Planilha baixada com sucesso",
+        });
+        salvou = true;
+    }
+
+    return salvou;
+}
+
+// Evento chamado para atualizar a malha
+// Evento para atualizar malha
+function handleSalvarNovaMalha(event) {
+    const malha = new MalhaUpdate(newOSMFile, dbPath);
+    let promessa = new Promise();
+    malha
+        .update()
+        .then(() => {
+            appconfig.delete("OD");
+            promessa.resolve();
+        })
+        .catch(() => {
+            promessa.reject();
+        });
+
+    return promessa;
+}
+
+// Evento que inicia a geração de rotas (feito de forma assíncrona para não bloquear o processo principal)
+function onIniciaGeracaoRotas(event, routingArgs) {
+    let cachedODMatrix = appconfig.get("OD", {
+        nodes: {},
+        dist: {},
+        cost: {},
+    });
+
+    cachedODMatrix = {
+        nodes: {},
+        dist: {},
+        cost: {},
+    };
+
+    const minNumVehicles = Math.max(routingArgs.numVehicles, Math.floor(routingArgs.stops.length / routingArgs.maxCapacity));
+    routingArgs.numVehicles = minNumVehicles;
+    routeOptimizer.optimize(cachedODMatrix, routingArgs);
+}
+
+// Evento chamado pelo nosso worker quando ele terminar de gerar a rota
+function onWorkerFinalizarGeracaoRotas(res) {
+    // Set new cache
+    const newODCache = res[0];
+    appconfig.set("OD", newODCache);
+
+    // Send generated routes
+    const optRoutes = res.slice(1);
+    appWindow.webContents.send("sete:finaliza-geracao-rotas", optRoutes);
+}
+
+// Evento chamado pelo nosso worker quando ele encontra um erro ao gerar a rota
+function onWorkerObtemErroGeracaoRotas(err) {
+    appWindow.webContents.send("sete:erro-geracao-rotas", err);
+}
+
+// Registro dos listeners
+function createListeners() {
+    ipcMain.on("abrir:site", onAbrirSite);
+    ipcMain.handle("salvar:planilha-modelo", handleSalvarPlanilhaModelo);
+    ipcMain.handle("salvar:nova-malha", handleSalvarNovaMalha);
+
+    ipcMain.on("worker:inicia-geracao-rotas", onIniciaGeracaoRotas);
+    app.on("worker:finaliza-geracao-rotas", onWorkerFinalizarGeracaoRotas);
+    app.on("worker:obtem-erro-geracao-rotas", onWorkerObtemErroGeracaoRotas);
+}
 
 // /////////////////////////////////////////////////////////////////////////////
 // Handlers para eventos do Electron.
@@ -206,8 +306,12 @@ app.on("login", (event, webContents, details, authInfo, callback) => {
 });
 
 // Evento que será chamado quando o electron terminou de carregar
-// Neste caso, redirecionamos para a função de criação do processo renderer
-app.on("ready", createEntryWindow);
+// Neste caso, registraremos os listeners
+// Por fim, redirecionamos para a função de criação do processo renderer
+app.on("ready", () => {
+    createListeners();
+    createEntryWindow();
+});
 
 // Evento quando todas as janelas tiverem terminadas
 app.on("window-all-closed", () => {
@@ -229,67 +333,4 @@ app.on("activate", () => {
         routeOptimizer = new RouteOptimization(app, dbPath);
         createEntryWindow();
     }
-});
-
-/// /////////////////////////////////////////////////////////////////////////////
-// Handlers para eventos do SETE
-/// /////////////////////////////////////////////////////////////////////////////
-
-// Navegar até a página web do suporte
-ipcMain.on("abrirSite", (event, site) => {
-    console.log("QUI AQUI AQUI")
-    console.log(site)
-    shell.openExternal(site);
-});
-
-// Worker que vai lidar com a parte de roteirização
-let routeOptimizer = new RouteOptimization(app, dbPath);
-
-// Evento para gerar rotas
-ipcMain.on("start:route-generation", (event, routingArgs) => {
-    let cachedODMatrix = appconfig.get("OD", {
-        nodes: {},
-        dist: {},
-        cost: {},
-    });
-
-    cachedODMatrix = {
-        nodes: {},
-        dist: {},
-        cost: {},
-    };
-
-    const minNumVehicles = Math.max(routingArgs.numVehicles, Math.floor(routingArgs.stops.length / routingArgs.maxCapacity));
-    routingArgs.numVehicles = minNumVehicles;
-    routeOptimizer.optimize(cachedODMatrix, routingArgs);
-});
-
-// Evento chamado pelo nosso worker quando ele terminar de gerar a rota
-app.on("done:route-generation", (res) => {
-    // Set new cache
-    const newODCache = res[0];
-    appconfig.set("OD", newODCache);
-
-    // Send generated routes
-    const optRoutes = res.slice(1);
-    appWindow.webContents.send("end:route-generation", optRoutes);
-});
-
-// Evento chamado pelo nosso worker quando ele encontra um erro ao gerar a rota
-app.on("error:route-generation", (err) => {
-    appWindow.webContents.send("error:route-generation", err);
-});
-
-// Evento para atualizar malha
-ipcMain.on("start:malha-update", (event, newOSMFile) => {
-    const malha = new MalhaUpdate(newOSMFile, dbPath);
-    malha
-        .update()
-        .then((updateData) => {
-            appconfig.delete("OD");
-            appWindow.webContents.send("end:malha-update", true);
-        })
-        .catch((err) => {
-            appWindow.webContents.send("end:malha-update", false);
-        });
 });
