@@ -62,20 +62,12 @@ var schema = {
     },
 };
 
-$("#baixarPlanilha").on("click", () => {
+$("#baixarPlanilha").on("click", async () => {
     if (!isElectron) {
         saveAs("/src/renderer/templates/FormatoImportacaoAluno.xlsx", "FormatoImportacaoAluno.xlsx");
     } else {
-        let arqDestino = dialog.showSaveDialogSync(win, {
-            title: "Salvar Planilha Exemplo",
-            buttonLabel: "Salvar",
-            filters: [{ name: "XLSX", extensions: ["xlsx"] }],
-        });
-
-        if (arqDestino != "" && arqDestino != undefined) {
-            let arqOrigem = path.join(__dirname, "templates", "FormatoImportacaoAluno.xlsx");
-            console.log("Copiando de: ", arqOrigem, arqDestino);
-            fs.copySync(arqOrigem, arqDestino);
+        let salvou = await window.sete.salvarPlanilhaModelo();
+        if (salvou) {
             Swal2.fire({
                 icon: "success",
                 title: "Planilha baixada com sucesso",
@@ -188,6 +180,7 @@ var dicionarioNivel = [
 ];
 
 var dicionarioGrauParentesco = [
+    { label: "Pai, Mãe, Padrasto ou Madrasta", value: 0 },
     { label: "pai", value: 0 },
     { label: "PAI", value: 0 },
     { label: "mãe", value: 0 },
@@ -201,11 +194,13 @@ var dicionarioGrauParentesco = [
     { label: "avô", value: 1 },
     { label: "AVÓ", value: 1 },
     { label: "AVÔ", value: 1 },
+    { label: "Avô ou Avó", value: 1 },
 
     { label: "irmão", value: 2 },
     { label: "irmã", value: 2 },
     { label: "IRMÃO", value: 2 },
     { label: "IRMÃ", value: 2 },
+    { label: "Irmão ou Irmã", value: 2 },
 
     { label: "outro", value: 4 },
     { label: "OUTRO", value: 4 },
@@ -501,13 +496,7 @@ $(".card-wizard").bootstrapWizard({
             // If it's the last tab then hide the last button and show the finish instead
             if ($current >= $total) {
                 if ($("#arqPlanilha").length > 0) {
-                    var arquivo;
-
-                    if (isElectron && $("#arqPlanilha")[0].files[0]) {
-                        arquivo = $("#arqPlanilha")[0].files[0].path;
-                    } else {
-                        arquivo = $("#arqPlanilha")[0].files[0];
-                    }
+                    let arquivo = $("#arqPlanilha")[0].files[0];
                     if (ultArquivoAnalisado != arquivo) {
                         if (preprocess(arquivo)) {
                             $($wizard).find(".btn-next").hide();

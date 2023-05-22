@@ -10,7 +10,7 @@
 
 // Imports principais
 const electron = require("electron");
-const { app, BrowserWindow, ipcMain, shell } = electron;
+const { app, dialog, BrowserWindow, ipcMain, shell } = electron;
 const path = require("path");
 const fs = require("fs-extra");
 
@@ -201,19 +201,15 @@ function onAbrirSite(event, site) {
 function handleSalvarPlanilhaModelo(event) {
     let salvou = false;
 
-    let arqDestino = dialog.showSaveDialogSync(win, {
+    let arqDestino = dialog.showSaveDialogSync(appWindow, {
         title: "Salvar Planilha Exemplo",
         buttonLabel: "Salvar",
         filters: [{ name: "XLSX", extensions: ["xlsx"] }],
     });
 
     if (arqDestino != "" && arqDestino != undefined) {
-        let arqOrigem = path.join(__dirname, "templates", "FormatoImportacaoAluno.xlsx");
+        let arqOrigem = path.join(__dirname, "renderer", "templates", "FormatoImportacaoAluno.xlsx");
         fs.copySync(arqOrigem, arqDestino);
-        Swal2.fire({
-            icon: "success",
-            title: "Planilha baixada com sucesso",
-        });
         salvou = true;
     }
 
