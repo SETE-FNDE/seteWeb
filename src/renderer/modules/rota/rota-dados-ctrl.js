@@ -482,18 +482,31 @@ restImpl.dbGETEntidade(DB_TABLE_ROTA, `/${estadoRota.ID}`)
     .then(() => pegarAlunosEscolasRota())
     .then(() => pegarVeiculoRota())
     .then(() => adicionarDadosRotaTabela())
-    .then(() => adicionarDadosAlunoEscolaTabelaEMapa())
+    .then(async () => await adicionarDadosAlunoEscolaTabelaEMapa())
     .then(async () => {
         // Carrega mapa para impressão
         $("#detalheMapa").trigger("click");
-        mapa["map"].updateSize();
+        await mapa["map"].updateSize();
         await new Promise(r => setTimeout(r, 500));
-        $("#detalheInitBtn").trigger("click");
+        
+        $("#tab-dados-localizacao").removeClass("active");
+        $("#detalheInitBtn").trigger("click");    
         Swal2.close()
     })
     .catch((err) => {
         console.log(err)
     })
+
+// TODO
+// Por algum motivo o tab de mapa aparece nas outras abas
+// Vamos forçar remover quando for diferente
+function esconderTabMapa() {
+    $("#tab-dados-localizacao").removeClass("active");
+}
+
+$("#detalheInitBtn, #detalheEscolas, #detalheAlunos").each((idx, tab) => {
+    $(tab).on('click', esconderTabMapa);
+})
 
 // Processa garagem
 var processarGaragem = (res) => {
@@ -515,7 +528,7 @@ async function pegarShapeRota() {
         temShape = false;
     } finally {
         if (temShape) {
-            estadoRota["SHAPE"] = shapeDaRota.shape;
+            estadoRota["SHAPE"] = JSON.parse(shapeDaRota?.data?.shape);
         }
     }
 }
@@ -528,7 +541,6 @@ async function pegarVeiculoRota() {
         let v = veiculoRotaReq[0];
 
         let veiculoEspecifico = todosVeiculosReq.filter(a => Number(a.id_veiculo) == Number(v.id_veiculo))[0]
-        debugger
         estadoRota["VEICULO_ROTA"] = `${veiculoEspecifico.tipo} (${veiculoEspecifico.placa})`
     } catch (erro) {
         estadoRota["VEICULO_ROTA"] = "Não informado"
@@ -612,7 +624,7 @@ function adicionarDadosRotaTabela() {
 }
 
 // Adiciona dados de alunos e escola nas respectivas tabelas e mapa
-function adicionarDadosAlunoEscolaTabelaEMapa() {
+async function adicionarDadosAlunoEscolaTabelaEMapa() {
     // Acrescentando rota existente
     if (estadoRota["SHAPE"] != "" && estadoRota["SHAPE"] != null && estadoRota["SHAPE"] != undefined) {
         $("#avisoNaoGeoReferenciada").hide();
@@ -627,7 +639,7 @@ function adicionarDadosAlunoEscolaTabelaEMapa() {
         try {
             // let rotaGeoJson = (new ol.format.GeoJSON()).readFeatures(estadoRota["SHAPE"]);
             // rotaGeoJson[0].getGeometry().flatCoordinates[1]
-            let primeiro_ponto = JSON.parse(estadoRota["SHAPE"]).features[0].geometry.coordinates[0];
+            let primeiro_ponto = estadoRota["SHAPE"].features[0].geometry.coordinates[0];
 
             let novaListaDeAlunos = [...listaDeAlunos.values()];
             let alunosComGPS = novaListaDeAlunos.filter(aluno => (aluno["LOC_LONGITUDE"] != null && aluno["LOC_LONGITUDE"] != undefined &&
@@ -719,7 +731,7 @@ function adicionarDadosAlunoEscolaTabelaEMapa() {
     listaDeEscolas.forEach(escola => {
         if (escola["LOC_LONGITUDE"] != null && escola["LOC_LONGITUDE"] != undefined &&
             escola["LOC_LATITUDE"] != null && escola["LOC_LATITUDE"] != undefined) {
-            plotarEscola(escola)
+            plotarEscola(escola);
         }
 
         dataTableListaDeEscolas.row.add(escola);
@@ -731,10 +743,10 @@ function adicionarDadosAlunoEscolaTabelaEMapa() {
     return true;
 }
 
-$("#detalheInitBtn").click();
+$("#detalheInitBtn").trigger("click");
 
-$("#detalheMapa").on('click', () => {
-    atualizaMapaOpenLayers(mapa, malhaSource);
+$("#detalheMapa").on("click", async () => {
+    await atualizaMapaOpenLayers(mapa, malhaSource);
 })
 action = "detalharRota";
 

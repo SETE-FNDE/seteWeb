@@ -483,5 +483,5 @@ function atualizaMapaOpenLayers(mapa, mapaSource) {
             }
             mapa["map"].updateSize();
         }
-    }, 200);
+    }, 500);
 }
