@@ -14,9 +14,9 @@ if (action == "editarAluno") {
 
 // Variável armazena o ID da escola do aluno 
 // Importante ter para caso o usuário modifique os dados do aluno/escola e aluno/rota
-// A princípio, assuma nenhuma escola/rota, isto é, id escola/rota = 0
-var idEscolaAnterior = 0;
-var idRotaAnterior = [];
+// A princípio, assuma nenhuma escola/rota, isto é, id escola/rota = -1
+var idEscolaAnterior = -1;
+var idRotaAnterior = [-1];
 
 // Posição do Aluno (Mapa)
 var posicaoAluno;
