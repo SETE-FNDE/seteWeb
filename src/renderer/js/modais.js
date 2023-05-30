@@ -117,7 +117,7 @@ function criarModalQuestionar(titulo, descricao) {
 
 // Função genérica para crair um dialogo que questiona se o usuário tem certeza
 function goaheadDialog(msgTitle, msgDesc) {
-    return criarModalQuestionar(titulo, descricao);
+    return criarModalQuestionar(msgTitle, msgDesc);
 }
 
 function criarModalConfirmarCancelar(titulo = "Cancelar Edição?", descricao = "Se você cancelar nenhum alteração será feita.") {

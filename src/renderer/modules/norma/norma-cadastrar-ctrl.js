@@ -122,8 +122,7 @@ $("#salvarnorma").on("click", async () => {
                 criarModalLoading("Salvando a norma")
 
                 let reqSalvar = await restImpl.dbPOST(DB_TABLE_NORMAS, "", payload);
-                let idNorma = reqSalvar?.data?.messages?.id;
-                
+                let idNorma = reqSalvar?.data?.data?.id;
                 let formData = new FormData();
                 formData.append("file", $("#arqNorma")[0].files[0]);
                 await restImpl.dbPOST(DB_TABLE_NORMAS, `/${idNorma}/file`, formData);
