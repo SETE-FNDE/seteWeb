@@ -371,16 +371,18 @@ function InserirAlunoREST(alunoJSON, idEscola, idRota) {
             if (res?.data?.messages?.id) {
                 let idAluno = res.data.messages.id;
 
-                if (idEscola != 0) {
+                if (idEscola != -1) {
                     promisses.push(restImpl.dbPOST(DB_TABLE_ALUNO, "/" + idAluno + "/escola", {
                         "id_escola": Number(idEscola),
                     }))
                 }
     
-                if (idRota != 0) {
-                    promisses.push(restImpl.dbPOST(DB_TABLE_ALUNO, "/" + idAluno + "/rota", {
-                        "id_rota": Number(idRota),
-                    }))
+                if (idRota != []) {
+                    for (let r of idRota) {
+                        promisses.push(restImpl.dbPOST(DB_TABLE_ALUNO, "/" + idAluno + "/rota", {
+                            id_rota: Number(r)
+                        }))
+                    }
                 }
             }
 
@@ -395,7 +397,7 @@ function AtualizarAlunoREST(alunoJSON, idAluno, idEscola, idEscolaAnterior, idRo
     promessasBasicas.push(restImpl.dbPUT(DB_TABLE_ALUNO, "/" + idAluno, alunoJSON))
 
     // Muda escola se mudou
-    if (idEscola != idEscolaAnterior && idEscolaAnterior != 0) {
+    if (idEscola != idEscolaAnterior && idEscolaAnterior != -1) {
         promessasBasicas.push(restImpl.dbDELETE(DB_TABLE_ALUNO, "/" + idAluno + "/escola"));
     }
 
@@ -410,7 +412,7 @@ function AtualizarAlunoREST(alunoJSON, idAluno, idEscola, idEscolaAnterior, idRo
 
             // Muda escola se mudou 
             // Insere caso seja dif de 0 (sem escola)
-            if (idEscola != idEscolaAnterior && idEscola != 0) {
+            if (idEscola != idEscolaAnterior && idEscola != -1) {
                 promessasNovasRelacoes.push(restImpl.dbPOST(DB_TABLE_ALUNO, "/" + idAluno + "/escola", {
                     id_escola: Number(idEscola)
                 }));

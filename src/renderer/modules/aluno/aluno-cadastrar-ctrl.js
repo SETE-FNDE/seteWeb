@@ -132,9 +132,11 @@ var validadorFormulario = $("#wizardCadastrarAlunoForm").validate({
             listaescola: {
                 required: true,
             },
-            listarota: {
-                required: true,
-            },
+            // MLTSELECT precisa ser refeito para integrar com jquery validate
+            // listarota: {
+            //     required: true,
+            //     mltselect: true,
+            // },
             turnoAluno: {
                 required: true
             },
@@ -216,7 +218,7 @@ $("#salvaraluno").on('click', () => {
     } else {
         let alunoJSON = GetAlunoFromForm();
         const idEscola = $("#listaescola").val();
-        const idRota = $("#listarota").val().map(Number).filter(r => r != -1)
+        const idRota = $("#listarota").val().map(Number).filter(r => r != -1);
 
         if (estaEditando) {
             const idAluno = estadoAluno["ID"];
