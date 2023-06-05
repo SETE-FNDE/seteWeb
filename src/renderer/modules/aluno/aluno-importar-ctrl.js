@@ -229,6 +229,7 @@ var dicionarioTurno = [
 async function parsePlanilha(arquivo) {
     readXlsxFile(arquivo)
         .then((rows) => {
+            let conjuntoMsgsErro = new Set();
             let dadosLinhas = [];
             let cabecalho = rows[0];
 
@@ -280,6 +281,10 @@ async function parsePlanilha(arquivo) {
                         alunoJSON["nivel"] = fuseNivel.search(linha?.OBRIGATORIO_NIVEL_ENSINO)[0]?.item?.value;
                         alunoJSON["turno"] = fuseTurno.search(linha?.OBRIGATORIO_TURNO_ENSINO)[0]?.item?.value;
 
+                        if (!(alunoJSON["nome"] && alunoJSON["sexo"] && alunoJSON["cor"] && alunoJSON["mec_tp_localizacao"] &&
+                            alunoJSON["nivel"] && alunoJSON["turno"])) {
+                            throw new Error("Campo obrigatório não preenchido ou fora do padrão.")
+                        }
                         ////////////////////////////////////////////////////////////
                         // TRATAMENTO DOS CAMPOS OPTATIVOS
                         ////////////////////////////////////////////////////////////
@@ -315,12 +320,15 @@ async function parsePlanilha(arquivo) {
                         // promiseAlunos.push(dbInserirPromise("alunos", alunoJSON, idAluno));
                     }
                 } catch (err) {
-                    debugger;
                     erroDeProcessamento = true;
                     numErros++;
 
                     if (linha["OBRIGATORIO_NOME"]) {
                         alunosErrosOpt[linha["OBRIGATORIO_NOME"]] = linha["OBRIGATORIO_NOME"];
+                    }
+
+                    if (err?.message) {
+                        conjuntoMsgsErro.add(err.message);
                     }
                 }
             }
@@ -333,10 +341,11 @@ async function parsePlanilha(arquivo) {
             dataTableImportar.draw();
 
             if (erroDeProcessamento) {
+                let erros = "<ul>" + [...conjuntoMsgsErro].map(e => "<li>" + e + "</li>").join("") + "</ul>"
                 Swal2.fire({
                     icon: "warning",
                     title: "Aviso",
-                    text: `Ocorreu um erro ao processar os seguintes ${numErros} alunos da planilha:`,
+                    html: `${erros} Ocorreu um erro ao processar os seguintes ${numErros} alunos da planilha:`,
                     input: "select",
                     inputOptions: alunosErrosOpt,
                 });
