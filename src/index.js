@@ -17,7 +17,11 @@ const fs = require("fs-extra");
 // Menu Direito
 const contextMenu = require("electron-context-menu");
 
-// Desabilita cache do http
+// Importa biblioteca para baixar dados via http
+const http = require("http");
+const https = require("https");
+
+// Desabilita cache do http no electron
 app.commandLine.appendSwitch("disable-http-cache");
 
 // Arquivo de configuração (variáveis básicas)
@@ -216,22 +220,64 @@ function handleSalvarPlanilhaModelo(event) {
     return salvou;
 }
 
+// Evento chamado para salvar malha do OSM
+function handleSalvarMalhaOSM(event, latitude, longitude) {
+    let comecouSalvar = false;
+
+    let arqDestino = dialog.showSaveDialogSync(appWindow, {
+        title: "Salvar Malha OSM",
+        buttonLabel: "Salvar Malha",
+        filters: [{ name: "OSM", extensions: ["osm"] }],
+    });
+
+    if (arqDestino != "" && arqDestino != undefined) {
+        console.log(arqDestino)
+        comecouSalvar = true;
+        const latmin = Number(latitude) - 0.25;
+        const lngmin = Number(longitude) - 0.25;
+        const latmax = Number(latitude) + 0.25;
+        const lngmax = Number(longitude) + 0.25;
+
+        const latstr = `${latmin},${lngmin},${latmax},${lngmax}`;
+
+        const url = `https://overpass-api.de/api/interpreter?data=[out:xml][timeout:60];
+    (node['highway']['highway'!='footway']['highway'!='pedestrian']['-highway'!='path'](${latstr});
+    way['highway']['highway'!='footway']['highway'!='pedestrian']['-highway'!='path'](${latstr});
+    relation['highway']['highway'!='footway']['highway'!='pedestrian']['-highway'!='path'](${latstr});)
+    ;(._;>;);out meta;`;
+
+        const arqMalha = fs.createWriteStream(arqDestino);
+        https.get(url, (response) => {
+            // check if response is not a success
+            if (response.statusCode !== 200) {
+                console.log("Response status was " + response.statusCode);
+                appWindow.webContents.send("renderer:finaliza-salvar-malha-osm", false);
+            }
+            response.pipe(arqMalha);
+            response.on("end", () => {
+                console.log("ARQUIVO SALVO", arqDestino);
+                arqMalha.close();
+                appWindow.webContents.send("renderer:finaliza-salvar-malha-osm", true);
+            });
+        });
+    }
+
+    return comecouSalvar;
+}
+
 // Evento chamado para atualizar a malha
-// Evento para atualizar malha
-function handleSalvarNovaMalha(event) {
-    const malha = new MalhaUpdate(newOSMFile, dbPath);
-    let promessa = new Promise();
+function onSalvarNovaMalha(event, arquivo) {
+    console.log("SALVANDO NOVA MALHA", arquivo, dbPath)
+    const malha = new MalhaUpdate(arquivo, dbPath);
     malha
         .update()
         .then(() => {
             appconfig.delete("OD");
-            promessa.resolve();
+            appWindow.webContents.send("renderer:finaliza-salvar-nova-malha", true);
         })
         .catch(() => {
-            promessa.reject();
+            appWindow.webContents.send("renderer:finaliza-salvar-nova-malha", false);
         });
-
-    return promessa;
 }
 
 // Evento que inicia a geração de rotas (feito de forma assíncrona para não bloquear o processo principal)
@@ -271,9 +317,11 @@ function onWorkerObtemErroGeracaoRotas(err) {
 
 // Registro dos listeners
 function createListeners() {
-    ipcMain.on("abrir:site", onAbrirSite);
-    ipcMain.handle("salvar:planilha-modelo", handleSalvarPlanilhaModelo);
-    ipcMain.handle("salvar:nova-malha", handleSalvarNovaMalha);
+    ipcMain.on("main:abrir-site", onAbrirSite);
+    ipcMain.on("main:salvar-nova-malha", onSalvarNovaMalha);
+
+    ipcMain.handle("main:salvar-planilha-modelo", handleSalvarPlanilhaModelo);
+    ipcMain.handle("main:salvar-malha-osm", handleSalvarMalhaOSM);
 
     ipcMain.on("worker:inicia-geracao-rotas", onIniciaGeracaoRotas);
     app.on("worker:finaliza-geracao-rotas", onWorkerFinalizarGeracaoRotas);
