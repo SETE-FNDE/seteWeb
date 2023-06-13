@@ -14,11 +14,13 @@ const { app, dialog, BrowserWindow, ipcMain, shell } = electron;
 const path = require("path");
 const fs = require("fs-extra");
 
+// Biblioteca para lidar com dados espaciais
+const osmtogeojson = require("osmtogeojson");
+
 // Menu Direito
 const contextMenu = require("electron-context-menu");
 
 // Importa biblioteca para baixar dados via http
-const http = require("http");
 const https = require("https");
 
 // Desabilita cache do http no electron
@@ -69,13 +71,6 @@ if (!fs.existsSync(malhaTemplatePath)) {
 }
 
 // Instanciação das bases de dados
-const sqliteDB = require("knex")({
-    client: "sqlite3",
-    connection: {
-        filename: dbPath,
-    },
-    useNullAsDefault: true,
-});
 const spatialite = require("spatialite");
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -184,9 +179,6 @@ const MalhaUpdate = require("./main/malha/malha-update.js");
 // Rotina para otimização da malha
 const RouteOptimization = require("./main/routing/routing-optimization.js");
 
-// Carrega módulo de configuração do Proxy
-const Proxy = require("./main/proxy/proxy.js");
-
 // Worker que vai lidar com a parte de roteirização
 let routeOptimizer = new RouteOptimization(app, dbPath);
 
@@ -231,7 +223,7 @@ function handleSalvarMalhaOSM(event, latitude, longitude) {
     });
 
     if (arqDestino != "" && arqDestino != undefined) {
-        console.log(arqDestino)
+        console.log(arqDestino);
         comecouSalvar = true;
         const latmin = Number(latitude) - 0.25;
         const lngmin = Number(longitude) - 0.25;
@@ -267,7 +259,7 @@ function handleSalvarMalhaOSM(event, latitude, longitude) {
 
 // Evento chamado para atualizar a malha
 function onSalvarNovaMalha(event, arquivo) {
-    console.log("SALVANDO NOVA MALHA", arquivo, dbPath)
+    console.log("SALVANDO NOVA MALHA", arquivo, dbPath);
     const malha = new MalhaUpdate(arquivo, dbPath);
     malha
         .update()
@@ -278,6 +270,18 @@ function onSalvarNovaMalha(event, arquivo) {
         .catch(() => {
             appWindow.webContents.send("renderer:finaliza-salvar-nova-malha", false);
         });
+}
+
+// Evento chamado para carregar e retornar a malha ao renderer
+function onAbrirMalha() {
+    let arqOrigem = path.join(app.getPath("userData"), "malha.osm");
+    return new Promise((resolve, reject) => {
+        fs.readFile(arqOrigem, "utf8", (err, dataOSM) => {
+            if (err) reject({ code: "erro:malha" });
+
+            resolve(dataOSM);
+        });
+    });
 }
 
 // Evento que inicia a geração de rotas (feito de forma assíncrona para não bloquear o processo principal)
@@ -307,12 +311,12 @@ function onWorkerFinalizarGeracaoRotas(res) {
 
     // Send generated routes
     const optRoutes = res.slice(1);
-    appWindow.webContents.send("sete:finaliza-geracao-rotas", optRoutes);
+    appWindow.webContents.send("renderer:sucesso-geracao-rotas", optRoutes);
 }
 
 // Evento chamado pelo nosso worker quando ele encontra um erro ao gerar a rota
 function onWorkerObtemErroGeracaoRotas(err) {
-    appWindow.webContents.send("sete:erro-geracao-rotas", err);
+    appWindow.webContents.send("renderer:erro-geracao-rotas", err);
 }
 
 // Registro dos listeners
@@ -322,8 +326,9 @@ function createListeners() {
 
     ipcMain.handle("main:salvar-planilha-modelo", handleSalvarPlanilhaModelo);
     ipcMain.handle("main:salvar-malha-osm", handleSalvarMalhaOSM);
+    ipcMain.handle("main:abrir-malha", onAbrirMalha);
 
-    ipcMain.on("worker:inicia-geracao-rotas", onIniciaGeracaoRotas);
+    ipcMain.on("main:inicia-geracao-rotas", onIniciaGeracaoRotas);
     app.on("worker:finaliza-geracao-rotas", onWorkerFinalizarGeracaoRotas);
     app.on("worker:obtem-erro-geracao-rotas", onWorkerObtemErroGeracaoRotas);
 }
