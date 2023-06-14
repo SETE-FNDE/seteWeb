@@ -25,7 +25,9 @@ class RoutingOptimizationWorker {
             this.reverseMap.set(key, stopsAtGivenLocation);
         });
 
+        console.log("--> --> --> PARAMETROS DE ROTEIRIZAÇÃO")
         console.log(routingParams)
+        console.log("--> --> --> PARAMETROS DE ROTEIRIZAÇÃO")
     }
 
     getStops(rawCluster) {
@@ -58,8 +60,10 @@ class RoutingOptimizationWorker {
                 let kmeans = new SchoolBusKMeans(this.routingParams);
                 let routingGraph;
 
+                console.log("--> --> --> INICIO KMEANS");
                 kmeans.partition(this.routingParams["numVehicles"])
                     .then(clusters => {
+                        console.log("--> --> --> FINALIZOU KMEANS");
                         let clusterizedStops = new Array();
                         clusters.forEach((c) => clusterizedStops.push(this.getStops(c.cluster)))
 
@@ -89,6 +93,7 @@ class RoutingOptimizationWorker {
                         return Promise.all(clarkAlgorithmsPromise)
                     })
                     .then((busRoutesGenerated) => {
+                        console.log("--> --> --> FINALIZOU CLARK AND WRIGHT + SpeedRoute");
                         // Bus Routes
                         busRoutes = busRoutesGenerated;
 
@@ -123,6 +128,7 @@ class RoutingOptimizationWorker {
                         return Promise.all(routingGraph.buildInnerCityMatrix())
                     })
                     .then(() => {
+                        console.log("--> --> --> FINALIZOU 2-3-OPT");
                         // Run opt
                         let optimizedRoutes = new Array();
 
@@ -151,6 +157,7 @@ class RoutingOptimizationWorker {
                         return Promise.all(promises)
                     })
                     .then((routesJSON) => {
+                        console.log("--> --> --> FINALIZOU TRADUÇÃO DE ROTA PARA GEOJSON");
                         var fc = new Map();
                         routesJSON.forEach((r) => {
                             var ckey = r["path"].map(a => a["id"]).join("-")
@@ -178,15 +185,17 @@ if (isMainThread) {
             });
 
             this.worker.on('message', (payload) => {
+                console.log("MESSAGE", payload)
                 if (!payload.error) {
-                    app.emit("done:route-generation", payload.result)
+                    app.emit("worker:finaliza-geracao-rotas", payload.result)
                 } else {
-                    app.emit("error:route-generation", payload.result)
+                    app.emit("worker:obtem-erro-geracao-rotas", payload.result)
                 }
             });
 
             this.worker.on('error', (err) => {
-                app.emit("error:route-generation", err)
+                app.emit("worker:obtem-erro-geracao-rotas", err)
+                console.log("ERROR", err)
             });
 
             this.worker.on('exit', (code) => {

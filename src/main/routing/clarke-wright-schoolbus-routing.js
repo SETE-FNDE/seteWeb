@@ -87,7 +87,6 @@ class ClarkeWrightSchoolBusRouting {
     }
 
     processSavings(savingsQueue) {
-        let xy =[...this.routes.values()].filter(k => k.has("VITOR-MANUEL-NEVES-SILVA-MOREIRA-10-10-1994"))
         // debugger
         while (!savingsQueue.empty()) {
             let saving = savingsQueue.pop();

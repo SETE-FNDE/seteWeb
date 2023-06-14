@@ -195,7 +195,9 @@ function novoMapaOpenLayers(target, latitude, longitude) {
     };
 
     mapa["activateSidebarLayerSwitcher"] = function (elemID) {
-        if (mapa["layerSwitcherActivated"] == false) {
+        if (mapa["layer-switch-" + elemID]) {
+            return mapa["layer-switch-" + elemID];
+        } else if (mapa["layerSwitcherActivated"] == false) {
             var switcher = new ol.control.LayerSwitcher({
                 target: $(elemID).get(0),
                 reordering: false,
@@ -204,7 +206,8 @@ function novoMapaOpenLayers(target, latitude, longitude) {
             });
             olMap.addControl(switcher);
             mapa["layerSwitcherActivated"] = true;
-
+            mapa["layer-switch-" + elemID] = switcher;
+            
             return switcher;
         }
     };
