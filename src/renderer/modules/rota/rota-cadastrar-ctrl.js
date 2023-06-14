@@ -148,13 +148,13 @@ var completeForm = () => {
 
 async function preProcessarSalvarRota(alunosAdicionar, alunosRemover, escolasRemover, motoristasRemover, monitoresRemover, veiculosRemover) {
     // Remover o vínculo da rota dos aluno que iremos adicionar nesta rota
-    for (const aID of alunosAdicionar) {
-        try {
-            await restImpl.dbDELETE(DB_TABLE_ALUNO, `/${aID}/rota`);
-        } catch (error) {
-            console.error(error);
-        }
-    };
+    // for (const aID of alunosAdicionar) {
+    //     try {
+    //         await restImpl.dbDELETE(DB_TABLE_ALUNO, `/${aID}/rota`);
+    //     } catch (error) {
+    //         console.error(error);
+    //     }
+    // };
 
     // Remover o vínculo da rota dos aluno que não irão mais utilizar essa rota
     for (const aID of alunosRemover) {
