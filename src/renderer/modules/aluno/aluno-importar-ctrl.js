@@ -430,7 +430,7 @@ $("#importarAlunos").on("click", () => {
     }
 });
 
-function realizaImportacao(rawDados) {
+async function realizaImportacao(rawDados) {
     Swal2.fire({
         title: "Importando os dados...",
         imageUrl: "img/icones/processing.gif",
@@ -465,7 +465,12 @@ function realizaImportacao(rawDados) {
         delete aluno["SELECT"];
         delete aluno["georef"];
         aluno["cpf"] = String(aluno["cpf"]).replace(/\D/g, "");
-        promiseAlunos.push(restImpl.dbPOST(DB_TABLE_IMPORTACAO, "/planilha/aluno", aluno).then(() => updateProgresso()));
+        try {
+            await restImpl.dbPOST(DB_TABLE_IMPORTACAO, "/planilha/aluno", aluno)   
+        } catch (error) {
+            console.log("ERROR", error)
+        }
+        updateProgresso();
     }
 
     Promise.all(promiseAlunos)
