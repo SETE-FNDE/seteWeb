@@ -606,5 +606,12 @@ $(() => {
     }
 });
 
+Swal2.fire({
+    title: "O sistema entrará em manutenção",
+    text: "O sistema SETE estará fora do ar no período de 29/06/2023 até o dia 03/07/2023 para manutenção. ",
+    icon: "warning",
+  })
+
+
 // Indica que o script terminou seu carregamento
 window.loadedLoginControl = true;
