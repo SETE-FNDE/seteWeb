@@ -176,16 +176,14 @@ async function buscarDadosRotasVeiculos() {
         // Rotas do motorista
         let rotasMotorista = await restImpl.dbGETColecao(DB_TABLE_MOTORISTA, `/${estadoMotorista.cpf}/rota`);
 
-        // Todos os veículos
-        let veiculos = await restImpl.dbGETColecao(DB_TABLE_VEICULO);
-
         for (let r of rotasMotorista) {
             try {
                 let req_veiculo_rota = await restImpl.dbGETEntidade(DB_TABLE_ROTA, `/${r.id_rota}/veiculos`);
-                let veiculo = veiculos.find(v => v.id_veiculo == req_veiculo_rota.id_veiculo)
-
-                if (veiculo) {
-                    r["VEICULO"] = `${veiculo.tipo} (${veiculo.placa})`;
+                if (req_veiculo_rota.data.length == 0) {
+                    r["VEICULO"] = "Sem veículo informado";    
+                } else {
+                    let veiculoJSON = parseVeiculoREST(req_veiculo_rota.data);
+                    r["VEICULO"] = `${veiculoJSON.TIPOSTR} (${veiculoJSON.PLACA})`;
                 }
             } catch (err) {
                 r["VEICULO"] = "Sem veículo informado";

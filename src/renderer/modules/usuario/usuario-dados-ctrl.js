@@ -133,9 +133,13 @@ $(function () {
 $("#finishconfig").on('click', () => {
     // Verifica se está válido
     var valido = validadorFormulario.valid();
+    let precisaMudarSenha = false;
+    if ($("#regpassword").val().length >= 6 && $("#regpassword").val() != senhaAtual) {
+        precisaMudarSenha = true;
+    }
     
-    if (valido && $("#regpassword").val().length >= 6) {
-        loadingFn("Atualizando o cadastro...")
+    if (valido && (!precisaMudarSenha || (precisaMudarSenha && $("#regpassword").val().length >= 6))) {
+        criarModalLoading("Atualizando o cadastro...")
 
         // Pega o ID e usuário do firebase
         let idUsuarioAtualizar = userconfig.get("ID");
@@ -150,30 +154,16 @@ $("#finishconfig").on('click', () => {
             "nivel_permissao": userconfig.get("TIPO_PERMISSAO"),
         };
 
-        let precisaMudarSenha = false;
         let nova_senha = "";
-        if ($("#regpassword").val() != senhaAtual) {
+        if (precisaMudarSenha) {
             // Precisa mudar a senha
             dadosUsuario["password"] = MD5($("#regpassword").val());
-            precisaMudarSenha = true;
             nova_senha = $("#regpassword").val();
         } else {
             dadosUsuario["password"] = MD5(senhaAtual);
         }
 
         restImpl.dbPUT(DB_TABLE_USUARIOS, "/" + userconfig.get("ID"), dadosUsuario)
-            // .then(() => {
-            //     if (precisaMudarSenha) {
-            //         return restImpl.dbPUT(DB_TABLE_USUARIOS, "/alterar-senha",
-            //             {
-            //                 "id_usuario": userconfig.get("ID"),
-            //                 "senha_atual": MD5(senhaAtual),
-            //                 "nova_senha": MD5(nova_senha)
-            //             })
-            //     } else {
-            //         return true;
-            //     }
-            // })
             .then(() => {
                 if (precisaMudarSenha) {
                     let dadoUSUARIO = JSON.parse(userconfig.get("DADO_USUARIO"));
@@ -184,7 +174,7 @@ $("#finishconfig").on('click', () => {
                 }
             })
             .then(() => Swal2.fire({
-                title: "Sucesso!/",
+                title: "Sucesso!",
                 text: "Usuário alterado com sucesso.",
                 icon: "success",
                 button: "Fechar"
