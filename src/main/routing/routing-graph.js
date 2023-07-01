@@ -171,10 +171,10 @@ module.exports = class RoutingGraph {
 
             let sqlQuery = `SELECT *, ST_LENGTH(geometry, 1) AS dist
                             FROM malha_net
-                            WHERE NodeFrom = ${cnodeID} AND NodeTo = ${dnodeID}
-                            LIMIT 1`;
+                            WHERE NodeFrom = ${cnodeID} AND NodeTo = ${dnodeID}`;
             return new Promise((resolve, reject) => {
                 spatialiteDB.get(sqlQuery, (err, row) => {
+                    if (err) { reject(); }
                     let cost = row["Cost"];
                     let dist = row["dist"];
 
@@ -182,7 +182,8 @@ module.exports = class RoutingGraph {
                     if (cost == null) { cost = 0; }
 
                     // distance log
-                    // console.log(cnodeID, dnodeID, cost, dist)
+                    console.log("FROM", "TO", "COST", "DIST")
+                    console.log(cnodeID, dnodeID, cost, dist)
 
                     // Setting in our matrix
                     c.get("spatialDistEdges").set(d.get("key"), dist);
@@ -221,7 +222,7 @@ module.exports = class RoutingGraph {
                     let dbNodeID = row["node_id"];
 
                     // Setting in our matrix
-                    // console.log("dbNodeID", c.get("key"), dbNodeID)
+                    console.log("dbNodeID", c.get("key"), dbNodeID)
                     c.set("dbNodeID", dbNodeID);
 
                     // Caching if not a school key

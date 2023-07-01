@@ -104,7 +104,7 @@ var dataTablesVeiculos = $("#datatables").DataTable({
 
                                     return Promise.all(promiseArray)
                                         .then(() => {
-                                            successDialog(text = msgConclusao);
+                                            criarModalSucesso(text = msgConclusao);
                                             dataTablesVeiculos.rows('.selected').remove();
                                             dataTablesVeiculos.draw();
                                     })
@@ -181,7 +181,7 @@ dataTablesVeiculos.on('click', '.frotaRemove', function () {
     var idVeiculo = estadoVeiculo["ID_VEICULO"];
 
     action = "apagarVeiculo";
-    confirmDialog("Remover esse veículo?",
+    criarModalConfirmacaoAcao("Remover esse veículo?",
         "Ao remover esse veículo ele será retirado do sistema das "
         + "rotas e das escolas que possuir vínculo."
     ).then((res) => {

@@ -68,7 +68,7 @@ var dataTableDadosMonitor = $("#dataTableDadosMonitor").DataTable({
             className: "btnApagar",
             action: function(e, dt, node, config) {
                 action = "apagarMonitor";
-                confirmDialog('Remover esse monitor?',
+                criarModalConfirmacaoAcao('Remover esse monitor?',
                                "Ao remover esse monitor ele será retirado do sistema das  " + 
                                "rotas que possuir vínculo."
                 ).then(async (res) => {

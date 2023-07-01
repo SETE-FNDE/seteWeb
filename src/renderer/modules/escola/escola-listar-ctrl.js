@@ -105,7 +105,7 @@ var dataTableEscolas = $("#datatables").DataTable({
 
                                 Promise.all(promiseArray)
                                 .then(() => {
-                                    successDialog(text = msgConclusao);
+                                    criarModalSucesso(text = msgConclusao);
                                     dataTableEscolas.rows('.selected').remove();
                                     dataTableEscolas.draw();
                                 })
@@ -189,7 +189,7 @@ dataTableEscolas.on('click', '.escolaRemove', function () {
 
     estadoEscola = dataTableEscolas.row($tr).data();
     action = "apagarEscola";
-    confirmDialog('Remover essa escola?',
+    criarModalConfirmacaoAcao('Remover essa escola?',
                   "Ao remover uma escola os alunos remanescentes da mesma " + 
                   "deverão ser alocados novamente a outra(s) escola(s)."
     ).then((result) => {

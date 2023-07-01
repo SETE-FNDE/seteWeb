@@ -67,7 +67,7 @@ $("#tipoVeiculo").on("change", (evt) => {
 
 var validadorFormulario = $("#wizardCadastrarVeiculoForm").validate({
     // Estrutura comum de validação dos nossos formulários (mostrar erros, mostrar OK)
-    ...configMostrarResultadoValidacao(),
+    ...templateWizardValidacao(),
     ...{
         rules: {
             tipoModal: {
@@ -162,7 +162,7 @@ $("#salvarveiculo").on('click', () => {
         return false;
     } else {
         if (estaEditando) {
-            loadingFn("Editando o veículo ...")
+            criarModalLoading("Editando o veículo ...")
             let idVeiculo = estadoVeiculo["ID"];
             restImpl.dbPUT(DB_TABLE_VEICULO, "/" + idVeiculo, veiculoJSON)
                 .then(() => completeForm())
@@ -171,7 +171,7 @@ $("#salvarveiculo").on('click', () => {
                     errorFn("Erro ao atualizar o veículo.", err)
                 })
         } else {
-            loadingFn("Cadastrando o veículo ...")
+            criarModalLoading("Cadastrando o veículo ...")
 
             restImpl.dbPOST(DB_TABLE_VEICULO, "", veiculoJSON)
             .then(() => completeForm())
@@ -242,7 +242,7 @@ function verificaEdicao() {
                     $(".consumomask").trigger("input");
                     $("#tipoVeiculo").trigger("input");
                     $("#cancelarAcao").on('click', () => {
-                        cancelDialog()
+                        criarModalConfirmarCancelar()
                             .then((result) => {
                                 if (result.value) {
                                     navigateDashboard(lastPage);

@@ -1,9 +1,6 @@
 // db_rest.js
 // Este arquivo implementa as funções do banco de dados utilizando a API rest
 
-// ENDPOINT REST
-var REST_BASE_URL = BASE_URL ? BASE_URL : "https://sete.transportesufg.eng.br";
-
 // Inicializa a API
 var restAPI = axios.create({
     baseURL: BASE_URL,
@@ -87,8 +84,8 @@ restAPI.interceptors.response.use((response) => {
             usuario: username,
             senha: userpass
         });
-        userconfig.set("TOKEN", resp.data.access_token.access_token)
-        restAPI.defaults.headers.Authorization = resp.data.access_token.access_token;
+        userconfig.set("TOKEN", resp.data.data.token.access_token)
+        restAPI.defaults.headers.Authorization = resp.data.data.token.access_token;
         return restAPI(originalRequest);
     }
     return Promise.reject(error);
@@ -136,7 +133,7 @@ var restModule = {
 
         return restAPI.get(caminho)
             .then((res) => {
-                if (DEBUG) { console.debug("GET ENTIDADE REPLY", caminho, res.data) }
+                if (DEBUG) { console.debug("GET ENTIDADE REPLY", caminho, res.data.data) }
                 return Promise.resolve(res.data)
             });
     },

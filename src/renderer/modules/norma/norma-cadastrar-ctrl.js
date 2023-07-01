@@ -35,7 +35,7 @@ $("#tipoAssunto").on("change", () => {
 
 var validadorFormulario = $("#wizardCadastrarNormaForm").validate({
     // Estrutura comum de validação dos nossos formulários (mostrar erros, mostrar OK)
-    ...configMostrarResultadoValidacao(),
+    ...templateWizardValidacao(),
     ...{
         rules: {
             titulo: {
@@ -119,17 +119,16 @@ $("#salvarnorma").on("click", async () => {
         try {
             if (!estaEditando) {
                 // Salvando
-                loadingFn("Salvando a norma")
+                criarModalLoading("Salvando a norma")
 
                 let reqSalvar = await restImpl.dbPOST(DB_TABLE_NORMAS, "", payload);
-                let idNorma = reqSalvar?.data?.messages?.id;
-                
+                let idNorma = reqSalvar?.data?.data?.id;
                 let formData = new FormData();
                 formData.append("file", $("#arqNorma")[0].files[0]);
                 await restImpl.dbPOST(DB_TABLE_NORMAS, `/${idNorma}/file`, formData);
             } else {
                 // Atualizando
-                loadingFn("Atualizando a norma")
+                criarModalLoading("Atualizando a norma")
 
                 await restImpl.dbPUT(DB_TABLE_NORMAS, `/${estadoNorma.ID}`, payload);
                 
@@ -171,7 +170,7 @@ $("#salvarnorma").on("click", async () => {
         // console.log(formData)
         // if (!estaEditando) {
         //     try {
-        //         loadingFn("Cadastrando a norma...")
+        //         criarModalLoading("Cadastrando a norma...")
         //         await restImpl.dbPOST(DB_TABLE_NORMAS, "", formData)
         //         completeForm()
         //     } catch (error) {

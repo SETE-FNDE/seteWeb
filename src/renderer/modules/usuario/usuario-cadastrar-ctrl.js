@@ -35,7 +35,7 @@ $("#btCancelarCadastroUsuario").on('click', () => {
 
 $("#registerform").validate({
     // Estrutura comum de validação dos nossos formulários (mostrar erros, mostrar OK)
-    ...configMostrarResultadoValidacao(),
+    ...templateWizardValidacao(),
     ...{
         rules: {
             regnome: {
@@ -103,7 +103,7 @@ $("#regsubmit").on('click', () => {
     $("#registerform").validate();
 
     if ($("#registerform").valid()) {
-        loadingFn("Processando...", "Espere um minutinho...")
+        criarModalLoading("Processando...", "Espere um minutinho...")
 
         // Dados do usuario
         let dadosUsuario = {

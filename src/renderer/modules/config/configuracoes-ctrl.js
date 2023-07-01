@@ -51,7 +51,7 @@ $(document).ready(function () {
     // Especifica o validador
     validadorFormulario = $("#wizardConfigForm").validate({
         // Estrutura comum de validação dos nossos formulários (mostrar erros, mostrar OK)
-        ...configMostrarResultadoValidacao(),
+        ...templateWizardValidacao(),
         ...{
             rules: {
                 regnome: {
@@ -144,7 +144,7 @@ $("#finishconfig").on('click', () => {
     var valido = validadorFormulario.valid();
 
     if (valido) {
-        loadingFn("Atualizando o cadastro...")
+        criarModalLoading("Atualizando o cadastro...")
 
         // Pega o ID e usuário do firebase
         let idUsuarioAtualizar = userconfig.get("ID");

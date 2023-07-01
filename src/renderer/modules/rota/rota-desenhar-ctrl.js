@@ -882,7 +882,7 @@ $("#listarotas").on("change", async (evt) => {
                 });
 
                 // Acrescentando rota existente
-                var rawGeoJSON = JSON.parse(shapeDaRota.shape)
+                var rawGeoJSON = JSON.parse(shapeDaRota.data.shape)
                 var novoShape = turf.toWgs84(rawGeoJSON).features.map((a) => {
                     console.log(a)
                     if (a?.geometry?.type != "LineString") {
@@ -1005,7 +1005,7 @@ $("#rota-malha-salvarNovaMalha").on('click', () => {
 });
 
 $("#cancelarAcao").on('click', () => {
-    cancelDialog()
+    criarModalConfirmarCancelar()
         .then((result) => {
             if (result.value) {
                 navigateDashboard(lastPage);

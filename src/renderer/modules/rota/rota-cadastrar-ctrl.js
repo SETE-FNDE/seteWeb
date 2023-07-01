@@ -50,7 +50,7 @@ $('.cnh').mask('000000000-00', { reverse: true });
 
 var validadorFormulario = $("#wizardCadastrarRotaForm").validate({
     // Estrutura comum de validação dos nossos formulários (mostrar erros, mostrar OK)
-    ...configMostrarResultadoValidacao(),
+    ...templateWizardValidacao(),
     ...{
         rules: {
             tipoRota: {
@@ -95,7 +95,7 @@ $('.card-wizard').bootstrapWizard({
             if (estadoRota) {
                 $($wizard).find('#cancelarAcao').show();
                 $("#cancelarAcao").on('click', () => {
-                    cancelDialog().then((result) => {
+                    criarModalConfirmarCancelar().then((result) => {
                         if (result.value) {
                             navigateDashboard(lastPage);
                         }
@@ -148,13 +148,13 @@ var completeForm = () => {
 
 async function preProcessarSalvarRota(alunosAdicionar, alunosRemover, escolasRemover, motoristasRemover, monitoresRemover, veiculosRemover) {
     // Remover o vínculo da rota dos aluno que iremos adicionar nesta rota
-    for (const aID of alunosAdicionar) {
-        try {
-            await restImpl.dbDELETE(DB_TABLE_ALUNO, `/${aID}/rota`);
-        } catch (error) {
-            console.error(error);
-        }
-    };
+    // for (const aID of alunosAdicionar) {
+    //     try {
+    //         await restImpl.dbDELETE(DB_TABLE_ALUNO, `/${aID}/rota`);
+    //     } catch (error) {
+    //         console.error(error);
+    //     }
+    // };
 
     // Remover o vínculo da rota dos aluno que não irão mais utilizar essa rota
     for (const aID of alunosRemover) {
@@ -308,7 +308,7 @@ $("#salvarrota").on("click", async () => {
     if (!$valid) {
         return false;
     } else {
-        loadingFn("Processando dados da rota ...")
+        criarModalLoading("Processando dados da rota ...")
 
         try {
             await preProcessarSalvarRota(alunosAdicionar, alunosRemover, escolasRemover, motoristasRemover, monitoresRemover, veiculosRemover);

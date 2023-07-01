@@ -103,7 +103,9 @@ window.$.validator.addMethod("datavalida", function (value, element) {
 
 // Validar ano
 window.$.validator.addMethod("ano", function (value, element) {
-    return moment(value, "YYYY").isValid();
+    let anodigitado = moment(value, "YYYY");
+    let anoatualmaisum = moment(new Date().getFullYear() + 1, "YYYY")
+    return anodigitado.isValid() && anodigitado.isBefore(anoatualmaisum);
 }, "Informe um ano válido");
 
 // Validar hora

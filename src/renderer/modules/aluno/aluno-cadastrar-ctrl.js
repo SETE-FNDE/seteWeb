@@ -94,7 +94,7 @@ $(".cpfmask").mask('000.000.000-00', { reverse: true });
 // Estrutura de validação do formulário
 var validadorFormulario = $("#wizardCadastrarAlunoForm").validate({
     // Estrutura comum de validação dos nossos formulários (mostrar erros, mostrar OK)
-    ...configMostrarResultadoValidacao(),
+    ...templateWizardValidacao(),
     ...{
         rules: {
             reglat: {
@@ -224,12 +224,12 @@ $("#salvaraluno").on('click', () => {
             const idAluno = estadoAluno["ID"];
             // delete alunoJSON["cpf"];
 
-            loadingFn("Atualizando os dados do(a) aluno(a) ...");
+            criarModalLoading("Atualizando os dados do(a) aluno(a) ...");
             AtualizarAlunoREST(alunoJSON, idAluno, idEscola, idEscolaAnterior, idRota, idRotaAnterior)
                 .then(() => completeForm())
                 .catch((err) => errorFn("Erro ao atualizar o(a) aluno na escola!", err));
         } else {
-            loadingFn("Cadastrando o(a) aluno(a) ...")
+            criarModalLoading("Cadastrando o(a) aluno(a) ...")
             InserirAlunoREST(alunoJSON, idEscola, idRota)
                 .then(() => completeForm())
                 .catch((err) => errorFn("Erro ao salvar o aluno.", err))
@@ -364,7 +364,7 @@ function preencheDadosParaEdicao() {
     }
 
     $("#cancelarAcao").on('click', () => {
-        cancelDialog()
+        criarModalConfirmarCancelar()
             .then((result) => {
                 if (result.value) {
                     navigateDashboard(lastPage);

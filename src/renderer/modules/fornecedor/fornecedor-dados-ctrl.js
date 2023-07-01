@@ -104,7 +104,7 @@ var dataTableFornecedor = $("#dataTableDetalhes").DataTable({
             className: "btnApagar",
             action: function (e, dt, node, config) {
                 action = "apagarFornecedor";
-                confirmDialog('Remover esse fornecedor?',
+                criarModalConfirmacaoAcao('Remover esse fornecedor?',
                 "Ao remover esse fornecedor ele será retirado do sistema e dos " +
                 "serviços que possuir vínculo."
                 ).then((res) => {

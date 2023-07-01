@@ -100,7 +100,7 @@ var dataTablesNormas = $("#datatables").DataTable({
 
                                     Promise.all(promiseArray)
                                         .then(() => {
-                                            successDialog(text = msgConclusao);
+                                            criarModalSucesso(text = msgConclusao);
                                             dataTablesNormas.rows('.selected').remove();
                                             dataTablesNormas.draw();
                                         })
@@ -161,7 +161,7 @@ dataTablesNormas.on('click', '.normaViewPDF', function () {
     action = "normaViewPDF";
 
     // if (arqDestino != "" && arqDestino != undefined) {
-    loadingFn("Baixando o arquivo")
+    criarModalLoading("Baixando o arquivo")
 
     restAPI.get(`${BASE_URL}/normas/${codCidade}/${estadoNorma.ID}/visualizar`, { responseType: "arraybuffer" })
         .then((res) => {
@@ -172,7 +172,7 @@ dataTablesNormas.on('click', '.normaViewPDF', function () {
             link.setAttribute('download', `Norma ${estadoNorma.ID}.pdf`)
             document.body.appendChild(link)
             link.click();
-            successDialog("Parabéns", "Seu arquivo está pronto.");
+            criarModalSucesso("Parabéns", "Seu arquivo está pronto.");
         })
         .catch((err) => errorFn(err))
 });
@@ -200,7 +200,7 @@ dataTablesNormas.on('click', '.normaRemove', function () {
     var idNorma = estadoNorma["CPF"];
 
     action = "apagarNorma";
-    confirmDialog('Remover essa norma?', "Você tem certeza?").then((res) => {
+    criarModalConfirmacaoAcao('Remover essa norma?', "Você tem certeza?").then((res) => {
         let listaPromisePraRemover = [];
         if (res.value) {
             listaPromisePraRemover.push(restImpl.dbDELETE(DB_TABLE_NORMAS, `/${idNorma}`));

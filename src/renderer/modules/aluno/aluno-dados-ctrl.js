@@ -103,7 +103,7 @@ var dataTableAluno = $("#dataTableDadosAluno").DataTable({
             className: "btnApagar",
             action: function (e, dt, node, config) {
                 action = "apagarAluno";
-                confirmDialog('Remover esse aluno?',
+                criarModalConfirmacaoAcao('Remover esse aluno?',
                     "Ao remover esse aluno ele será retirado do sistema das rotas " +
                     "e das escolas que possuir vínculo."
                 ).then((result) => {
@@ -133,7 +133,7 @@ var dataTableAluno = $("#dataTableDadosAluno").DataTable({
 
 restImpl.dbGETEntidade(DB_TABLE_ALUNO, `/${estadoAluno.ID}`)
     .then((alunoRaw) => {
-        loadingFn("Carregando...")
+        criarModalLoading("Carregando...")
         aluno = parseAlunoREST(alunoRaw);
         return aluno;
     })

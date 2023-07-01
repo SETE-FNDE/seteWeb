@@ -87,7 +87,7 @@ var dataTableInstitucional = $("#dataTableInstitucional").DataTable({
             className: "btnApagar",
             action: function (e, dt, node, config) {
                 action = "apagarEscola";
-                confirmDialog('Remover essa escola?',
+                criarModalConfirmacaoAcao('Remover essa escola?',
                   "Ao remover essa escola ela será retirado do sistema das rotas " + 
                   "e dos alunos que possuí vínculo."
                 ).then((result) => {
@@ -381,7 +381,7 @@ function editarAluno(alunoID) {
 }
 // Rotina para remover aluno (verifica se usuário tem ctz antes)
 function removerAluno(alunoID) {
-    return confirmDialog('Remover esse aluno?',
+    return criarModalConfirmacaoAcao('Remover esse aluno?',
         "Ao remover esse aluno, ele será retirado do sistema das rotas e das escolas que possuir vínculo."
     ).then((result) => {
         let listaPromisePraRemover = [];

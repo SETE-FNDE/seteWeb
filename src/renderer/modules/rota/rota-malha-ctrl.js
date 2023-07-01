@@ -2,92 +2,42 @@
 // Este arquivo contém o script de controle da tela rota-malha-view. O memso
 // permite importar os dados de uma rota no formato OSM
 
-var http;
 // Esta ferramenta só funciona no Electron
 if (!isElectron) {
     Swal2.fire({
         title: "Funcionalidade indisponível",
         icon: "warning",
         html:
-            'Esta funcionalidade está disponível apenas no SETE desktop. ' +
-            'Baixe a versão desktop para acessá-la. <br> ' + 
-            'Clique ' + 
-            '<a target="_blank" href="https://transportes.fct.ufg.br/p/31448-sete-sistema-eletronico-de-gestao-do-transporte-escolar">aqui</a> ' + 
-            'para baixar a versão desktop.',
-    }).then(() => navigateDashboard(lastPage))
+            "Esta funcionalidade está disponível apenas no SETE desktop. " +
+            "Baixe a versão desktop para acessá-la. <br> " +
+            "Clique " +
+            '<a target="_blank" href="https://transportes.fct.ufg.br/p/31448-sete-sistema-eletronico-de-gestao-do-transporte-escolar">aqui</a> ' +
+            "para baixar a versão desktop.",
+    }).then(() => navigateDashboard(lastPage));
 } else {
-    // Rodando no electron
-    // Biblioteca http para baixar a malha do OSM overpass
-    http = require('http');
-}
+    // Listeners
+    window?.sete?.onFinalizaSalvarMalhaOSM((evt, sucesso) => {
+        sucesso ? criarModalSucesso() : criarModalErro("Erro ao baixar a malha deste município");
+    });
 
-function baixarMalhaDoOSM(arqDestino, latitude = cidadeLatitude, longitude = cidadeLongitude) {
-    var latmin = latitude - 0.25;
-    var lngmin = longitude - 0.25;
-    var latmax = latitude + 0.25;
-    var lngmax = longitude + 0.25;
-
-    var latstr = `${latmin},${lngmin},${latmax},${lngmax}`;
-
-    var url = `http://overpass-api.de/api/interpreter?data=[out:xml][timeout:25];
-(node['highway']['highway'!='footway']['highway'!='pedestrian']['-highway'!='path'](${latstr});
-way['highway']['highway'!='footway']['highway'!='pedestrian']['-highway'!='path'](${latstr});
-relation['highway']['highway'!='footway']['highway'!='pedestrian']['-highway'!='path'](${latstr});)
-;(._;>;);out meta;`
-
-    loadingFn("Baixando a malha...", "Aguarde alguns minutinhos...");
-    http.get(url, function (response) {
-        if (response.statusCode != 200) {
-            errorFn("Erro ao baixar a malha")
-        } else {
-            var file = fs.createWriteStream(arqDestino);
-            response.pipe(file);
-        }
-
-        response.on('end', () => {
-            Swal2.fire({
-                icon: "success",
-                title: "Malha baixada com sucesso!",
-                text: "Arquivo localizado em: " + arqDestino
-            })
-        });
+    window?.sete?.onFinalizaSalvarNovaMalha((evt, sucesso) => {
+        sucesso ? criarModalSucesso() : criarModalErro("Erro ao atualizar a malha deste município");
     });
 }
 
-
-$("#baixarMalha").on('click', () => {
-    let arqDestino = dialog.showSaveDialogSync(win, {
-        title: "Salvar Malha OSM",
-        buttonLabel: "Salvar Malha",
-        filters: [
-            { name: "OSM", extensions: ["osm"] }
-        ]
+$("#baixarMalha").on("click", () => {
+    window?.sete?.salvarMalhaOSM(cidadeLatitude, cidadeLongitude).then((comecouSalvar) => {
+        comecouSalvar ? criarModalLoading("Baixando a malha...", "Aguarde alguns minutinhos...") : null;
     });
+});
 
-    if (arqDestino != "" && arqDestino != undefined) {
-        let arqOrigem = path.join(userDataDir, "malha.osm");
-        console.log("Copiando de: ", arqOrigem, arqDestino);
-        baixarMalhaDoOSM(arqDestino);
+$("#rota-malha-salvarNovaMalha").on("click", () => {
+    let osmFilePath = $("#novaMalhaOSM")[0]?.files[0]?.path;
+    if (osmFilePath) {
+        criarModalLoading("Processando a malha...");
+        window?.sete?.salvarNovaMalha(osmFilePath);
     }
 });
 
-$('#rota-malha-salvarNovaMalha').on('click', () => {
-    loadingFn("Processando a malha...")
-
-    let osmFilePath = $("#novaMalhaOSM")[0].files[0].path;
-    ipcRenderer.send('start:malha-update', osmFilePath);
-});
-
-if (isElectron) {
-    ipcRenderer.on("end:malha-update", function (event, status) {
-        if (status) {
-            successDialog("Malha atualizada com sucesso",
-                "Clique em OK para retornar a visão geral do sistema.")
-        } else {
-            errorFn("Erro ao atualizar a malha")
-        }
-    });
-}
-
 // Wizard
-$('.card-wizard').bootstrapWizard(configWizardBasico("", usarValidador = false))
+$(".card-wizard").bootstrapWizard(configWizardBasico("", (usarValidador = false)));

@@ -179,10 +179,10 @@ function clearDBPromises() {
 
 // Sync data with Firestore
 function fbSync() {
-    loadingFn("Sincronizando os dados com a nuvem...", "Espere um minutinho...");
+    criarModalLoading("Sincronizando os dados com a nuvem...", "Espere um minutinho...");
 
     dbSincronizar()
-        .then(() => successDialog("Sucesso!", "Dados sincronizados com sucesso. Clique em OK para voltar ao painel de gestão."))
+        .then(() => criarModalSucesso("Sucesso!", "Dados sincronizados com sucesso. Clique em OK para voltar ao painel de gestão."))
         .then(() => navigateDashboard("./dashboard-main.html"))
         .catch(err => errorFn("Erro ao sincronizar, tente mais tarde", err))
 }

@@ -1,0 +1,24 @@
+// Preload Script
+const { contextBridge, ipcRenderer } = require("electron");
+
+// this should print out the value of MY_ENVIRONMENT_VARIABLE
+
+contextBridge.exposeInMainWorld("sete", {
+    APP_VERSION: process.env.npm_package_version,
+    BASE_URL: process.env.BASE_URL,
+    isElectron: process ? true : false,
+
+    // Handlers Main
+    abrirSite: (site) => ipcRenderer.send("main:abrir-site", site),
+    salvarPlanilhaModelo: () => ipcRenderer.invoke("main:salvar-planilha-modelo"),
+    salvarMalhaOSM: (latitude, longitude) => ipcRenderer.invoke("main:salvar-malha-osm", latitude, longitude),
+    salvarNovaMalha: (arquivo) => ipcRenderer.send("main:salvar-nova-malha", arquivo),
+    abrirMalha: () => ipcRenderer.invoke("main:abrir-malha"),
+    iniciaGeracaoRotas: (paramRoteirizacao) => ipcRenderer.send("main:inicia-geracao-rotas", paramRoteirizacao),
+
+    // Handlers Renderer
+    onFinalizaSalvarMalhaOSM: (callback) => ipcRenderer.on("renderer:finaliza-salvar-malha-osm", callback),
+    onFinalizaSalvarNovaMalha: (callback) => ipcRenderer.on("renderer:finaliza-salvar-nova-malha", callback),
+    onSucessoGeracaoRotas: (callback) => ipcRenderer.on("renderer:sucesso-geracao-rotas", callback),
+    onErroGeracaoRotas: (callback) => ipcRenderer.on("renderer:erro-geracao-rotas", callback),
+});

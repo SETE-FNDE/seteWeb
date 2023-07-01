@@ -94,7 +94,7 @@ var dataTablesMonitores = $("#datatables").DataTable({
 
                                 Promise.all(promiseArray)
                                 .then(() => {
-                                    successDialog(text = msgConclusao);
+                                    criarModalSucesso(text = msgConclusao);
                                     dataTablesMonitores.rows('.selected').remove();
                                     dataTablesMonitores.draw();
                                 })
@@ -170,7 +170,7 @@ dataTablesMonitores.on('click', '.monitorRemove', function () {
     var idMonitor = estadoMonitor["CPF"];
 
     action = "apagarMonitor";
-    confirmDialog('Remover esse monitor?',
+    criarModalConfirmacaoAcao('Remover esse monitor?',
                   "Ao remover esse monitor ele será retirado do sistema das  " + 
                   "rotas e das escolas que possuir vínculo."
     ).then(async (res) => {

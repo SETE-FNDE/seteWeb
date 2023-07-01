@@ -38,7 +38,7 @@ mapa["activateGeocoder"]();
 $(".content").hide();
 
 if (firstAcess) {
-    loadingFn("Sincronizando os dados com a nuvem...", "Espere um minutinho...");
+    criarModalLoading("Sincronizando os dados com a nuvem...", "Espere um minutinho...");
     $(".preload").hide();
 } else {
     $(".preload").show();

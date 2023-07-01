@@ -65,8 +65,7 @@ class BusRoute {
         let dnodeID = d.get("dbNodeID");
         let sqlQuery = `SELECT AsGeoJSON(geometry) AS js
                         FROM malha_net
-                        WHERE NodeFrom = ${cnodeID} AND NodeTo = ${dnodeID}
-                        LIMIT 1`;
+                        WHERE NodeFrom = ${cnodeID} AND NodeTo = ${dnodeID}`;
         return new Promise((resolve, reject) => {
             spatialiteDB.get(sqlQuery, (err, row) => {
                 resolve({

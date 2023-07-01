@@ -48,7 +48,7 @@ var dataTableDadosRota = $("#dataTableDadosRota").DataTable({
 function preencheDadosBasicos(rota) {
     let rotaJSON = parseRotaDBREST(rota);
 
-    loadingFn("Calculando o custo da rota..." + rotaJSON.nome);
+    criarModalLoading("Calculando o custo da rota..." + rotaJSON.nome);
 
     $("#nomeRota").text(rotaJSON.nome);
     dataTableDadosRota.row.add(["Nome da Rota", rotaJSON.nome]);

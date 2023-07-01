@@ -42,7 +42,7 @@ $(function () {
     // Especifica o validador
     validadorFormulario = $("#wizardConfigForm").validate({
         // Estrutura comum de validação dos nossos formulários (mostrar erros, mostrar OK)
-        ...configMostrarResultadoValidacao(),
+        ...templateWizardValidacao(),
         ...{
             rules: {
                 regnome: {
