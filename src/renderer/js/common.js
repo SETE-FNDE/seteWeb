@@ -10,7 +10,7 @@
 
 // Variáveis Basicas
 const appTitle = "SETE - Software Eletrônico de Gestão do Transporte Escolar";
-const appVersion = sete.APP_VERSION ? sete.APP_VERSION : "WEB";
+const appVersion = (typeof sete != "undefined") ? sete.APP_VERSION : "WEB";
 
 var userData = {};
 var userRole = "";

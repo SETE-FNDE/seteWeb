@@ -7,6 +7,7 @@
 var estaEditando = false;
 if (action == "editarUsuario") {
     estaEditando = true;
+    $("#regcpf").attr("readonly", true);
 }
 
 // Máscaras
@@ -112,7 +113,7 @@ $("#regsubmit").on('click', () => {
             "password": MD5($("#regpassword").val()),
             "cpf": String($("#regcpf").val()).replace(/\D/g, ''),
             "telefone": $("#regtel").val(),
-            "tipo_permissao": $("#regpapel").val()
+            "nivel_permissao": $("#regpapel").val()
         };
 
         if (!estaEditando) {

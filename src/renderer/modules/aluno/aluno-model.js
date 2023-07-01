@@ -368,8 +368,8 @@ function InserirAlunoREST(alunoJSON, idEscola, idRota) {
         .then((res) => {
             let promisses = [];
 
-            if (res?.data?.messages?.id) {
-                let idAluno = res.data.messages.id;
+            if (res?.data?.data?.id) {
+                let idAluno = res.data.data.id;
 
                 if (idEscola != -1) {
                     promisses.push(restImpl.dbPOST(DB_TABLE_ALUNO, "/" + idAluno + "/escola", {

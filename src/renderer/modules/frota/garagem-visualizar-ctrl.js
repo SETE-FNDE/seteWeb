@@ -47,10 +47,6 @@ var plotaGaragem = (lat, lon) => {
 
 // Lida com click de usuário
 mapaOL.on('singleclick', function (evt) {
-    if (evt.originalEvent.path.length > 21) {
-        return;
-    }
-
     if (posicaoGaragem != null && posicaoGaragem != undefined) {
         try {
             vSource.removeFeature(posicaoGaragem);

@@ -22,7 +22,6 @@ var dataTablesVeiculos = $("#datatables").DataTable({
             { data: 'MARCA', width: "12%" },
             { data: 'MODELOSTR', width: "12%" },
             { data: 'CAPACIDADE', width: "15%" },
-            { data: 'CAPACIDADE_ATUAL', width: "15%" },
             { data: 'ESTADO', width: "10%" },
             { data: 'ORIGEMSTR', width: "10%" },
             {
@@ -231,7 +230,7 @@ adicionaDadosTabela = (res) => {
     });
 
     dataTablesVeiculos.draw();
-    dtInitFiltros(dataTablesVeiculos, [1, 2, 3, 4, 5, 6, 7, 8]);
+    dtInitFiltros(dataTablesVeiculos, [1, 2, 3, 4, 5, 6, 7]);
 }
 
 $("#datatables_filter input").on('keyup', function () {

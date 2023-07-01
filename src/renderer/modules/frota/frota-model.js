@@ -65,7 +65,7 @@ function GetOSFromForm() {
 function PopulateOSFromState(estadoOSJSON) {
     $(".pageTitle").html("Atualizar Ordem de Serviço");
     $("#tipoServico").val(estadoOSJSON["TIPO_SERVICO"]);
-    $("#regdata").val(moment(estadoOSJSON["DATASTR"]).format("yyyy-MM-DD"));
+    $("#regdata").val(moment(estadoOS.data).format("yyyy-MM-DD"));
     $("#tipoVeiculo").val(estadoOSJSON["ID_VEICULO"]);
     $("#tipoFornecedor").val(estadoOSJSON["ID_FORNECEDOR"]);
     $("#comentario").val(estadoOSJSON["COMENTARIO"]);
@@ -186,7 +186,6 @@ var parseVeiculoREST = function (veiculoRaw) {
 
 var parseVeiculoDB = function (veiculoRaw) {
     var veiculoJSON = Object.assign({}, veiculoRaw);
-    veiculoJSON["CAPACIDADE_ATUAL"] = 0;
     veiculoJSON["CAPACIDADE"] = Number(veiculoJSON["CAPACIDADE"]);
 
     if (veiculoJSON["MANUTENCAO"] == "Sim" || veiculoJSON["MANUTENCAO"] == true) {
