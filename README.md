@@ -24,9 +24,9 @@ O SETE é construído em cima do *framework*  [Electron](https://github.com/elec
 O SETE utiliza bibliotecas nativas, a saber o SQLite, para possibilitar o uso e armazenamento de informações de forma *offline*. 
 
 Considerando estes fatores, para construir o **SETE** assume-se as seguintes dependências básicas:
-* Node.js v12 LTS (*e.g.*, Node.js v12.18.3)
+* Node.js v16 LTS (*e.g.*, Node.js v16.20.1)
 * Yarn v1.22. (utilizado pelo electron para empacotar os binários)
-* Python 2.7 (muitos módulos nativos ainda usam o Python 2)
+* Python 3.5
 * fakeroot, dpkg e rpm para compilar pacotes para GNU/Linux
 * [windows-build-tools](https://github.com/felixrieseberg/windows-build-tools) (para compilação dos módulos no Windows)
 * [Wix Toolset](https://wixtoolset.org) (para gerar binários .msi e .exe para o Windows)
@@ -34,7 +34,7 @@ Considerando estes fatores, para construir o **SETE** assume-se as seguintes dep
 Para compilar o código execute os seguintes passos.
 
 ### 1: Instalação das dependências básicas
-Instale o NodeJS v12. Você pode utilizar os binários disponbilizados no site [nodejs.org](nodejs.org) ou utilizar uma ferramenta de versionamento para instalação (_e.g._, [Node Version Manager - NVM](https://github.com/nvm-sh/nvm)).
+Instale o NodeJS v16. Você pode utilizar os binários disponbilizados no site [nodejs.org](nodejs.org) ou utilizar uma ferramenta de versionamento para instalação (_e.g._, [Node Version Manager - NVM](https://github.com/nvm-sh/nvm)).
 
 Semelhantemente, instale o gerenciador de pacotes Yarn v1.22. Você pode utilizar os binários disponiblizados no site [https://yarnpkg.com/](https://yarnpkg.com/). O yarn é utilizado pelo electron-forge para gerar os binários.
 
@@ -55,24 +55,19 @@ Por fim, o Windows ainda requer que o `npm` especifique a versão do compilador 
 
 ```sh
 npm config set msvs_version "2017"
-npm config set python "C:\\Python27-x64\\pythonw.exe"
+npm config set python "C:\\Python35-x64\\pythonw.exe"
 ```
 
 ### 2: Baixe o código fonte
 
 ```sh
-git clone https://github.com/marcosroriz/sete/
+git clone https://github.com/SETE-FNDE/seteWeb/
 ```
 
 Depois instale as dependência:
 
 ```sh
 npm install
-```
-
-Por fim, recompile a dependência nativa.
-```sh
-npm install sqlite3 --build-from-source --runtime=electron --target=8.5.2 --dist-url=https://electronjs.org/headers
 ```
 
 ### 3: Executando o projeto
