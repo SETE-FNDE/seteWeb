@@ -15,7 +15,6 @@ clone_depth: 5
 
 environment:
   APPVEYOR_YML_DISABLE_PS_LINUX: true
-  APPVEYOR_RDP_PASSWORD: rhqpZ8G*bS
   nodejs_version: "18.16.0"
 
 for:
@@ -44,39 +43,39 @@ for:
 install:
   - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
   # - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
-  # - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-vnc.sh' | bash -e -
+  # # - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-vnc.sh' | bash -e -
 
-  # Add Wix to Windows Build Path
-  - cmd: dir "c:\Program Files (x86)\WiX Toolset"*
-  - cmd: set PATH="c:\Program Files (x86)\WiX Toolset v3.11\bin";%PATH%
+  # # Add Wix to Windows Build Path
+  # - cmd: dir "c:\Program Files (x86)\WiX Toolset"*
+  # - cmd: set PATH="c:\Program Files (x86)\WiX Toolset v3.11\bin";%PATH%
 
-  # Get the latest LTS version of Node.js in Windows
-  - ps: Install-Product node $env:nodejs_version x64
+  # # Get the latest LTS version of Node.js in Windows
+  # - ps: Install-Product node $env:nodejs_version x64
 
-  # Set NPM in Windows to use Visual Studio 2017 and Python x64
-  - cmd: npm config set msvs_version "2017"
-  - cmd: npm config set python "C:\\Python35-x64\\pythonw.exe"
+  # # Set NPM in Windows to use Visual Studio 2017 and Python x64
+  # - cmd: npm config set msvs_version "2017"
+  # - cmd: npm config set python "C:\\Python35-x64\\pythonw.exe"
 
-  # Get the latest LTS version of Node.js in MAC and Linux
-  - sh: nvm install $nodejs_version
-  - sh: nvm use $nodejs_version
+  # # Get the latest LTS version of Node.js in MAC and Linux
+  # - sh: nvm install $nodejs_version
+  # - sh: nvm use $nodejs_version
   
-  # Install Yarn
-  - sh: npm install yarn
+  # # Install Yarn
+  # - sh: npm install yarn
   
-  # Install Packages
-  - cmd: npm install 
-  - sh: npm install --no-optional
+  # # Install Packages
+  # - cmd: npm install 
+  # - sh: npm install --no-optional
 
-  # Webify
-  - ps: .\webify.ps1
-  - sh: chmod +x webify.sh
-  - sh: chmod +x webify_macos.sh
+  # # Webify
+  # - ps: .\webify.ps1
+  # - sh: chmod +x webify.sh
+  # - sh: chmod +x webify_macos.sh
 
-  # Linux Webify
-  - sh: echo ${APPVEYOR_BUILD_WORKER_IMAGE}
-  - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "Ubuntu"; then ./webify.sh; fi
-  - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "macOS"; then ./webify_macos.sh; fi
+  # # Linux Webify
+  # - sh: echo ${APPVEYOR_BUILD_WORKER_IMAGE}
+  # - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "Ubuntu"; then ./webify.sh; fi
+  # - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "macOS"; then ./webify_macos.sh; fi
   # Rebuild native packages
   # Install SQLite from Source (Native Module)
   # Previous --target=8.5.2
