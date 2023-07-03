@@ -223,7 +223,7 @@ function mostraSeTemUpdate(modal = true) {
     fetch(PACKAGE_JSON)
         .then((res) => res.json())
         .then((pkg) => {
-            if (isElectron) {
+            if (sete != undefined && sete?.isElectron) {
                 let remoteVersion = pkg.version;
 
                 if (appVersion != remoteVersion) {
