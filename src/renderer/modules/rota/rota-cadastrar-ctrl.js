@@ -321,7 +321,7 @@ $("#salvarrota").on("click", async () => {
             } else {
                 console.log("Inserindo Rota com:", rotasJSON);
                 let resp = await restImpl.dbPOST(DB_TABLE_ROTA, "", rotasJSON);
-                idRota = resp?.data?.messages?.id;
+                idRota = resp?.data?.data?.id;
             }
 
             if (idRota == null || idRota == "") {
@@ -357,9 +357,7 @@ restImpl.dbGETColecao(DB_TABLE_VEICULO)
             return false;
         }
     }).then((veiculo) => {
-        // TODO: Arrumar na API REST
-        let v = veiculo[0];
-        debugger
+        let v = veiculo.data;
         if (v && $("#tipoVeiculo option[value='" + v?.id_veiculo + "']").length > 0) {
             $("#tipoVeiculo").val(v.id_veiculo);
             antVeiculos.add(String(v.id_veiculo));

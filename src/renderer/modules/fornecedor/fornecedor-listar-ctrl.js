@@ -188,8 +188,8 @@ dataTablesFornecedores.on('click', '.fornecedorRemove', function () {
 
 restImpl.dbGETColecao(DB_TABLE_FORNECEDOR)
 .then(res => processarFornecedores(res))
-// .then(() => dbBuscarTodosDadosPromise(DB_TABLE_ORDEM_DE_SERVICO))
-// .then(res => processaOSs(res))
+.then(() => restImpl.dbGETColecao(DB_TABLE_ORDEM_DE_SERVICO))
+.then(res => processaOSs(res))
 .then(res => adicionaDadosTabela(res))
 .catch((err) => {
     debugger
@@ -209,11 +209,12 @@ var processarFornecedores = (res) => {
 // Processar OSs
 var processaOSs = (res) => {
     for (let osRaw of res) {
-        let idFornecedor = osRaw["ID_FORNECEDOR"];
-        let fornecedorJSON = listaDeFornecedores.get(idFornecedor);
-        fornecedorJSON["NUM_OS"] = fornecedorJSON["NUM_OS"] + 1;
-        
-        listaDeFornecedores.set(idFornecedor, fornecedorJSON);
+        let idFornecedor = osRaw.id_fornecedor;
+        if (listaDeFornecedores.has(idFornecedor)) {
+            let fornecedorJSON = listaDeFornecedores.get(idFornecedor);
+            fornecedorJSON["NUM_OS"] = fornecedorJSON["NUM_OS"] + 1;
+            listaDeFornecedores.set(idFornecedor, fornecedorJSON);
+        }
     }
     return listaDeFornecedores;
 }

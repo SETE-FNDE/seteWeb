@@ -65,9 +65,9 @@ var parseFornecedorDB = function (fornecedorRaw) {
 
 
     var servicos = new Array();
-    if (fornecedorRaw["RAMO_MECANICA"]) servicos.push("Mecânica");
-    if (fornecedorRaw["RAMO_COMBUSTIVEL"]) servicos.push("Combustível");
-    if (fornecedorRaw["RAMO_SEGURO"]) servicos.push("Seguros");
+    if (fornecedorJSON["RAMO_MECANICA"]) servicos.push("Mecânica");
+    if (fornecedorJSON["RAMO_COMBUSTIVEL"]) servicos.push("Combustível");
+    if (fornecedorJSON["RAMO_SEGURO"]) servicos.push("Seguros");
     fornecedorJSON["SERVICOSTR"] = servicos.join(", ");
 
     return fornecedorJSON;

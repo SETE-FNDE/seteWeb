@@ -1113,10 +1113,8 @@ async function pegarParametrosVeiculos() {
         params.NUM_VEICULOS.valor = 1; //veiculos.length;
 
         // for (let veiculo of veiculos) {
-        let veiculo = veiculos;
         try {
-            // TODO: GAMB FIX THIS 
-            veiculo = veiculo[0]; 
+            let veiculo = veiculos.data;
 
             veiculoDetalhe = await restImpl.dbGETEntidade(DB_TABLE_VEICULO, `/${veiculo.id_veiculo}`);
             veiculos = veiculoDetalhe;

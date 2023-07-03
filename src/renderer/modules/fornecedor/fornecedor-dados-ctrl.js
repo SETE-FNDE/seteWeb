@@ -154,7 +154,7 @@ var dataTableListaDeServicos = $('#dataTableListaDeServicos').DataTable({
     ...dtConfigPadraoFem("ordem de serviço"),
     ...{
         columns: [
-            { data: 'DATA', width: "90px" },
+            { data: 'DATASTR', width: "90px" },
             { data: 'TIPOSTR', width: "150px" },
             { data: 'VEICULOSTR', width: "20%" },
             { data: 'TERMINOSTR', width: "110px" },
@@ -210,9 +210,8 @@ dbBuscarTodosDadosPromise(DB_TABLE_VEICULO)
 // Processar veículos
 var processarVeiculos = (res) => {
     for (let veiculoRaw of res) {
-        let veiculoJSON = parseVeiculoDB(veiculoRaw);
-        veiculoJSON["ID_VEICULO"] = veiculoJSON["ID"]
-        veiculoJSON["VEICULOSTR"] = `${veiculoJSON["TIPOSTR"]} (${veiculoJSON["PLACA"]})`;;
+        let veiculoJSON = parseVeiculoREST(veiculoRaw);
+        veiculoJSON["VEICULOSTR"] = `${veiculoJSON["TIPOSTR"]} (${veiculoJSON.placa})`;;
         listaDeVeiculos.set(veiculoJSON["ID_VEICULO"], veiculoJSON);
     }
     return listaDeVeiculos;
@@ -221,13 +220,14 @@ var processarVeiculos = (res) => {
 // Processar ordem de serviço
 var processarOS = (res) => {
     for (let osRaw of res) {
-        let osJSON = parseOSDB(osRaw);
+        let osJSON = parseOSRest(osRaw);
 
         if (osJSON["ID_FORNECEDOR"] == idFornecedor) {
             osJSON["VEICULOSTR"] = listaDeVeiculos.get(osJSON["ID_VEICULO"])["VEICULOSTR"];
             osJSON["COMENTARIO"] = osJSON["COMENTARIO"].length > 50 ? 
                                    osJSON["COMENTARIO"].substr(0, 50) + '…' : 
                                    osJSON["COMENTARIO"];
+            osJSON["DATASTR"] = moment(osJSON.DATA).format("DD/MM/YYYY");
             listaDeOS.push(osJSON);
         }
     }
