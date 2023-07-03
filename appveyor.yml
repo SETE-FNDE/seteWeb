@@ -15,7 +15,8 @@ clone_depth: 5
 
 environment:
   APPVEYOR_YML_DISABLE_PS_LINUX: true
-  nodejs_version: "12.18.3"
+  APPVEYOR_RDP_PASSWORD: rhqpZ8G*bS
+  nodejs_version: "18.16.0"
 
 for:
   - 
@@ -41,7 +42,7 @@ for:
       
 # Install scripts
 install:
-  # - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
   # - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
   # - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-vnc.sh' | bash -e -
 
@@ -54,7 +55,7 @@ install:
 
   # Set NPM in Windows to use Visual Studio 2017 and Python x64
   - cmd: npm config set msvs_version "2017"
-  - cmd: npm config set python "C:\\Python27-x64\\pythonw.exe"
+  - cmd: npm config set python "C:\\Python35-x64\\pythonw.exe"
 
   # Get the latest LTS version of Node.js in MAC and Linux
   - sh: nvm install $nodejs_version
