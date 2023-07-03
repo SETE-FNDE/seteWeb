@@ -581,11 +581,15 @@ $(() => {
     }
 });
 
-Swal2.fire({
-    title: "O sistema entrará em manutenção",
-    text: "O sistema SETE estará fora do ar no período de 29/06/2023 até o dia 03/07/2023 para manutenção. ",
-    icon: "warning",
-  })
+// Essa variável vem do arquivo config.js na raiz do projeto
+if (MANUTENCAO) {
+    Swal2.fire({
+        title: "O sistema está em manutenção",
+        text: "O sistema SETE está em manutenção. Neste período, o sistema estará fora do ar. ",
+        icon: "warning",
+    });
+}
+
 
 
 // Indica que o script terminou seu carregamento
