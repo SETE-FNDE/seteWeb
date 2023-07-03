@@ -10,7 +10,7 @@
 
 // Variáveis Basicas
 const appTitle = "SETE - Software Eletrônico de Gestão do Transporte Escolar";
-const appVersion = (typeof sete != "undefined") ? sete.APP_VERSION : "WEB";
+let appVersion = (typeof sete != "undefined") ? "DESKTOP" : "WEB";
 
 var userData = {};
 var userRole = "";
@@ -222,11 +222,13 @@ function numberToMoney(num) {
 function mostraSeTemUpdate(modal = true) {
     fetch(PACKAGE_JSON)
         .then((res) => res.json())
-        .then((pkg) => {
+        .then(async (pkg) => {
             if (sete != undefined && sete?.isElectron) {
+                let currVersion = await sete.APP_VERSION();
+                appVersion = currVersion;
                 let remoteVersion = pkg.version;
 
-                if (appVersion != remoteVersion) {
+                if (currVersion != remoteVersion) {
                     if (modal) {
                         Swal2.fire({
                             title: "Saiu uma nova versão do SETE",

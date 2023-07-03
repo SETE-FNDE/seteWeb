@@ -1,10 +1,8 @@
 // Preload Script
 const { contextBridge, ipcRenderer } = require("electron");
 
-// this should print out the value of MY_ENVIRONMENT_VARIABLE
-
 contextBridge.exposeInMainWorld("sete", {
-    APP_VERSION: process.env.npm_package_version,
+    APP_VERSION: async () => await ipcRenderer.invoke("main:pegar-versao-sete"),
     BASE_URL: process.env.BASE_URL,
     isElectron: process ? true : false,
 

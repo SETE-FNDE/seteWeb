@@ -15,7 +15,7 @@ clone_depth: 5
 
 environment:
   APPVEYOR_YML_DISABLE_PS_LINUX: true
-  nodejs_version: "12.18.3"
+  nodejs_version: "16"
 
 for:
   - 
@@ -53,8 +53,10 @@ install:
   - ps: Install-Product node $env:nodejs_version x64
 
   # Set NPM in Windows to use Visual Studio 2017 and Python x64
+  # For some reason, newest version of npm are not allowing this config
+  - cmd: npm install -g npm@^8
   - cmd: npm config set msvs_version "2017"
-  - cmd: npm config set python "C:\\Python27-x64\\pythonw.exe"
+  - cmd: npm config set python "C:\\Python35-x64\\pythonw.exe"
 
   # Get the latest LTS version of Node.js in MAC and Linux
   - sh: nvm install $nodejs_version
@@ -76,10 +78,6 @@ install:
   - sh: echo ${APPVEYOR_BUILD_WORKER_IMAGE}
   - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "Ubuntu"; then ./webify.sh; fi
   - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "macOS"; then ./webify_macos.sh; fi
-  # Rebuild native packages
-  # Install SQLite from Source (Native Module)
-  # Previous --target=8.5.2
-  # - npm install sqlite3 --build-from-source --runtime=electron --target=11.2.2 --dist-url=https://electronjs.org/headers
   
 build_script:
   - cmd: set PATH=C:\projects\seteWeb\node_modules\.bin;%PATH%
@@ -105,16 +103,6 @@ deploy:
   on:
     branch: master
     APPVEYOR_REPO_TAG: true
-
-# deploy:
-#   release: SETE-v$(APPVEYOR_BUILD_VERSION)
-#   description: 'SETE v1.0.0'
-#   provider: GitHub
-#   auth_token: 
-#     secure: o9FnGoA7kIQPmz6pI/uzpPbOrolyu2jgAzTVV7Ld6TdbmM3pSh60UR7PU2B9FzpF
-#   artifact: WinBinaries
-#   on:
-#     branch: master                 # release from master branch only
 
 on_finish:
   - cmd: ECHO Exiting...

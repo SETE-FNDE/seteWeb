@@ -135,7 +135,7 @@ function createEntryWindow() {
     }
 
     // Abre DevTools.
-    appWindow.webContents.openDevTools();
+    // appWindow.webContents.openDevTools();
 
     // Desabilita navegação externa
     appWindow.webContents.on("will-navigate", (e, url) => {
@@ -321,6 +321,7 @@ function onWorkerObtemErroGeracaoRotas(err) {
 
 // Registro dos listeners
 function createListeners() {
+    ipcMain.handle("main:pegar-versao-sete", () => app.getVersion());
     ipcMain.on("main:abrir-site", onAbrirSite);
     ipcMain.on("main:salvar-nova-malha", onSalvarNovaMalha);
 
