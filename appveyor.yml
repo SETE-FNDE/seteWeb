@@ -67,6 +67,7 @@ install:
   
   # Install Packages
   - cmd: npm install 
+  - cmd: npm install exe-icon-extractor
   - sh: npm install --no-optional
 
   # Webify
