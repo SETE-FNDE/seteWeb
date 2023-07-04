@@ -45,8 +45,8 @@ for:
 # Install scripts
 install:
   # - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-  # - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
-  - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-vnc.sh' | bash -e -
+  - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
+  # - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-vnc.sh' | bash -e -
 
   # Add Wix to Windows Build Path
   - cmd: dir "c:\Program Files (x86)\WiX Toolset"*
@@ -111,8 +111,8 @@ deploy:
 on_finish:
   - cmd: ECHO Exiting...
   - sh: echo Exiting...
-  # - sh: export APPVEYOR_SSH_BLOCK=true
-  # - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
+  - sh: export APPVEYOR_SSH_BLOCK=true
+  - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
   - sh: export APPVEYOR_VNC_BLOCK=true
   - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-vnc.sh' | bash -e -
   # - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
