@@ -5,7 +5,7 @@ branches:
 
 image: 
   # - Visual Studio 2017
-  - Ubuntu2004
+  # - Ubuntu2004
   - macos-monterey
 
 platform:
@@ -15,6 +15,7 @@ clone_depth: 5
 
 environment:
   APPVEYOR_VNC_PASSWORD: bydJuK#G4t
+  APPVEYOR_VNC_BLOCK: true
   APPVEYOR_SSH_KEY: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC20sptK/9B0hIAaGRyP25tIMIhm7GufuJckN5TSuNkk1eDmLqnPuGlZlq0fYcZOJOUgdROgzT754dknQsC85Bt67rc39I37RK8aHDjqhvfo1E0tOPLsEci1z9Y7LWm3L+wXVkkKaW0LRsznICtcy6jfM8hESe4n5yvIge/rcK/uW8PppJIV34ZLa/igJbQHPjBiDcketyKwGtV42XNcMSsJZPCvvyQLKObhwe6+QgQQ8oNM8oFdYpq4Wuov0B96zZnR4CBT151brDwqi9xdisxNZUtagzjq76gFKE9NGGEJCGy1UaW/Lr3tbo0wIQQNbxqcKFljoomECzYPQ7YTt73
   APPVEYOR_YML_DISABLE_PS_LINUX: true
   nodejs_version: "18"
