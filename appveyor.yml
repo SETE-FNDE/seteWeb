@@ -5,8 +5,8 @@ branches:
 
 image: 
   - Visual Studio 2017
-  - Ubuntu
-  - macos
+  - Ubuntu2004
+  - macos-monterey
 
 platform:
   - x64
@@ -15,7 +15,7 @@ clone_depth: 5
 
 environment:
   APPVEYOR_YML_DISABLE_PS_LINUX: true
-  nodejs_version: "16"
+  nodejs_version: "18"
 
 for:
   - 
