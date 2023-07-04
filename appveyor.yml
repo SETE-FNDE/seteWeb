@@ -74,8 +74,10 @@ install:
   # Ubuntu specific
   - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "Ubuntu2004"; then npm install; fi
   - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "Ubuntu2004"; then npm install @electron-forge/maker-deb; fi
+  - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "Ubuntu2004"; then npm install --save-dev @electron-forge/cli; fi
+  - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "Ubuntu2004"; then npx electron-forge import; fi
   # Mac-OS specific packages
-  - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "macOS-BigSur"; npm install --no-optional; fi
+  - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "macOS-BigSur"; then npm install --no-optional; fi
   - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "macOS-BigSur"; then npm install dmg-license; fi
 
   # Webify
