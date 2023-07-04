@@ -4,8 +4,8 @@ branches:
     - dev
 
 image: 
-  # - Visual Studio 2017
-  # - Ubuntu2004
+  - Visual Studio 2017
+  - Ubuntu2004
   - macos-bigsur
 
 platform:
@@ -14,8 +14,7 @@ platform:
 clone_depth: 5
 
 environment:
-  APPVEYOR_VNC_BLOCK: true
-  APPVEYOR_SSH_KEY: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC20sptK/9B0hIAaGRyP25tIMIhm7GufuJckN5TSuNkk1eDmLqnPuGlZlq0fYcZOJOUgdROgzT754dknQsC85Bt67rc39I37RK8aHDjqhvfo1E0tOPLsEci1z9Y7LWm3L+wXVkkKaW0LRsznICtcy6jfM8hESe4n5yvIge/rcK/uW8PppJIV34ZLa/igJbQHPjBiDcketyKwGtV42XNcMSsJZPCvvyQLKObhwe6+QgQQ8oNM8oFdYpq4Wuov0B96zZnR4CBT151brDwqi9xdisxNZUtagzjq76gFKE9NGGEJCGy1UaW/Lr3tbo0wIQQNbxqcKFljoomECzYPQ7YTt73
+  # APPVEYOR_VNC_BLOCK: true
   APPVEYOR_YML_DISABLE_PS_LINUX: true
   nodejs_version: "18"
 
@@ -23,13 +22,13 @@ for:
   - 
     matrix:
       only:
-        - image: macos
+        - image: macos-bigsur
     init:
       - sh: cd $HOME/projects/seteWeb
   - 
     matrix:
       only:
-        - image: Ubuntu
+        - image: Ubuntu2004
     init:
       # Install basic packages in Ubuntu
       - sh: sudo apt-get update
@@ -62,7 +61,7 @@ install:
   - cmd: npm config set python "C:\\Python35-x64\\pythonw.exe"
 
   # Get the latest LTS version of Node.js in MAC and Linux
-  - sh: nvm install $nodejs_version
+  # - sh: nvm install $nodejs_version
   - sh: nvm use $nodejs_version
   
   # Install Yarn
@@ -72,6 +71,8 @@ install:
   - cmd: npm install 
   - cmd: npm install exe-icon-extractor
   - sh: npm install --no-optional
+  # Mac-OS specific packages
+  - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "macOS-BigSur"; then npm install dmg-license; fi
 
   # Webify
   - ps: .\webify.ps1
@@ -81,7 +82,7 @@ install:
   # Linux and MacOS Webify
   - sh: echo ${APPVEYOR_BUILD_WORKER_IMAGE}
   - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "Ubuntu2004"; then ./webify.sh; fi
-  - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "macos-monterey"; then ./webify_macos.sh; fi
+  # - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "macOS-BigSur"; then ./webify_macos.sh; fi
   
 build_script:
   - cmd: set PATH=C:\projects\seteWeb\node_modules\.bin;%PATH%
@@ -111,9 +112,9 @@ deploy:
 on_finish:
   - cmd: ECHO Exiting...
   - sh: echo Exiting...
-  - sh: export APPVEYOR_SSH_BLOCK=true
-  - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
-  - sh: export APPVEYOR_VNC_BLOCK=true
-  - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-vnc.sh' | bash -e -
+  # - sh: export APPVEYOR_SSH_BLOCK=true
+  # - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
+  # - sh: export APPVEYOR_VNC_BLOCK=true
+  # - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-vnc.sh' | bash -e -
   # - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
