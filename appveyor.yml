@@ -31,7 +31,7 @@ for:
         - image: Ubuntu2004
     init:
       # Install basic packages in Ubuntu
-      - sh: sudo apt-get update
+      # - sh: sudo apt-get update
       - sh: sudo apt-get install -y fakeroot dpkg rpm
   - 
     matrix:
@@ -44,7 +44,7 @@ for:
 # Install scripts
 install:
   # - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-  - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
+  # - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
   # - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-vnc.sh' | bash -e -
 
   # Add Wix to Windows Build Path
