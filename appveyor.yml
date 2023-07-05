@@ -96,7 +96,7 @@ build_script:
   - npm run make
 
 artifacts:
-  - path: "\\out\\make\\wix\\x64\\sete*"
+  - path: "\\out\\make\\wix\\x64\\sete.msi"
     name: WinBinaries
   - path: "\\out\\make\\deb\\x64\\sete*"
     name: UbuntuBinaries
@@ -105,15 +105,28 @@ artifacts:
 
 
 deploy:
-  release: SETE-AUTOMATIC-v$(APPVEYOR_REPO_TAG_NAME)
-  description: 'AUTOMATIC BUILD'
-  provider: GitHub
-  draft: true
-  auth_token: 
-    secure: 1nhqp9s1MntRhWF6sieDcx1Y8ZY9165vivEWlQ6/AU7nkze+uMGLstYDx9imLNtN
-  artifact: WinBinaries, UbuntuBinaries, MacBinaries
-  on:
-    branch: master
+  - provider: GITHUB-TAG
+    release: SETE-AUTO-v$(APPVEYOR_REPO_TAG_NAME)
+    description: 'AUTOMATIC TAG BUILD'
+    provider: GitHub
+    draft: true
+    auth_token: 
+      secure: 1nhqp9s1MntRhWF6sieDcx1Y8ZY9165vivEWlQ6/AU7nkze+uMGLstYDx9imLNtN
+    artifact: WinBinaries, UbuntuBinaries, MacBinaries
+    on:
+      APPVEYOR_REPO_TAG: true
+  
+  - provider: GITHUB-ALL
+    release: SETE-AUTO-LATEST
+    description: 'AUTOMATIC LATEST BUILD'
+    provider: GitHub
+    draft: true
+    auth_token: 
+      secure: 1nhqp9s1MntRhWF6sieDcx1Y8ZY9165vivEWlQ6/AU7nkze+uMGLstYDx9imLNtN
+    artifact: WinBinaries, UbuntuBinaries, MacBinaries
+    on:
+      branch: master
+
 
 on_finish:
   - cmd: ECHO Exiting...
