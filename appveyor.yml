@@ -1,7 +1,8 @@
 branches:
   only:
     - master
-    - dev
+
+skip_non_tags: false
 
 image: 
   - Visual Studio 2017
@@ -113,7 +114,6 @@ deploy:
   artifact: WinBinaries, UbuntuBinaries, MacBinaries
   on:
     branch: master
-    APPVEYOR_REPO_TAG: true
 
 on_finish:
   - cmd: ECHO Exiting...
