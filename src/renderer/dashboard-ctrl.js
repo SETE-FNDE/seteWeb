@@ -145,7 +145,7 @@ async function pegarShapeRota(rotaID) {
     return new Promise((resolve, reject) => {
         restImpl.dbGETEntidade(DB_TABLE_ROTA, `/${rotaID}/shape`)
         .then(shapeDaRota => {
-            resolve({rotaID, shape: shapeDaRota.shape})
+            resolve({rotaID, shape: shapeDaRota.data.shape})
         })
         .catch(err => {
             resolve({rotaID, shape: null})
