@@ -105,7 +105,7 @@ artifacts:
 
 
 deploy:
-  - provider: GITHUB-TAG
+  - name: GITHUB-TAG
     release: SETE-AUTO-v$(APPVEYOR_REPO_TAG_NAME)
     description: 'AUTOMATIC TAG BUILD'
     provider: GitHub
@@ -116,7 +116,7 @@ deploy:
     on:
       APPVEYOR_REPO_TAG: true
   
-  - provider: GITHUB-ALL
+  - name: GITHUB-ALL
     release: SETE-AUTO-LATEST
     description: 'AUTOMATIC LATEST BUILD'
     provider: GitHub
