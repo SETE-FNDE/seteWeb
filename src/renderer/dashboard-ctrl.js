@@ -641,10 +641,11 @@ var popupAlunoEscolaConfig = new ol.Overlay.PopupFeature({
                 after: ' min',        // something to add after
                 visible: (e) => e.getProperties().TIPO == "ROTA"
             },
-            'NUM_ALUNOS_ROTA': {
-                title: "Número de alunos",
-                visible: (e) => e.getProperties().TIPO == "ROTA"
-            },
+            // TODO: readicionar depois
+            // 'NUM_ALUNOS_ROTA': {
+            //     title: "Número de alunos",
+            //     visible: (e) => e.getProperties().TIPO == "ROTA"
+            // },
             'MENSAGEM': {
                 title: "Mensagem:",
                 visible: (e) => e.getProperties().TIPO == "ALERTA"
