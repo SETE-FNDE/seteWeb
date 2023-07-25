@@ -223,38 +223,27 @@ function mostraSeTemUpdate(modal = true) {
     fetch(PACKAGE_JSON)
         .then((res) => res.json())
         .then(async (pkg) => {
-            if (typeof sete != undefined) {
+            if (typeof sete != 'undefined') {
                 if (sete?.isElectron) {
                     let currVersion = await sete.APP_VERSION();
                     appVersion = currVersion;
                     let remoteVersion = pkg.version;
     
                     if (currVersion != remoteVersion) {
-                        if (modal) {
-                            Swal2.fire({
+                        $.notifyClose();
+                        $.notify(
+                            {
+                                icon: "ml-1 fa fa-cloud-download menu-icon",
                                 title: "Saiu uma nova versão do SETE",
-                                text: "Você deve atualizar o SETE ou utilizar a versão web do sistema. " + "Clique aqui para entrar na página do SETE.",
-                                icon: "warning",
-                            }).then(() => {
-                                shell.openExternal("https://transportes.fct.ufg.br/p/31448-sete-sistema-eletronico-de-gestao-do-transporte-escolar");
-                            });
-                        } else {
-                            // popup
-                            $.notifyClose();
-                            $.notify(
-                                {
-                                    icon: "ml-1 fa fa-cloud-download menu-icon",
-                                    title: "Saiu uma nova versão do SETE",
-                                    message: "Clique aqui para entrar na página do SETE",
-                                    url: "https://transportes.fct.ufg.br/p/31448-sete-sistema-eletronico-de-gestao-do-transporte-escolar",
-                                    target: "_blank",
-                                },
-                                {
-                                    type: "warning",
-                                    delay: 0,
-                                }
-                            );
-                        }
+                                message: "Clique aqui para entrar na página do SETE",
+                                url: "https://transportes.fct.ufg.br/p/31448-sete-sistema-eletronico-de-gestao-do-transporte-escolar",
+                                target: "_blank",
+                            },
+                            {
+                                type: "warning",
+                                delay: 0,
+                            }
+                        );
                     }
                 }
             }
