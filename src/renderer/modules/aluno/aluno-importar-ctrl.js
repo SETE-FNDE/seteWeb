@@ -265,7 +265,29 @@ async function parsePlanilha(arquivo) {
                         ////////////////////////////////////////////////////////////
                         // TRATAMENTO DOS CAMPOS OBRIGATÓRIOS
                         ////////////////////////////////////////////////////////////
-                        alunoJSON["nome"] = linha["OBRIGATORIO_NOME"].toUpperCase().trim();
+                        if (linha?.OBRIGATORIO_NOME) {
+                            alunoJSON["nome"] = linha["OBRIGATORIO_NOME"].toUpperCase().trim();
+                        }
+
+                        if (linha?.OBRIGATORIO_SEXO) {
+                            alunoJSON["sexo"] = fuseSexo.search(linha?.OBRIGATORIO_SEXO)[0]?.item?.value;
+                        }
+                        
+                        if (linha?.OBRIGATORIO_COR) {
+                            alunoJSON["cor"] = fuseCor.search(linha?.OBRIGATORIO_COR)[0]?.item?.value;
+                        }
+
+                        if (linha?.OBRIGATORIO_NIVEL_ENSINO) {
+                            alunoJSON["nivel"] = fuseNivel.search(linha?.OBRIGATORIO_NIVEL_ENSINO)[0]?.item?.value;
+                        }
+
+                        if (linha?.OBRIGATORIO_LOCALIZACAO) {
+                            alunoJSON["mec_tp_localizacao"] = fuseLocalizacao.search(linha?.OBRIGATORIO_LOCALIZACAO)[0]?.item?.value;
+                        }
+
+                        if (linha?.OBRIGATORIO_TURNO_ENSINO) {
+                            alunoJSON["turno"] = fuseTurno.search(linha?.OBRIGATORIO_TURNO_ENSINO)[0]?.item?.value;
+                        }
 
                         if (typeOf(linha["OBRIGATORIO_DATA_NASCIMENTO"]) == "date") {
                             alunoJSON["data_nascimento"] = moment(linha["OBRIGATORIO_DATA_NASCIMENTO"]).format("DD/MM/YYYY");
@@ -275,16 +297,13 @@ async function parsePlanilha(arquivo) {
                             alunoJSON["data_nascimento"] = moment(linha["OBRIGATORIO_DATA_NASCIMENTO"].trim(), "DD-MM-YYYY").format("DD/MM/YYYY");
                         }
 
-                        alunoJSON["sexo"] = fuseSexo.search(linha?.OBRIGATORIO_SEXO)[0]?.item?.value;
-                        alunoJSON["cor"] = fuseCor.search(linha?.OBRIGATORIO_COR)[0]?.item?.value;
-                        alunoJSON["mec_tp_localizacao"] = fuseLocalizacao.search(linha?.OBRIGATORIO_LOCALIZACAO)[0]?.item?.value;
-                        alunoJSON["nivel"] = fuseNivel.search(linha?.OBRIGATORIO_NIVEL_ENSINO)[0]?.item?.value;
-                        alunoJSON["turno"] = fuseTurno.search(linha?.OBRIGATORIO_TURNO_ENSINO)[0]?.item?.value;
-
-                        if (!(alunoJSON["nome"] && alunoJSON["sexo"] && alunoJSON["cor"] && alunoJSON["mec_tp_localizacao"] &&
-                            alunoJSON["nivel"] && alunoJSON["turno"])) {
-                            throw new Error("Campo obrigatório não preenchido ou fora do padrão.")
+                        let camposObr = ["nome", "sexo", "cor", "nivel", "turno", "mec_tp_localizacao", "data_nascimento"];
+                        for (let campo of camposObr) {
+                            if (alunoJSON[campo] == undefined || (alunoJSON[campo] instanceof Array && alunoJSON[campo].length > 0)) {
+                                throw new Error(`Campo ${campo} não preenchido ou fora do padrão.`)
+                            }
                         }
+                        
                         ////////////////////////////////////////////////////////////
                         // TRATAMENTO DOS CAMPOS OPTATIVOS
                         ////////////////////////////////////////////////////////////
@@ -320,6 +339,7 @@ async function parsePlanilha(arquivo) {
                         // promiseAlunos.push(dbInserirPromise("alunos", alunoJSON, idAluno));
                     }
                 } catch (err) {
+                    debugger
                     erroDeProcessamento = true;
                     numErros++;
 
