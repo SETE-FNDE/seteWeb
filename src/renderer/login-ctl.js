@@ -449,7 +449,7 @@ $(() => {
                     telefone: telefone,
                     email: email,
                     password: md5password,
-                    tipo_permissao: "admin",
+                    nivel_permissao: "admin",
                 })
                 .then(() => {
                     Swal2.fire({
