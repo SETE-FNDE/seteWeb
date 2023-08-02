@@ -291,6 +291,7 @@ restImpl.dbGETColecao(DB_TABLE_ROTA)
     })
     .then((rota) => {
         if (rota && rota?.data?.length > 0) {
+            idRotaAnterior = []
             rota?.data?.forEach(r => {
                 idRotaAnterior.push(r["id_rota"]);
             });
