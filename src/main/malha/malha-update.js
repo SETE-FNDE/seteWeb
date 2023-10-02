@@ -40,15 +40,15 @@ class MalhaUpdate {
         
         if (process.platform == "linux") {
             binario = "spatialite";
-            envVariables = ".:" + path.join(app.getAppPath(), "bin");
+            envVariables = ".:" + path.join(app.getAppPath(), "..", "bin");
         } else if (process.platform == "win32") {
             binario = "spatialite.exe";
         } else {
             binario = "spatialite_mac";
-            envVariables = ".:" + path.join(app.getAppPath(), "bin");
+            envVariables = ".:" + path.join(app.getAppPath(), "..", "bin");
         }
 
-        let spatialiteBinPath = path.join(app.getAppPath(), "bin", binario);
+        let spatialiteBinPath = path.join(app.getAppPath(), "..", "bin", binario);
         let sqlQuery = `BEGIN;
         SELECT DropTable(NULL, 'malha', 1);
         SELECT DropTable(NULL, 'malha_net', 1);
@@ -81,15 +81,15 @@ class MalhaUpdate {
         
         if (process.platform == "linux") {
             binario = "spatialite_osm_net";
-            envVariables = ".:" + path.join(app.getAppPath(), "bin");
+            envVariables = ".:" + path.join(app.getAppPath(), "..",  "bin");
         } else if (process.platform == "win32") {
             binario = "spatialite_osm_net.exe";
         } else {
             binario = "spatialite_osm_net_mac";
-            envVariables = ".:" + path.join(app.getAppPath(), "bin");
+            envVariables = ".:" + path.join(app.getAppPath(),"..",  "bin");
         }
 
-        let spatialiteNetBinPath = path.join(app.getAppPath(), "bin", binario);
+        let spatialiteNetBinPath = path.join(app.getAppPath(), "..", "bin", binario);
         let templateFile = path.join(path.dirname(this.dbPath), "osm_road_template");
         let args = [
             "-o", this.newOSMFile,
@@ -117,15 +117,15 @@ class MalhaUpdate {
         let envVariables = "";
         if (process.platform == "linux") {
             binario = "spatialite_network";
-            envVariables = ".:" + path.join(app.getAppPath(), "bin");
+            envVariables = ".:" + path.join(app.getAppPath(), "..", "bin");
         } else if (process.platform == "win32") {
             binario = "spatialite_network.exe";
         } else {
             binario = "spatialite_network_mac";
-            envVariables = ".:" + path.join(app.getAppPath(), "bin");
+            envVariables = ".:" + path.join(app.getAppPath(), "..", "bin");
         }
 
-        let spatialliteVirtualNetBin = path.join(app.getAppPath(), "bin", binario);
+        let spatialliteVirtualNetBin = path.join(app.getAppPath(), "..", "bin", binario);
         let args = [
             "-d", this.dbPath,
             "-T", tabela,

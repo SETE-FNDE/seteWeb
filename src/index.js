@@ -179,8 +179,14 @@ const MalhaUpdate = require("./main/malha/malha-update.js");
 // Rotina para otimização da malha
 const RouteOptimization = require("./main/routing/routing-optimization.js");
 
+// Rotina para otimização dos pontos de parada
+const PontosDeParadaOptimization = require("./main/pontos-de-parada/pontos-de-parada-optimization.js");
+
 // Worker que vai lidar com a parte de roteirização
 let routeOptimizer = new RouteOptimization(app, dbPath);
+
+// Worker que vai lidar com a parte de roteirização
+let pontosDeParadaOptimizer = new PontosDeParadaOptimization(app, dbPath);
 
 // /////////////////////////////////////////////////////////////////////////////
 // Funções para lidar com eventos do SETE
@@ -292,6 +298,7 @@ function onIniciaGeracaoRotas(event, routingArgs) {
         cost: {},
     });
 
+    
     cachedODMatrix = {
         nodes: {},
         dist: {},
@@ -319,6 +326,23 @@ function onWorkerObtemErroGeracaoRotas(err) {
     appWindow.webContents.send("renderer:erro-geracao-rotas", err);
 }
 
+// Evento que inicia a geração de pontos de parada (feito de forma assíncrona para não bloquear o processo principal)
+function onIniciaGeracaoPontosDeParada(event, paramPontosDeParada) {
+    let cachedODMatrix = appconfig.get("OD", {
+        nodes: {},
+        dist: {},
+        cost: {},
+    });
+
+    cachedODMatrix = {
+        nodes: {},
+        dist: {},
+        cost: {},
+    };
+    
+    pontosDeParadaOptimizer.optimize(cachedODMatrix, paramPontosDeParada);
+}
+
 // Registro dos listeners
 function createListeners() {
     ipcMain.handle("main:pegar-versao-sete", () => app.getVersion());
@@ -330,6 +354,8 @@ function createListeners() {
     ipcMain.handle("main:abrir-malha", onAbrirMalha);
 
     ipcMain.on("main:inicia-geracao-rotas", onIniciaGeracaoRotas);
+    ipcMain.on("main:inicia-geracao-pontos-de-parada", onIniciaGeracaoPontosDeParada);
+
     app.on("worker:finaliza-geracao-rotas", onWorkerFinalizarGeracaoRotas);
     app.on("worker:obtem-erro-geracao-rotas", onWorkerObtemErroGeracaoRotas);
 }

@@ -72,6 +72,7 @@
     }
   },
   "dependencies": {
+    "@cdxoo/dbscan": "^1.1.1",
     "@mapbox/togeojson": "^0.16.0",
     "axios": "^1.4.0",
     "bootstrap": "^5.2.3",
