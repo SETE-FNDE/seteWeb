@@ -1034,6 +1034,17 @@ if (isElectron) {
 ////////////////////////////////////////////////////////////////////////////////
 // Validar Formulário
 ////////////////////////////////////////////////////////////////////////////////
+
+// Mostra e esconde o campo para especificar a frota com base no input do usuário
+$("input[name='tipoFrota']").on('click', (evt) => {
+    if ($("#veiculosCustomizados").is(":checked")) {
+        $("#divVeiculosCustomizados").show();
+    } else {
+        $("#divVeiculosCustomizados").hide();
+    }
+})
+
+
 var validadorFormulario = $("#wizardSugestaoRotaForm").validate({
     rules: {
         publico: {
@@ -1041,6 +1052,9 @@ var validadorFormulario = $("#wizardSugestaoRotaForm").validate({
         },
         turno: {
             required: true,
+        },
+        tipoFrota: {
+            required: true
         },
         maxTime: {
             required: true,

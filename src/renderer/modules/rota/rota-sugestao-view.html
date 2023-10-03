@@ -33,12 +33,9 @@
 
                                 <div class="row justify-content-center">
                                     <h6 class="mb-4 mt-1 text-center text-space">
-                                        Essa ferramenta possibilita traçar rotas otimizadas para os(as) alunos(as) de
-                                        cada
-                                        turno.
+                                        Essa ferramenta possibilita traçar rotas otimizadas para os(as) alunos(as) de cada turno.
                                         <br>
-                                        Para tal, por favor especifique o público alvo e o tempo máximo e distância
-                                        máxima
+                                        Para tal, por favor especifique o público alvo e o tempo máximo e distância máxima 
                                         das rotas a serem geradas.
                                     </h6>
 
@@ -49,12 +46,10 @@
                                         <span data-notify="icon" class="fa fa-exclamation-circle"></span>
                                         <span data-notify="message">
                                             O SETE utiliza os parâmetros abaixo para guiar o processo de sugestão de
-                                            rotas.
-                                            Entretanto, em casos de conflito de parâmetros, por exemplo, uma distância
-                                            de
-                                            viagem permitido muito pequena e poucos veículos, o sistema irá flexibilizar
-                                            os
-                                            parâmetros para atender os alunos escolhidos na sugestão de rotas.
+                                            rotas. Entretanto, em casos de conflito de parâmetros, por exemplo, uma 
+                                            distância de viagem permitido muito pequena e poucos veículos, o sistema irá
+                                            flexibilizar os parâmetros para atender os alunos escolhidos na sugestão 
+                                            de rotas.
                                         </span>
                                     </div>
 
@@ -173,6 +168,43 @@
                                     </div>
 
                                     <div class="col-12">
+                                        <div class="form-group">
+                                            <label>
+                                                <b>Tipo da frota:</b>
+                                                <star>*</star>
+                                            </label>
+                                            <br />
+                                            <div class="form-check form-check-radio">
+                                                <label class="form-check-label">
+                                                    <input class="form-check-input" type="radio" id="veiculosCustomizados"
+                                                        name="tipoFrota" type="checkbox" value="veiculosCustomizados" checked>
+                                                    <span class="form-check-sign"></span>
+                                                    Definir os limites dos veículos
+                                                </label>
+                                            </div>
+                                            <br />
+                                            <div class="form-check form-check-radio">
+                                                <label class="form-check-label">
+                                                    <input class="form-check-input" type="radio" id="veiculosFNDE"
+                                                        name="tipoFrota" type="checkbox" value="veiculosFNDE">
+                                                    <span class="form-check-sign"></span>
+                                                    Apenas veículos do Caminho da Escola
+                                                </label>
+                                            </div>
+                                            
+                                            <br />
+                                            <div class="form-check form-check-radio">
+                                                <label class="form-check-label">
+                                                    <input class="form-check-input" type="radio" id="veiculosFrotaAtual"
+                                                        name="tipoFrota" type="checkbox" value="veiculosFrotaAtual">
+                                                    <span class="form-check-sign"></span>
+                                                    Usar frota atual
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12" id="divVeiculosCustomizados">
                                         <div class="row">
                                             <div class="col-6">
                                                 <div class="form-group">
