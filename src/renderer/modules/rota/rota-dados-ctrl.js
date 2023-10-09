@@ -538,7 +538,7 @@ async function pegarVeiculoRota() {
         // TODO: Mudar esse código
         let todosVeiculosReq = await restImpl.dbGETColecao(DB_TABLE_VEICULO);
         let veiculoRotaReq = await restImpl.dbGETEntidade(DB_TABLE_ROTA, `/${idRota}/veiculos`);
-        let v = veiculoRotaReq[0];
+        let v = veiculoRotaReq.data;
 
         let veiculoEspecifico = todosVeiculosReq.filter(a => Number(a.id_veiculo) == Number(v.id_veiculo))[0]
         estadoRota["VEICULO_ROTA"] = `${veiculoEspecifico.tipo} (${veiculoEspecifico.placa})`
