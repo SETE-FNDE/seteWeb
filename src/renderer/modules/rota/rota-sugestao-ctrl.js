@@ -41,6 +41,7 @@ var nomeRotaMap = new Map(); // Mapa que associa nome rota  -> dados da rota
 var alunos = new Array();
 var garagens = new Array();
 var escolas = new Array();
+var veiculos = [];
 
 // Número da simulação
 var numSimulacao = userconfig.get("SIMULATION_COUNT");
@@ -216,9 +217,10 @@ function plotMalha(osmGeoJSON) {
 
 // Preprocessa veículos
 async function preprocessarVeiculos() {
-    let veiculos = [];
     try {
-        veiculos = await restImpl.dbBuscarTodosDadosPromise(DB_TABLE_VEICULO);
+        let veiculosRaw = await restImpl.dbBuscarTodosDadosPromise(DB_TABLE_VEICULO);
+        veiculos = veiculosRaw.map(v => v.capacidade).sort().reverse().filter(v => Number(v) != 0);
+
     } catch (err) {
         veiculos = [];
     }
@@ -968,7 +970,18 @@ function initSimulation() {
         garage: garagens,
         stops: alunos,
         schools: escolas,
+        multiplePass: false,
     };
+
+    if ($("input[name='tipoFrota']:checked").val() == "veiculosFNDE") {
+        routeGenerationInputData["maxCapacity"] = 59;
+        routeGenerationInputData["numVehicles"] = 1;
+    } else if ($("input[name='tipoFrota']:checked").val() == "veiculosFrotaAtual") {
+        routeGenerationInputData["numVehicles"] = 1;
+        routeGenerationInputData["maxCapacity"] = Math.max(...veiculos)
+        routeGenerationInputData["multiplePass"] = true;
+        routeGenerationInputData["vehicles"] = veiculos;
+    }
 
     window.sete.iniciaGeracaoRotas(routeGenerationInputData);
 }
@@ -1084,7 +1097,7 @@ var validadorFormulario = $("#wizardSugestaoRotaForm").validate({
             required: true,
             number: true,
             min: 1,
-            max: 100,
+            max: 200,
         },
     },
     messages: {
@@ -1149,6 +1162,14 @@ function validaDadosEscolhidos() {
             `Não é possível realizar a sugestão de rotas. Para esta combinação de parâmetros não há nenhuma escola georeferenciada`,
             "",
             "Nenhuma escola georeferenciada neste caso"
+        );
+        formValido = false;
+    } else if ($("input[name='tipoFrota']:checked").val() == "veiculosFrotaAtual" && 
+                veiculos.reduce((a, b) => a + b, 0) < alunos.length) {
+        errorFn(
+            `Não é possível realizar a sugestão de rotas. O número de alunos é maior que a capacidade da frota`,
+            "",
+            "O número de alunos " + String(alunos.length) + " é maior que a capacidade da frota " + String(veiculos.reduce((a, b) => a + b, 0))
         );
         formValido = false;
     }

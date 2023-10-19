@@ -51,6 +51,8 @@ class RoutingOptimizationWorker {
         return new Promise((resolve, reject) => {
             // Activate spatial db
             this.spatialiteDB.spatialite((dbError) => {
+                console.log("--> --> --> INICIO KMEANS");
+
                 if (dbError) {
                     reject("ERRO AO ABRIR MALHA");
                 }
@@ -60,33 +62,91 @@ class RoutingOptimizationWorker {
                 let kmeans = new SchoolBusKMeans(this.routingParams);
                 let routingGraph;
 
-                console.log("--> --> --> INICIO KMEANS");
                 kmeans.partition(this.routingParams["numVehicles"])
-                    .then(clusters => {
+                    .then(async (clusters) => {
                         console.log("--> --> --> FINALIZOU KMEANS");
+                        console.log("--> --> --> INICIOU CLARK AND WRIGHT + SpeedRoute");
+
                         let clusterizedStops = new Array();
                         clusters.forEach((c) => clusterizedStops.push(this.getStops(c.cluster)))
-
                         let clarkAlgorithmsPromise = new Array();
-                        clusterizedStops.forEach((cs) => {
+
+                        if (this.routingParams["multiplePass"]) {
+                            console.log("--> --> --> --> INICIO DE MULTIPLE PASS");
+                            let veiculos = this.routingParams["vehicles"];
                             let param = Object.assign({}, this.routingParams);
-                            param["stops"] = cs;
+                            // veiculos = [3, 2, 2, 2, 2];
 
-                            // Deixar apenas as escolas que atendem os alunos no conjunto
-                            let clusterSchoolsSet = new Set()
-                            cs.forEach(student => clusterSchoolsSet.add(student["school"]))
-                            let clusterSchools = new Array()
-                            this.routingParams.schools.forEach(school => {
-                                if (clusterSchoolsSet.has(school["key"])) {
-                                    clusterSchools.push(school);
+                            // Rodaremos o algoritmo para cada veículo
+                            // Isto é, consideraremos a restrição de cada veículo
+                            for (let v of veiculos) {
+                                // Ajusta os parâmetros para a capacidade do veículo atual
+                                param = Object.assign({}, param);
+                                param["maxCapacity"] = v;
+
+                                // Executa o algoritmo
+                                let cwalg = new ClarkeWrightSchoolBusRouting(this.cachedODMatrix, param, this.spatialiteDB);
+                                await cwalg.spatialRoute();
+
+                                // Deixa apenas a maior rota, uma vez que estamos considerando apenas o veículo da rodada
+                                let maiorRota;
+                                let tamMaiorRota = 0;
+                                for (let rota of cwalg.routes.values()) {
+                                    if (rota.route.length > tamMaiorRota) {
+                                        maiorRota = rota;
+                                        tamMaiorRota = rota.route.length;
+                                    }
                                 }
-                            })
-                            param["schools"] = clusterSchools;
+                                cwalg.routes = new Map();
+                                cwalg.routes.set(maiorRota.busID, maiorRota)
 
-                            let cwalg = new ClarkeWrightSchoolBusRouting(this.cachedODMatrix, param, this.spatialiteDB);
-                            clarkAlgorithmsPromise.push(cwalg.spatialRoute());
-                            routers.push(cwalg);
-                        })
+                                // Faz o push das promisses com os resultados
+                                clarkAlgorithmsPromise.push(Promise.resolve(cwalg.routes));
+                                routers.push(cwalg);
+                                
+                                // Remove os alunos atendidos da rota extraída de params
+                                let setAlunosAtendidos = new Set(maiorRota.route);
+                                let arrAlunosRestantes = param["stops"].filter(el => !setAlunosAtendidos.has(el.key));
+                                param["stops"] = arrAlunosRestantes;
+
+                                // Se não tem que atender mais nenhum aluno, saí do laço
+                                if (arrAlunosRestantes.length == 0) {
+                                    break;
+                                }
+                                
+                                // Ajusta as escolas, para somente as dos estudantes atuais
+                                let setEscolasAlunosRestantes = new Set();
+                                let arrEscolasAlunosRestantes = new Array()
+                                arrAlunosRestantes.forEach(student => setEscolasAlunosRestantes.add(student["school"]));
+                                param["schools"].forEach(school => {
+                                    if (setEscolasAlunosRestantes.has(school["key"])) {
+                                        arrEscolasAlunosRestantes.push(school);
+                                    }
+                                })
+                                param["schools"] = arrEscolasAlunosRestantes;
+                            }
+                        } else {
+                            clusterizedStops.forEach((cs) => {
+                                let param = Object.assign({}, this.routingParams);
+                                param["stops"] = cs;
+    
+                                // Deixar apenas as escolas que atendem os alunos no conjunto
+                                let clusterSchoolsSet = new Set()
+                                cs.forEach(student => clusterSchoolsSet.add(student["school"]))
+                                let clusterSchools = new Array()
+                                this.routingParams.schools.forEach(school => {
+                                    if (clusterSchoolsSet.has(school["key"])) {
+                                        clusterSchools.push(school);
+                                    }
+                                })
+                                param["schools"] = clusterSchools;
+    
+                                let cwalg = new ClarkeWrightSchoolBusRouting(this.cachedODMatrix, param, this.spatialiteDB);
+                                clarkAlgorithmsPromise.push(cwalg.spatialRoute());
+                                routers.push(cwalg);
+                            })
+                        }
+                       
 
                         // let schoolBusRouter = new ClarkeWrightSchoolBusRouting(this.routingParams, this.spatialiteDB);
                         // schoolBusRouter.spatialRoute().then((busRoutes) => {
@@ -94,6 +154,8 @@ class RoutingOptimizationWorker {
                     })
                     .then((busRoutesGenerated) => {
                         console.log("--> --> --> FINALIZOU CLARK AND WRIGHT + SpeedRoute");
+                        console.log("--> --> --> INICIOU RECONSTRUÇÃO MALHA DAS ESCOLAS");
+
                         // Bus Routes
                         busRoutes = busRoutesGenerated;
 
@@ -128,7 +190,9 @@ class RoutingOptimizationWorker {
                         return Promise.all(routingGraph.buildInnerCityMatrix())
                     })
                     .then(() => {
-                        console.log("--> --> --> FINALIZOU 2-3-OPT");
+                        console.log("--> --> --> FINALIZOU RECONSTRUÇÃO MALHA DAS ESCOLAS");
+                        console.log("--> --> --> INICIOU 2-3-OPT");
+
                         // Run opt
                         let optimizedRoutes = new Array();
 
@@ -157,13 +221,16 @@ class RoutingOptimizationWorker {
                         return Promise.all(promises)
                     })
                     .then((routesJSON) => {
-                        console.log("--> --> --> FINALIZOU TRADUÇÃO DE ROTA PARA GEOJSON");
+                        console.log("--> --> --> FINALIZOU 2-3-OPT");
+                        console.log("--> --> --> INICIOU TRADUÇÃO DE ROTA PARA GEOJSON");
+
                         var fc = new Map();
                         routesJSON.forEach((r) => {
                             var ckey = r["path"].map(a => a["id"]).join("-")
                             fc.set(ckey, r);
                         })
                         // console.log([...fc.values()]);
+                        console.log("--> --> --> FINALIZOU TRADUÇÃO DE ROTA PARA GEOJSON");
                         resolve([this.cachedODMatrix, ...fc.values()])
                     })
             })
