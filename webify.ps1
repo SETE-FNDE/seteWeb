@@ -2,7 +2,7 @@ $configFiles = Get-ChildItem src *.html -rec
 foreach ($file in $configFiles)
 {
     (Get-Content $file.PSPath) |
-    Foreach-Object { $_ -replace "./modules", "https://sete-web.transportesufg.eng.br/src/renderer/modules" } |
+    Foreach-Object { $_ -replace "./modules", "https://www.fnde.gov.br/sete/src/renderer/modules" } |
     Set-Content $file.PSPath
 }
 
@@ -10,8 +10,8 @@ $configFiles = Get-ChildItem src *.html -rec
 foreach ($file in $configFiles)
 {
     (Get-Content $file.PSPath) |
-    Foreach-Object { $_ -replace "src=""./img", "src=""https://sete-web.transportesufg.eng.br/src/renderer/img" } |
-    Foreach-Object { $_ -replace "src=""img",   "src=""https://sete-web.transportesufg.eng.br/src/renderer/img" } |
+    Foreach-Object { $_ -replace "src=""./img", "src=""https://www.fnde.gov.br/sete/src/renderer/img" } |
+    Foreach-Object { $_ -replace "src=""img",   "src=""https://www.fnde.gov.br/sete/src/renderer/img" } |
     Set-Content $file.PSPath
 }
 
@@ -20,7 +20,7 @@ $configFiles = Get-ChildItem src *.html -rec
 foreach ($file in $configFiles)
 {
     (Get-Content $file.PSPath) |
-    Foreach-Object { $_ -replace "href=""css", "href=""https://sete-web.transportesufg.eng.br/src/renderer/css" } |
+    Foreach-Object { $_ -replace "href=""css", "href=""https://www.fnde.gov.br/sete/src/renderer/css" } |
     Set-Content $file.PSPath
 }
 
@@ -28,7 +28,7 @@ $configFiles = Get-ChildItem src *.html -rec
 foreach ($file in $configFiles)
 {
     (Get-Content $file.PSPath) |
-    Foreach-Object { $_ -replace "src=""js", "src=""https://sete-web.transportesufg.eng.br/src/renderer/js" } |
+    Foreach-Object { $_ -replace "src=""js", "src=""https://www.fnde.gov.br/sete/src/renderer/js" } |
     Set-Content $file.PSPath
 }
 
