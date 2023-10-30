@@ -13,8 +13,8 @@ var mapaRotaGerada = novoMapaOpenLayers("mapaRotaSugestaoGerada", cidadeLatitude
 
 // Desenha elementos
 // Onde vamos adicionar os elementos
-var vSource = mapaConfig["vectorSource"];
-var gSource = mapaRotaGerada["vectorSource"];
+var mapaConfigVectorSource = mapaConfig["vectorSource"];
+var mapaGeradoVectorSource = mapaRotaGerada["vectorSource"];
 
 // Rotina para atualizar os mapas quando a tela redimensionar
 window.onresize = function () {
@@ -28,19 +28,27 @@ window.onresize = function () {
     }, 200);
 };
 
+// Escolheu a rota a ser analisada?
+var escolheuRota = false;
+var idRotaSelecionada = 0;
+
 // Variável para armazenar as rotas geradas
 var rotasGeradas = new Map();
 
 // Variáveis que armazenará todos os usuários e escolas que podem utilizar a ferramenta
-var alunoMap = new Map(); // Mapa que associa id aluno -> dados do aluno
-var escolaMap = new Map(); // Mapa que associa id escola -> dados da escola
-var rotasMap = new Map();
+var alunoMap = new Map();      // Mapa que associa id aluno -> dados do aluno
+var escolaMap = new Map();     // Mapa que associa id escola -> dados da escola
+var rotasMap = new Map();      // Mapa que associa id rota -> dados da rota
 var nomeEscolaMap = new Map(); // Mapa que associa nome escola -> dados da escola
-var nomeRotaMap = new Map(); // Mapa que associa nome rota  -> dados da rota
 
-// Variáveis qeu contém apenas os usuários escolhidos para o processo de simulação
+// Variáveis que contém apenas os usuários escolhidos para o processo de simulação
+var alunosRota = [];
+var demaisAlunos = [];
+var alunosParaAproveitamento = [];
+var escolasRota = [];
+var demaisEscolas = [];
+
 var alunos = new Array();
-var garagens = new Array();
 var escolas = new Array();
 var veiculos = [];
 
@@ -74,24 +82,17 @@ function startTool() {
     } else {
         // Rodando no electron
         criarModalLoading("Preparando a ferramenta");
-        window.sete
-            .abrirMalha()
-            // .then((dataOSM) => convertOSMToGeoJSON(dataOSM))
-            // .then((osmGeoJSON) => plotMalha(osmGeoJSON))
-            .then(() => preprocessarVeiculos())
+        window.sete.abrirMalha()
+            .then((dataOSM) => convertOSMToGeoJSON(dataOSM))
+            .then((osmGeoJSON) => plotMalha(osmGeoJSON))
             .then(() => preprocessarEscolas())
             .then(() => preprocessarRotas())
-            .then(() => plotarRotasConfig())
-            // .then(() => preprocessarGaragem())
             .then(() => preprocessarAlunos())
             .then(() => listaElementos())
             .catch((err) => {
                 let code = err.code;
-                debugger
                 if (code == "erro:malha") {
                     informarNaoExistenciaDado("Malha não cadastrada", "Cadastrar malha", "a[name='rota/rota-malha-view']", "#veiculoMenu");
-                } else if (code == "erro:garagem") {
-                    informarNaoExistenciaDado("Garagem não cadastrada", "Cadastrar garagem", "a[name='frota/garagem-visualizar-view']", "#veiculoMenu");
                 } else if (code == "erro:aluno") {
                     informarNaoExistenciaDado("Não há nenhum aluno georeferenciado", "Gerenciar alunos", "a[name='aluno/aluno-listar-view']", "#alunoMenu");
                 } else if (code == "erro:escola") {
@@ -101,6 +102,8 @@ function startTool() {
                         "a[name='escola/escola-listar-view']",
                         "#escolaMenu"
                     );
+                } else if (code == "erro:rota") {
+                    informarNaoExistenciaDado("Não há nenhuma rota digitalizada", "Gerenciar rotas", "a[name='rota/rota-listar-view']", "#rotaMenu");
                 } else if (code == "erro:vinculo") {
                     informarNaoExistenciaDado(
                         "As escolas dos alunos escolhidos não estão georeferenciadas",
@@ -109,8 +112,7 @@ function startTool() {
                         "#escolaMenu"
                     );
                 } else {
-                    errorFn(`Erro ao utilizar a ferramenta de sugestão de rotas. 
-                         Entre em contato com a equipe de suporte`);
+                    criarModalErro(`Erro ao utilizar a ferramenta de sugestão de rotas. Entre em contato com a equipe de suporte`);
                 }
             });
     }
@@ -129,7 +131,7 @@ var informarNaoExistenciaDado = (titulo, msgConfirmacao, pagCadastroDado, pagMen
         confirmButtonText: msgConfirmacao,
     }).then((result) => {
         if (result.value) {
-            $(pagCadastroDado).click();
+            $(pagCadastroDado).trigger("click");
             $(pagMenu).collapse();
         } else {
             navigateDashboard("./dashboard-main.html");
@@ -202,11 +204,11 @@ function plotMalha(osmGeoJSON) {
             tile.setFeatures(features);
         },
     });
-    mapaConfig["vectorLayer"].setZIndex(99);
+    mapaConfig["vectorLayer"].setZIndex(1);
 
     var malhaVectorLayer = new ol.layer.VectorTile({
         source: malhaVectorSource,
-        zIndex: 90,
+        zIndex: 1,
         maxZoom: 20,
         minZoom: 12,
         style: (feature, resolution) => {
@@ -219,19 +221,6 @@ function plotMalha(osmGeoJSON) {
     });
     olConfigMap.addLayer(malhaVectorLayer);
     return Promise.resolve(tileIndex);
-}
-
-// Preprocessa veículos
-async function preprocessarVeiculos() {
-    try {
-        let veiculosRaw = await restImpl.dbBuscarTodosDadosPromise(DB_TABLE_VEICULO);
-        veiculos = veiculosRaw.map(v => v.capacidade).sort().reverse().filter(v => Number(v) != 0);
-
-    } catch (err) {
-        veiculos = [];
-    }
-
-    $("#numVehicles").val(1);
 }
 
 // Preprocessa alunos
@@ -288,11 +277,19 @@ async function preprocessarAlunos() {
             }
 
             // Verifica rota do aluno
-            if (alunoJSON["ROTA"] && nomeRotaMap.has(alunoJSON["ROTA"])) {
-                let rotaJSON = nomeRotaMap.get(alunoJSON["ROTA"]);
-                alunoJSON["TEM_ROTA"] = true;
-                alunoJSON["ROTA_ID"] = rotaJSON["ID"];
-                alunoJSON["ROTA_NOME"] = rotaJSON["NOME"];
+            if (alunoJSON["ROTA"] == "Sim") {
+                try {
+                    let rotasDoAluno = await restImpl.dbGETEntidade(DB_TABLE_ALUNO, `/${alunoJSON["ID"]}/rota`);
+                    let idRotasDoAluno = rotasDoAluno.data.map(r => r.id_rota);
+                    let nomeDasRotas = idRotasDoAluno.map(k => rotasMap.get(k).nome).join(",")
+                    alunoJSON["TEM_ROTA"] = true;
+                    alunoJSON["ROTA_ID"] = idRotasDoAluno;
+                    alunoJSON["ROTA_NOME"] = nomeDasRotas;
+                } catch (error) {
+                    alunoJSON["TEM_ROTA"] = false;
+                    alunoJSON["ROTA_ID"] = "";
+                    alunoJSON["ROTA_NOME"] = "";
+                }
             } else {
                 alunoJSON["TEM_ROTA"] = false;
                 alunoJSON["ROTA_ID"] = "";
@@ -356,7 +353,9 @@ async function preprocessarEscolas() {
 // Preprocessa rotas
 async function preprocessarRotas() {
     try {
+        let numRotasComShape = 0;
         let rotas = await restImpl.dbGETColecao(DB_TABLE_ROTA);
+
         for (let rotaRaw of rotas) {
             try {
                 let rotaID = rotaRaw["id_rota"];
@@ -368,126 +367,126 @@ async function preprocessarRotas() {
                 rotaJSON["SHAPE"] = rotaShape.data.shape;
                 rotaJSON["ALUNOS"] = rotaAlunos.data;
                 rotaJSON["NUM_ALUNOS"] = rotaAlunos?.data?.length;
+
                 rotasMap.set(rotaID, rotaJSON);
+                numRotasComShape++;
             } catch (errShape) {
                 console.log(rotaRaw["id_rota"] + " não possui shape");
             }
         }
 
+        if (numRotasComShape == 0) {
+            return Promise.reject({ code: "erro:rota" });
+        }
     } catch (err) {
-        console.log("Não há nenhuma rota cadastrada");
+        return Promise.reject({ code: "erro:rota" });
     }
 }
 
 // Plotar Rotas
-async function plotarRotasConfig() {
-    let rotasManha = [];
-    let rotasTarde = [];
-    let rotasNoite = [];
+$("#listarotas").on("change", async (evt) => {
+    if (evt.currentTarget.value == "") {
+        escolheuRota = false;
+    } else {
+        idRotaSelecionada = Number(evt.currentTarget.value);
+        escolheuRota = true;
 
-    // ordena rotas por nome
-    [...rotasMap.keys()].sort((a, b) => {
-        let nomeA = rotasMap.get(a)["NOME"]?.toLowerCase().trim();
-        let nomeB = rotasMap.get(b)["NOME"]?.toLowerCase().trim();
-        let parA = nomeA.split(" ");
-        let parB = nomeB.split(" ");
+        mapaConfig["vectorSource"].clear();
+        
+        filtraAlunosEscolasDaRota(idRotaSelecionada);
 
-        if (parA.length > 0 && parB.length > 0) {
-            parA = parA[0];
-            parB = parB[0];
-            if (isNumeric(parA) && isNumeric(parB)) {
-                return parA - parB;
-            }
-        }
-        return nomeA.localeCompare(nomeB);
-    }).reverse().forEach(rotaKey => {
-        // lê o geojson
-        // coloca elas no respectivo array (manhã, tarde, noite)
-        let rota = rotasMap.get(rotaKey);
-        if (rota["SHAPE"] != "" && rota["SHAPE"] != null && rota["SHAPE"] != undefined) {
-            try {
-                let rotaNome = rota["NOME"];
-                let rotaCor = proximaCor();
-                let rotaGeoJSON = (new ol.format.GeoJSON()).readFeatures(rota["SHAPE"]);
+        drawAlunos(demaisAlunos, mapaConfig["vectorSource"], "img/icones/aluno-marcador-v2.png", 0.5);
+        drawEscolas(demaisEscolas, mapaConfig["vectorSource"], 0.5);
+        drawAlunos(alunosRota, mapaConfig["vectorSource"]);
+        drawEscolas(escolasRota, mapaConfig["vectorSource"]);
+        drawRotaConfig(idRotaSelecionada);
 
-                rotaGeoJSON.forEach(f => {
-                    f.set("nome", rota["NOME"]);
-                    f.set("km", rota["KM"]);
-                    f.set("tempo", rota["TEMPO"] != "" ? rota["TEMPO"] : "Não");
-                    f.set("num_alunos", rota["NUM_ALUNOS"]);
-                    f.set("tipo", "rota");
-                });
-
-                let rotaStyles = [
-                    new ol.style.Style({
-                        stroke: new ol.style.Stroke({
-                            color: "white",
-                            width: 7
-                        })
-                    }),
-                    new ol.style.Style({
-                        stroke: new ol.style.Stroke({
-                            color: rotaCor,
-                            width: 5
-                        })
-                    })
-                ]
-
-                let camada = mapa["createLayer"](rotaNome, rotaNome, true)
-                camada.source.addFeatures(rotaGeoJSON);
-                camada.layer.setStyle(rotaStyles);
-                camada.layer.setZIndex(1);
-                camada.layer.setVisible(true);
-                camada.layer.setExtent(camada.source.getExtent());
-                
-                rota.turno_matutino == "S" ? rotasManha.push(camada.layer) : null;
-                rota.turno_vespertino == "S" ? rotasTarde.push(camada.layer) : null;
-                rota.turno_noturno == "S" ? rotasNoite.push(camada.layer) : null;
-            } catch (error) {
-                console.log(error);
-            }
-        }
-    })
-
-    mapaConfig["addGroupLayer"]("Noite", rotasNoite);
-    mapaConfig["addGroupLayer"]("Tarde", rotasTarde)
-    mapaConfig["addGroupLayer"]("Manhã", rotasManha);
-    mapaConfig["activateSidebarLayerSwitcher"](".sidebar-RotasConfig");
-
-
-}
-
-
-// Preprocessa garagens
-async function preprocessarGaragem() {
-    try {
-        let garagensRaw = await restImpl.dbGETColecao(DB_TABLE_GARAGEM);
-        let idGaragem = garagensRaw[0]?.id_garagem;
-        let garagemJSON = await restImpl.dbGETEntidade(DB_TABLE_GARAGEM, `/${idGaragem}`);
-
-        if (
-            garagemJSON["loc_latitude"] != "" &&
-            garagemJSON["loc_longitude"] != "" &&
-            garagemJSON["loc_latitude"] != undefined &&
-            garagemJSON["loc_longitude"] != undefined &&
-            garagemJSON["loc_latitude"] != null &&
-            garagemJSON["loc_longitude"] != null
-        ) {
-            garagens.push({
-                key: garagemJSON.id_garagem,
-                tipo: "garagem",
-                lat: garagemJSON["loc_latitude"],
-                lng: garagemJSON["loc_longitude"],
+        setTimeout(() => {
+            mapaConfig["map"].getView().fit(mapaConfig["vectorSource"].getExtent(), {
+                padding: [40, 40, 40, 40],
             });
-        } else {
-            throw new Error("erro:garagem");
-        }
-    } catch (err) {
-        return Promise.reject({ code: "erro:garagem" });
+        }, 300);
     }
+});
 
-    return garagens;
+function filtraAlunosEscolasDaRota(idRotaSelecionada) {
+    // Verifica se é para mostrar apenas as rotas da manhã/tarde ou de tarde/noite
+    let filtroTurno = Number($("input[name='turno']:checked").val());
+    let filtroAnaliseManhaTarde = filtroTurno == 1 ? true : false;
+
+    let rota = rotasMap.get(idRotaSelecionada);
+    let alunosRotaRaw = rota["ALUNOS"];
+    let arrAlunosRota = [];
+    let arrDemaisAlunos = [];
+
+    // Filtrar alunos e escolas pertinentes
+    let alunosRotaSet = new Set(alunosRotaRaw.map((a) => a.id_aluno));
+    let escolasRotaSet = new Set();
+    let demaisEscolasSet = new Set();
+
+    alunoMap.forEach((aluno) => {
+        let alunoFiltrado = false;
+        if (alunosRotaSet.has(aluno.id_aluno)) {
+            alunoFiltrado = aluno["GPS"];
+        } else if (filtroAnaliseManhaTarde) { // manhã-tarde
+            alunoFiltrado = aluno["GPS"] && aluno["ESCOLA_TEM_GPS"] && (aluno["TURNO"] == 2 || aluno["TURNO"] == 3)
+        } else { // noturno
+            alunoFiltrado = aluno["GPS"] && aluno["ESCOLA_TEM_GPS"] && aluno["TURNO"] == 4
+        }
+        
+        if (alunoFiltrado) {
+            if (!alunosRotaSet.has(aluno.id_aluno)) {
+                arrDemaisAlunos.push(aluno);
+                demaisEscolasSet.add(aluno["ESCOLA_ID"]);
+            } else {
+                arrAlunosRota.push(aluno);
+                escolasRotaSet.add(aluno["ESCOLA_ID"]);
+            }
+        }
+        return alunoFiltrado;
+    });
+
+    
+    alunosRota = mapeiaAlunosParaDadoEspacial(arrAlunosRota);
+    demaisAlunos = mapeiaAlunosParaDadoEspacial(arrDemaisAlunos);
+    
+    escolasRota = mapeiaEscolasParaDadoEspacial([...escolaMap].filter((e) => escolasRotaSet.has(e[1]["ID"])));
+    demaisEscolas = mapeiaEscolasParaDadoEspacial([...escolaMap].filter((e) => demaisEscolasSet.has(e[1]["ID"])));
 }
+
+function drawRotaConfig(idRota) {
+    let rota = rotasMap.get(idRota);
+    let rotaCor = "#1caac7";
+    let rotaGeoJSON = new ol.format.GeoJSON().readFeatures(rota["SHAPE"]);
+   
+    rotaGeoJSON.forEach((f) => {
+        f.set("nome", rota["NOME"]);
+        f.set("km", rota["KM"]);
+        f.set("tempo", rota["TEMPO"] != "" ? rota["TEMPO"] : "Não");
+        f.set("num_alunos", rota["NUM_ALUNOS"]);
+        f.set("tipo", "rota");
+    });
+
+    let rotaStyles = [
+        new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: "white",
+                width: 7,
+            }),
+        }),
+        new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: rotaCor,
+                width: 5,
+            }),
+        }),
+    ];
+
+    mapaConfig["vectorSource"].addFeatures(rotaGeoJSON);
+    mapaConfig["vectorLayer"].setStyle(rotaStyles);
+    mapaConfig["vectorLayer"].setZIndex(2);
+}
+
 
 // Filtrar os alunos e escolas que estão georeferenciados
 function processarVinculoAlunoEscolas(res) {
@@ -542,33 +541,27 @@ function processarVinculoAlunoRota(res) {
     return alunoMap;
 }
 
-// Pega os elementos do mapa e transforma no nosso array
-function transformaAlunosEmArray(mapaAlunos) {
-    let alunosArray = [];
-    mapaAlunos.forEach(([aID, a]) => {
-        if (a["GPS"] && a["ESCOLA_TEM_GPS"]) {
-            alunosArray.push({
-                key: aID,
-                tipo: "aluno",
-                nome: a["NOME"],
-                lat: a["LOC_LATITUDE"],
-                lng: a["LOC_LONGITUDE"],
-                turno: a["TURNOSTR"],
-                nivel: a["NIVELSTR"],
-                temEscola: a["TEM_ESCOLA"],
-                school: String(a["ESCOLA_ID"]),
-                escolaID: String(a["ESCOLA_ID"]),
-                escolaNome: a["ESCOLA_NOME"],
-                escolaTemGPS: a["ESCOLA_TEM_GPS"] ? "Sim" : "Não",
-                passengers: 1,
-            });
-        }
-    });
-
-    return alunosArray;
+function mapeiaAlunosParaDadoEspacial(arr) {
+    return arr.map((a) => ({
+        key: a["ID_ALUNO"],
+        tipo: "aluno",
+        nome: a["NOME"],
+        lat: a["LOC_LATITUDE"],
+        lng: a["LOC_LONGITUDE"],
+        turno: a["TURNOSTR"],
+        nivel: a["NIVELSTR"],
+        temEscola: a["TEM_ESCOLA"],
+        nomeRota: a["ROTA_NOME"],
+        temRota: a["ROTA"],
+        school: String(a["ESCOLA_ID"]),
+        escolaID: String(a["ESCOLA_ID"]),
+        escolaNome: a["ESCOLA_NOME"],
+        escolaTemGPS: a["ESCOLA_TEM_GPS"] ? "Sim" : "Não",
+        passengers: 1,
+    }));
 }
 
-function transformaEscolaEmArray(mapaEscolas) {
+function mapeiaEscolasParaDadoEspacial(mapaEscolas) {
     let escolasArray = [];
     mapaEscolas.forEach(([eID, e]) => {
         if (e["GPS"] && e["TEM_ALUNO_COM_GPS"]) {
@@ -588,28 +581,16 @@ function transformaEscolaEmArray(mapaEscolas) {
     return escolasArray;
 }
 
+
 function listaElementos() {
-    alunos = transformaAlunosEmArray([...alunoMap]);
-    escolas = transformaEscolaEmArray([...escolaMap]);
-
-    drawMapElements(alunos, garagens, escolas, vSource);
-    drawMapElements(alunos, garagens, escolas, gSource);
-    setTimeout(() => {
-        mapaConfig["map"].getView().fit(vSource.getExtent(), {
-            padding: [40, 40, 40, 40],
-        });
-        mapaRotaGerada["map"].getView().fit(gSource.getExtent(), {
-            padding: [40, 40, 40, 40],
-        });
-    }, 500);
-
     $("#turnoManhaTarde").trigger("click");
     Swal2.close();
+
+    addInteraction();
 }
 
-function drawMapElements(arrAlunos, arrGaragens, arrEscolas, camada) {
-    for (let i in arrAlunos) {
-        let a = arrAlunos[i];
+function drawAlunos(arrAlunos, camada, imgAluno = "img/icones/aluno-marcador.png", imgOpacity = 1) {
+    arrAlunos.forEach((a) => {
         let p = new ol.Feature({
             ...a,
             geometry: new ol.geom.Point(ol.proj.fromLonLat([a["lng"], a["lat"]])),
@@ -620,16 +601,17 @@ function drawMapElements(arrAlunos, arrGaragens, arrEscolas, camada) {
                     anchor: [12, 37],
                     anchorXUnits: "pixels",
                     anchorYUnits: "pixels",
-                    opacity: 1,
-                    src: "img/icones/aluno-marcador.png",
+                    opacity: imgOpacity,
+                    src: imgAluno,
                 }),
             })
         );
         camada.addFeature(p);
-    }
+    });
+}
 
-    for (let i in arrEscolas) {
-        let e = arrEscolas[i];
+function drawEscolas(arrEscolas, camada, imgOpacity) {
+    arrEscolas.forEach((e) => {
         let p = new ol.Feature({
             ...e,
             geometry: new ol.geom.Point(ol.proj.fromLonLat([e["lng"], e["lat"]])),
@@ -640,32 +622,13 @@ function drawMapElements(arrAlunos, arrGaragens, arrEscolas, camada) {
                     anchor: [12, 37],
                     anchorXUnits: "pixels",
                     anchorYUnits: "pixels",
-                    opacity: 1,
+                    opacity: imgOpacity,
                     src: "img/icones/escola-marcador.png",
                 }),
             })
         );
         camada.addFeature(p);
-    }
-    for (let i in arrGaragens) {
-        let g = arrGaragens[i];
-        let p = new ol.Feature({
-            ...g,
-            geometry: new ol.geom.Point(ol.proj.fromLonLat([g["lng"], g["lat"]])),
-        });
-        p.setStyle(
-            new ol.style.Style({
-                image: new ol.style.Icon({
-                    anchor: [12, 37],
-                    anchorXUnits: "pixels",
-                    anchorYUnits: "pixels",
-                    opacity: 1,
-                    src: "img/icones/garagem-marcador.png",
-                }),
-            })
-        );
-        camada.addFeature(p);
-    }
+    });
 }
 
 function getPoint(stopType, stopID) {
@@ -811,87 +774,6 @@ function drawRoutes(routesJSON) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Animação
-///////////////////////////////////////////////////////////////////////////////
-function iniciaAnimacao(rotaID) {
-    animating = false;
-
-    let rotaPicked = rotasGeradas.get(rotaID);
-    pickedLayer = rotaPicked["layer"];
-    pickedRoute = rotaPicked["payload"];
-    pickedRouteLength = pickedRoute["purejson"].coordinates.length;
-    pickedLayer.setZIndex(2);
-    startAnimation();
-}
-
-var pickedLayer = null;
-var pickedRoute = null;
-var pickedRouteLength = 0;
-var animating = false;
-var speed = 20;
-var now = 0;
-
-var moveFeature = function (event) {
-    var vectorContext = ol.render.getVectorContext(event);
-    var frameState = event.frameState;
-
-    var elapsedTime = frameState.time - now;
-    // here the trick to increase speed is to jump some indexes
-    // on lineString coordinates
-    var index = Math.round((speed * elapsedTime) / 1000);
-
-    if (index >= pickedRouteLength) {
-        pickedLayer.un("postrender", moveFeature);
-        animating = false;
-        return;
-    }
-
-    let pcoord = pickedRoute["purejson"].coordinates[index];
-    let plat = pcoord[1];
-    let plng = pcoord[0];
-
-    let geoMarker = new ol.Feature({
-        geometry: new ol.geom.Point(ol.proj.fromLonLat([plng, plat])),
-    });
-    let geoStyle = new ol.style.Style({
-        image: new ol.style.Circle({
-            radius: 7,
-            fill: new ol.style.Fill({ color: "black" }),
-            stroke: new ol.style.Stroke({
-                color: "white",
-                width: 2,
-            }),
-        }),
-    });
-
-    let iconStyle = new ol.style.Style({
-        image: new ol.style.Icon({
-            // anchor: [0, 0],
-            // anchorXUnits: 'pixels',
-            // anchorYUnits: 'pixels',
-            opacity: 1,
-            img: document.getElementById("onibusMarcador"),
-            // src: "img/icones/onibus-marcador.png",
-            imgSize: [36, 36],
-            // size: [36, 36]
-        }),
-    });
-
-    vectorContext.drawFeature(geoMarker, iconStyle);
-    // tell OpenLayers to continue the postrender animation
-    if (animating) {
-        mapaRotaGerada["map"].render();
-    }
-};
-
-function startAnimation() {
-    animating = true;
-    now = new Date().getTime();
-    pickedLayer.on("postrender", moveFeature);
-    mapaRotaGerada["map"].render();
-}
-
-///////////////////////////////////////////////////////////////////////////////
 // Popup
 ///////////////////////////////////////////////////////////////////////////////
 var selectConfig = new ol.interaction.Select({
@@ -941,6 +823,14 @@ var popupConfig = new ol.Overlay.PopupFeature({
             },
             turno: {
                 title: "Turno",
+                visible: (e) => e.getProperties().tipo == "aluno",
+            },
+            nomeRota: {
+                title: "Nome da Rota",
+                visible: (e) => e.getProperties().tipo == "aluno",
+            },
+            temRota: {
+                title: "Tem Rota?",
                 visible: (e) => e.getProperties().tipo == "aluno",
             },
             escolaNome: {
@@ -1077,25 +967,58 @@ mapaRotaGerada["map"].addOverlay(popup);
 // Realiza a Simulação
 //////////////////////////////////////////////////////////////
 
+function filtraAlunosQuePodemSerAproveitados(rota, params) {
+    debugger
+
+    let shp = rota.SHAPE
+    let shpJS = JSON.parse(shp)
+    let shpWGS84 = turf.toWgs84(shpJS)
+    let shpLineString = shpWGS84.features.filter(f => f?.geometry?.type == "LineString").flatMap(f => f?.geometry?.coordinates)
+    
+    let arrFiltro = [];
+
+    for (aluno of params.demaisAlunos) {
+        let alunoPoint = turf.point([aluno.lng, aluno.lat]);
+        let alunoDist = turf.pointToLineDistance(alunoPoint, shpLineString);
+
+        // distance é retornada em km (por isso multiplicamos por 1000)
+        if (alunoDist * 1000 < params.maxTravDist) {
+            arrFiltro.push(aluno);
+        }
+    }
+
+    mapaConfig["vectorSource"].clear();
+    drawAlunos(arrFiltro, mapaConfig["vectorSource"]);
+    mapaConfig["map"].update();
+
+    debugger
+
+    // a = turf.point([alunos[0].lng, alunos[0].lat])
+}
+
+
 // Trigger para Iniciar Simulação
 function initSimulation() {
-    criarModalLoading("Simulando...");
+    // criarModalLoading("Simulando...");
 
     // Juntar dados em um objeto
-    let routeGenerationInputData = {
+    let reaproveitamentoParams = {
         turno: Number($("input[name='turno']:checked").val()),
-        maxTravDist: Number($("#maxDist").val()) * 1000,
+        maxTravDist: Number($("#maxDist").val()),
         maxCapacity: Number($("#maxCapacity").val()),
         busSpeed: Number($("#velMedia").val()) / 3.6, // converte de km/h para m/s
-        garage: garagens,
-        stops: alunos,
-        schools: escolas,
-        rotas: rotasMap,
         rotasManha: [...rotasMap.keys()].filter(e => rotasMap.get(e).turno_matutino == "S"),
         rotasTarde: [...rotasMap.keys()].filter(e => rotasMap.get(e).turno_vespertino == "S"),
         rotasNoturno: [...rotasMap.keys()].filter(e => rotasMap.get(e).turno_noturno == "S"),
+        alunosRota,
+        demaisAlunos,
+        escolasRota,
+        demaisEscolas
     };
 
+    let rota = rotasMap.get(idRotaSelecionada);
+
+    let arrPossiveisAlunos = filtraAlunosQuePodemSerAproveitados(rota, reaproveitamentoParams);
     // window.sete.iniciaGeracaoRotas(routeGenerationInputData);
     Swal2.close();
 }
@@ -1122,7 +1045,7 @@ if (isElectron) {
 
             // Atualiza o mapa
             mapaRotaGerada["map"].updateSize();
-            mapaRotaGerada["map"].getView().fit(gSource.getExtent(), {
+            mapaRotaGerada["map"].getView().fit(mapaGeradoVectorSource.getExtent(), {
                 padding: [40, 40, 40, 40],
             });
 
@@ -1134,7 +1057,7 @@ if (isElectron) {
                         let rotaID = Number($($(li).find("label")[0]).text().split(": ")[1]);
                         $($.parseHTML('<div class="badge badge-pill badge-warning pull-right"><i class="fa fa-map-o"></i></div>'))
                             .on("click", function () {
-                                mapaRotaGerada["map"].getView().fit(gSource.getExtent(), {
+                                mapaRotaGerada["map"].getView().fit(mapaGeradoVectorSource.getExtent(), {
                                     padding: [40, 40, 40, 40],
                                 });
                                 iniciaAnimacao(rotaID);
@@ -1186,8 +1109,8 @@ var validadorFormulario = $("#wizardSugestaoRotaForm").validate({
         maxDist: {
             required: true,
             number: true,
-            min: 1,
-            max: 20,
+            min: 0,
+            max: 10000,
         },
         velMedia: {
             required: true,
@@ -1252,7 +1175,7 @@ function validaDadosEscolhidos() {
     let formValido = true;
 
     // Verifica se tem alunos e escolas escolhidas
-    if (alunos.length == 0) {
+    if (demaisAlunos.length == 0) {
         criarModalErro(
             "Nenhum aluno georeferenciado neste caso",
             "Não é possível realizar o reaproveitamento de rotas. Para esta combinação de parâmetros não há nenhum aluno georeferenciado"
@@ -1296,6 +1219,7 @@ $(".card-wizard").bootstrapWizard({
                 window.scroll(0, 0);
                 if (index == 1) {
                     initSimulation();
+                    return false;
                 }
             } else {
                 return false;
@@ -1336,51 +1260,46 @@ $(".card-wizard").bootstrapWizard({
 });
 
 ////////////////////////////////////////////////////////////////////////////////
-// Replota dados
+// Replota selects
 ////////////////////////////////////////////////////////////////////////////////
-function replotaDados() {
+function replotaSelectsDeRota() {
+    // Verifica se é para mostrar apenas as rotas da manhã/tarde ou de tarde/noite
     let filtroTurno = Number($("input[name='turno']:checked").val());
-
     let filtroAnaliseManhaTarde = filtroTurno == 1 ? true : false;
-    
-    // Filtrando
-    let escolasAlunosFiltrados = new Set();
-    let alunosFiltrados = [...alunoMap].filter((a) => {
-        let alunoFiltrado = false;
 
-        let aluno = a[1];
-        if (filtroAnaliseManhaTarde) { // manhã-tarde
-            alunoFiltrado = aluno["GPS"] && (aluno["TURNO"] == 2 || aluno["TURNO"] == 3)
-        } else { // noturno
-            alunoFiltrado = aluno["GPS"] && (aluno["TURNO"] == 4)
+    $("#listarotas").find("option").remove();
+    $("#listarotas").append('<option value="">Selecione uma opção</option>');
+
+    [...rotasMap.keys()].sort((a, b) => {
+        let nomeA = rotasMap.get(a)["NOME"]?.toLowerCase().trim();
+        let nomeB = rotasMap.get(b)["NOME"]?.toLowerCase().trim();
+        let parA = nomeA.split(" ");
+        let parB = nomeB.split(" ");
+
+        if (parA.length > 0 && parB.length > 0) {
+            parA = parA[0];
+            parB = parB[0];
+            if (isNumeric(parA) && isNumeric(parB)) {
+                return parA - parB;
+            }
         }
-        
-        if (alunoFiltrado) {
-            escolasAlunosFiltrados.add(a[1]["ESCOLA_ID"]);
+        return nomeA.localeCompare(nomeB);
+    }).forEach(rotaKey => {
+        let rota = rotasMap.get(rotaKey);
+        if (rota["SHAPE"] != "" && rota["SHAPE"] != null && rota["SHAPE"] != undefined) {
+            if (filtroAnaliseManhaTarde && rota.turno_matutino == "S") {
+                $('#listarotas').append(`<option value="${rota["ID"]}">${rota["NOME"]}</option>`);
+            } else if (!filtroAnaliseManhaTarde && rota.turno_vespertino == "S") {
+                $('#listarotas').append(`<option value="${rota["ID"]}">${rota["NOME"]}</option>`);
+            }
         }
-
-        return alunoFiltrado;
-    });
-
-    let escolasFiltradas = [...escolaMap].filter((e) => escolasAlunosFiltrados.has(e[1]["ID"]) && e[1]["GPS"]);
-
-    alunos = transformaAlunosEmArray(alunosFiltrados);
-    escolas = transformaEscolaEmArray(escolasFiltradas);
-
-    // Limpando dados do mapa
-    vSource.clear();
-    gSource.clear();
-
-    drawMapElements(alunos, garagens, escolas, vSource);
-    drawMapElements(alunos, garagens, escolas, gSource);
+    })
 }
 
-$("input[type=radio][name=publico]").on("change", (evt) => {
-    replotaDados();
-});
-
-$("input[type=radio][name=turno]").on("change", (evt) => {
-    replotaDados();
+$("input[type=radio][name=turno]").on("change", () => {
+    mapaConfig["vectorSource"].clear();
+    mapaRotaGerada["vectorSource"].clear();
+    replotaSelectsDeRota();
 });
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1552,4 +1471,233 @@ $("#rota-sugestao-saveBtnSim").on("click", () => {
         });
     }
 });
-// $(".visible.ol-layer-vector")
+
+
+
+
+////
+
+var sketch;
+
+/**
+ * The help tooltip element.
+ * @type {HTMLElement}
+ */
+var helpTooltipElement;
+
+/**
+ * Overlay to show the help messages.
+ * @type {Overlay}
+ */
+var helpTooltip;
+
+/**
+ * The measure tooltip element.
+ * @type {HTMLElement}
+ */
+var measureTooltipElement;
+
+/**
+ * Overlay to show the measurement.
+ * @type {Overlay}
+ */
+var measureTooltip;
+
+/**
+ * Message to show when the user is drawing a polygon.
+ * @type {string}
+ */
+var continuePolygonMsg = 'Click to continue drawing the polygon';
+
+/**
+ * Message to show when the user is drawing a line.
+ * @type {string}
+ */
+var continueLineMsg = 'Click to continue drawing the line';
+
+/**
+ * Handle pointer move.
+ * @param {import("../src/ol/MapBrowserEvent").default} evt The event.
+ */
+var pointerMoveHandler = function (evt) {
+  if (evt.dragging) {
+    return;
+  }
+  /** @type {string} */
+  let helpMsg = 'Click to start drawing';
+
+  if (sketch) {
+    const geom = sketch.getGeometry();
+    if (geom instanceof ol.geom.Polygon) {
+      helpMsg = continuePolygonMsg;
+    } else if (geom instanceof ol.geom.LineString) {
+      helpMsg = continueLineMsg;
+    }
+  }
+
+  helpTooltipElement.innerHTML = helpMsg;
+  helpTooltip.setPosition(evt.coordinate);
+
+  helpTooltipElement.classList.remove('hidden');
+};
+
+mapaConfig["map"].on('pointermove', pointerMoveHandler);
+
+mapaConfig["map"].getViewport().addEventListener('mouseout', function () {
+  helpTooltipElement.classList.add('hidden');
+});
+
+
+
+
+var typeSelect = document.getElementById('type');
+
+var draw; // global so we can remove it later
+
+/**
+ * Format length output.
+ * @param {LineString} line The line.
+ * @return {string} The formatted length.
+ */
+var formatLength = function (line) {
+  const length = ol.sphere.getLength(line);
+  let output;
+  if (length > 100) {
+    output = Math.round((length / 1000) * 100) / 100 + ' ' + 'km';
+  } else {
+    output = Math.round(length * 100) / 100 + ' ' + 'm';
+  }
+  return output;
+};
+
+/**
+ * Format area output.
+ * @param {Polygon} polygon The polygon.
+ * @return {string} Formatted area.
+ */
+var formatArea = function (polygon) {
+  const area = ol.sphere.getArea(polygon);
+  let output;
+  if (area > 10000) {
+    output = Math.round((area / 1000000) * 100) / 100 + ' ' + 'km<sup>2</sup>';
+  } else {
+    output = Math.round(area * 100) / 100 + ' ' + 'm<sup>2</sup>';
+  }
+  return output;
+};
+
+var style = new ol.style.Style({
+  fill: new ol.style.Fill({
+    color: 'rgba(255, 255, 255, 0.2)',
+  }),
+  stroke: new ol.style.Stroke({
+    color: 'rgba(0, 0, 0, 0.5)',
+    lineDash: [10, 10],
+    width: 2,
+  }),
+  image: new ol.style.Circle({
+    radius: 5,
+    stroke: new ol.style.Stroke({
+      color: 'rgba(0, 0, 0, 0.7)',
+    }),
+    fill: new ol.style.Fill({
+      color: 'rgba(255, 255, 255, 0.2)',
+    }),
+  }),
+});
+
+function addInteraction() {
+  const type = 'LineString';
+  draw = new ol.interaction.Draw({
+    source: mapaConfig["vectorSource"],
+    type: type,
+    style: function (feature) {
+      const geometryType = feature.getGeometry().getType();
+      if (geometryType === type || geometryType === 'Point') {
+        return style;
+      }
+    },
+  });
+  mapaConfig["map"].addInteraction(draw);
+
+  createMeasureTooltip();
+  createHelpTooltip();
+
+  let listener;
+  draw.on('drawstart', function (evt) {
+    // set sketch
+    sketch = evt.feature;
+
+    /** @type {import("../src/ol/coordinate.js").Coordinate|undefined} */
+    let tooltipCoord = evt.coordinate;
+
+    listener = sketch.getGeometry().on('change', function (evt) {
+      const geom = evt.target;
+      let output;
+      if (geom instanceof ol.geom.Polygon) {
+        output = formatArea(geom);
+        tooltipCoord = geom.getInteriorPoint().getCoordinates();
+      } else if (geom instanceof ol.geom.LineString) {
+        output = formatLength(geom);
+        tooltipCoord = geom.getLastCoordinate();
+      }
+      measureTooltipElement.innerHTML = output;
+      measureTooltip.setPosition(tooltipCoord);
+    });
+  });
+
+  draw.on('drawend', function () {
+    measureTooltipElement.className = 'ol-tooltip ol-tooltip-static';
+    measureTooltip.setOffset([0, -7]);
+    // unset sketch
+    sketch = null;
+    // unset tooltip so that a new one can be created
+    measureTooltipElement = null;
+    createMeasureTooltip();
+    unByKey(listener);
+  });
+}
+
+/**
+ * Creates a new help tooltip
+ */
+function createHelpTooltip() {
+  if (helpTooltipElement) {
+    helpTooltipElement.parentNode.removeChild(helpTooltipElement);
+  }
+  helpTooltipElement = document.createElement('div');
+  helpTooltipElement.className = 'ol-tooltip hidden';
+  helpTooltip = new ol.Overlay({
+    element: helpTooltipElement,
+    offset: [15, 0],
+    positioning: 'center-left',
+  });
+  mapaConfig["map"].addOverlay(helpTooltip);
+}
+
+/**
+ * Creates a new measure tooltip
+ */
+function createMeasureTooltip() {
+  if (measureTooltipElement) {
+    measureTooltipElement.parentNode.removeChild(measureTooltipElement);
+  }
+  measureTooltipElement = document.createElement('div');
+  measureTooltipElement.className = 'ol-tooltip ol-tooltip-measure';
+  measureTooltip = new ol.Overlay({
+    element: measureTooltipElement,
+    offset: [0, -15],
+    positioning: 'bottom-center',
+    stopEvent: false,
+    insertFirst: false,
+  });
+  mapaConfig["map"].addOverlay(measureTooltip);
+}
+
+/**
+ * Let user change the geometry type.
+ */
+typeSelect.onchange = function () {
+    mapaConfig["map"].removeInteraction(draw);
+  addInteraction();
+};

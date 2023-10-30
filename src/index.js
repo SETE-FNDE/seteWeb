@@ -343,6 +343,11 @@ function onIniciaGeracaoPontosDeParada(event, paramPontosDeParada) {
     pontosDeParadaOptimizer.optimize(cachedODMatrix, paramPontosDeParada);
 }
 
+// Evento que inicia a análise de aproveitamento de rotas
+function onIniciaReaproveitamentoRotas(event, paramReaproveitamento) {
+    debugger
+}
+
 // Registro dos listeners
 function createListeners() {
     ipcMain.handle("main:pegar-versao-sete", () => app.getVersion());
@@ -355,6 +360,7 @@ function createListeners() {
 
     ipcMain.on("main:inicia-geracao-rotas", onIniciaGeracaoRotas);
     ipcMain.on("main:inicia-geracao-pontos-de-parada", onIniciaGeracaoPontosDeParada);
+    ipcMain.on("main:inicia-reaproveitamento-rotas", onIniciaReaproveitamentoRotas);
 
     app.on("worker:finaliza-geracao-rotas", onWorkerFinalizarGeracaoRotas);
     app.on("worker:obtem-erro-geracao-rotas", onWorkerObtemErroGeracaoRotas);

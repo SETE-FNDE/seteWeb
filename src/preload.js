@@ -14,6 +14,7 @@ contextBridge.exposeInMainWorld("sete", {
     abrirMalha: () => ipcRenderer.invoke("main:abrir-malha"),
     iniciaGeracaoRotas: (paramRoteirizacao) => ipcRenderer.send("main:inicia-geracao-rotas", paramRoteirizacao),
     iniciaGeracaoPontosDeParada: (paramPontosDeParada) => ipcRenderer.send("main:inicia-geracao-pontos-de-parada", paramPontosDeParada),
+    iniciaReaproveitamentoRotas: (paramReaproveitamento) => ipcRenderer.send("main:inicia-reaproveitamento-rotas", paramReaproveitamento),
 
     // Handlers Renderer
     onFinalizaSalvarMalhaOSM: (callback) => ipcRenderer.on("renderer:finaliza-salvar-malha-osm", callback),
