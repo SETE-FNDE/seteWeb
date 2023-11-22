@@ -25,6 +25,7 @@ var dataTableCenso = $("#datatables").DataTable({
         style: 'multi',
         info: false
     },
+    scrollX: window.innerWidth < 767,
     autoWidth: false,
     bAutoWidth: false,
     lengthMenu: [[10, 50, -1], [10, 50, "Todas"]],
@@ -44,7 +45,7 @@ var dataTableCenso = $("#datatables").DataTable({
             "previous": "Anterior"
         },
     },
-    dom: 'lfrtip',
+    dom: 'rtilfp',
 });
 
 $("#datatables_filter input").on('keyup', function () {

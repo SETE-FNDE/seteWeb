@@ -101,4 +101,10 @@ div#datatables_filter {
         width: 100%;
         margin: 0.2em;
     }
+
+    #datatables_filter label {
+        width: 100%;
+        text-align: center;
+    }
+
 }

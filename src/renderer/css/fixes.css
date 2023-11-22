@@ -1119,6 +1119,13 @@ img#censoIcon {
     margin-left: 20px;
 }
 
+@media screen and (max-width: 767px) {
+    .btn-back {
+        margin-left: 0px;
+    }
+    
+}
+
 .btnApagar {
     height: 38px;
 }
