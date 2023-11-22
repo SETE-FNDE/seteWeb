@@ -75,10 +75,13 @@ function parseRegistro20(registro) {
         ENSINO_SUPERIOR: false
     }
 
-    // Turma regular (1) ou é de atividade complementar (0) ?
-    if (Number(registro.data[17]) == 1) {
-        // Modalidade de ensino da turma
-        var modalidade = Number(registro.data[27]);
+    // Campo 17 (18 no original, pois estamos indexando em 0)
+    // ----- Turma regular (1) ou é de atividade complementar (0) ? 
+    // Campo 20 (21 no original, pois estamos indexando em 0)
+    // ----- Formação geral básicaa (1) ou não (0)?
+    if (Number(registro.data[17]) == 1 && Number(registro.data[20]) == 1) {
+        // Modalidade de ensino da turma (campo 31 no original, 30 no nosso)
+        var modalidade = Number(registro.data[30]);
         switch (modalidade) {
             case 1:
                 turma["MEC_IN_REGULAR"] = true;
@@ -97,7 +100,7 @@ function parseRegistro20(registro) {
         }
 
         // Etapa (série) de ensino da turma
-        var etapa = Number(registro.data[28]);
+        var etapa = Number(registro.data[31]);
         if ([1, 2, 3, 56].includes(etapa)) {
             turma["ENSINO_PRE_ESCOLA"] = true;
         } else if ((4 <= etapa && etapa <= 24) ||
@@ -157,17 +160,28 @@ function parseRegistro30(registro) {
 
     // Possui deficiência?
     if (Number(registro.data[15]) == 1) {
-        if (Number(registro.data[16]) == 1) dadoPessoa["DEF_CAMINHAR"] = true;
+        // enxergar
+        if (Number(registro.data[16]) == 1) dadoPessoa["DEF_ENXERGAR"] = true;
         if (Number(registro.data[17]) == 1) dadoPessoa["DEF_ENXERGAR"] = true;
-        if (Number(registro.data[18]) == 1) dadoPessoa["DEF_OUVIR"] = true;
+        if (Number(registro.data[18]) == 1) dadoPessoa["DEF_ENXERGAR"] = true;
+        
+        // ouvir
         if (Number(registro.data[19]) == 1) dadoPessoa["DEF_OUVIR"] = true;
-        if (Number(registro.data[20]) == 1) {
+        if (Number(registro.data[20]) == 1) dadoPessoa["DEF_OUVIR"] = true;
+
+        // surdocegueira
+        if (Number(registro.data[21]) == 1) {
             dadoPessoa["DEF_ENXERGAR"] = true;
             dadoPessoa["DEF_OUVIR"] = true;
         }
-        if (Number(registro.data[21]) == 1) dadoPessoa["DEF_CAMINHAR"] = true;
-        if (Number(registro.data[22]) == 1) dadoPessoa["DEF_MENTAL"] = true;
+
+        // física
+        if (Number(registro.data[22]) == 1) dadoPessoa["DEF_CAMINHAR"] = true;
+
+        // mental // autista
+        if (Number(registro.data[23]) == 1) dadoPessoa["DEF_MENTAL"] = true;
         if (Number(registro.data[24]) == 1) dadoPessoa["DEF_MENTAL"] = true;
+        if (Number(registro.data[25]) == 1) dadoPessoa["DEF_MENTAL"] = true;
     }
 
     // Localização
@@ -180,8 +194,9 @@ function parseRegistro30(registro) {
     }
 
     // Contato Email
-    if (registro.data[80] != null && registro.data[80] != "") {
-        dadoPessoa["EMAIL"] = registro.data[80];
+    if ((registro.data[97] != null && registro.data[97] != "") || 
+        (registro.data[94] != null && registro.data[94] != "")) {
+        dadoPessoa["EMAIL"] = registro.data[94] || registro.data[97];
     }
 
     return dadoPessoa;
@@ -202,7 +217,7 @@ function processRegistro00(registro) {
 function processRegistro20(registro) {
     var turma = parseRegistro20(registro);
     var codEscola = Number(registro.data[1]);
-    var codTurma = registro.data[2];
+    var codTurma = registro.data[2] || registro.data[3];
 
     // TODO: colocar isso em um laço    
     baseDados[codEscola]["MEC_IN_REGULAR"] = baseDados[codEscola]["MEC_IN_REGULAR"] || turma["MEC_IN_REGULAR"];
@@ -224,22 +239,14 @@ function processRegistro20(registro) {
 function processRegistro30(registro) {
     var pessoa = parseRegistro30(registro);
     var codEscola = Number(registro.data[1]);
-    var codPessoa = registro.data[2];
-
-    if (codPessoa == "") {
-        codPessoa = registro.data[3];
-    }
+    var codPessoa = registro.data[2] || registro.data[3];
     
     baseDados[codEscola]["PESSOAS"][codPessoa] = pessoa;
 }
 
 function processRegistro40(registro) {
     var codEscola = Number(registro.data[1]);
-    var codGestor = registro.data[2];
-
-    if (codGestor == "") {
-        codGestor = registro.data[3];
-    }
+    var codGestor = registro.data[2] || registro.data[3]
 
     if (codGestor in baseDados[codEscola]["PESSOAS"]) {
         gestor = baseDados[codEscola]["PESSOAS"][codGestor];
@@ -253,57 +260,56 @@ function processRegistro40(registro) {
 
 function processRegistro60(registro) {
     // Vamos verificar se o aluno (registro tipo 60) utiliza transporte escolar
-    // Isto se encontra no registro 20
-    if (registro.data[20] != null && registro.data[20] != "") {
-        if (Number(registro.data[20]) == 1) {
-            // aluno utiliza transporte escolar
-            // adicionar ao campo de aluno da escola
-            var codEscola = registro.data[1];
-            var codAluno = registro.data[2];
-            let temIdProprio = true;
+    // Isto se encontra no registro 34/35 (antigamente 20)
+    // TODO: No oficial tá 35 (34), mas no arquivo tá 34 (33)
+    if (Number(registro.data[33]) == 1 || Number(registro.data[34]) == 1) {
+        // aluno utiliza transporte escolar
+        // adicionar ao campo de aluno da escola
+        var codEscola = registro.data[1];
+        var codAluno = registro.data[2];
+        let temIdProprio = true;
 
-            if (codAluno == "") {
-                temIdProprio = false;
-                codAluno = registro.data[3];
-            }
-
-            var codTurma = registro.data[4];
-
-            if (codAluno in baseDados[codEscola]["PESSOAS"]) {
-                var aluno = baseDados[codEscola]["PESSOAS"][codAluno];
-                var turma = baseDados[codEscola]["TURMAS"][codTurma];
-
-                if (temIdProprio) {
-                    aluno["mec_id_proprio"] = codAluno;
-                } else {
-                    aluno["mec_id_inep"] = codAluno;
-                }
-                
-                if (turma["ENSINO_PRE_ESCOLA"]) {
-                    aluno["NIVEL"] = 1;
-                } else if (turma["ENSINO_FUNDAMENTAL"]) {
-                    aluno["NIVEL"] = 2;
-                } else if (turma["ENSINO_MEDIO"]) {
-                    aluno["NIVEL"] = 3;
-                } else {
-                    aluno["NIVEL"] = 5;
-                }
-
-                if (turma["HORARIO_MATUTINO"]) {
-                    aluno["TURNO"] = 1;
-                } else if (turma["HORARIO_VESPERTINO"]) {
-                    aluno["TURNO"] = 2;
-                } else if (turma["HORARIO_INTEGRAL"]) {
-                    aluno["TURNO"] = 3;
-                } else {
-                    aluno["TURNO"] = 4; // Noite
-                }
-
-                baseDados[codEscola]["ALUNOS"][codAluno] = aluno
-                delete baseDados[codEscola]["PESSOAS"][codAluno]
-            }
+        if (codAluno == "") {
+            temIdProprio = false;
+            codAluno = registro.data[3];
         }
-    }
+
+        var codTurma = registro.data[4] || registro.data[5];
+
+        if (codAluno in baseDados[codEscola]["PESSOAS"]) {
+            var aluno = baseDados[codEscola]["PESSOAS"][codAluno];
+            var turma = baseDados[codEscola]["TURMAS"][codTurma];
+
+            if (temIdProprio) {
+                aluno["mec_id_proprio"] = codAluno;
+            } else {
+                aluno["mec_id_inep"] = codAluno;
+            }
+            
+            if (turma["ENSINO_PRE_ESCOLA"]) {
+                aluno["NIVEL"] = 1;
+            } else if (turma["ENSINO_FUNDAMENTAL"]) {
+                aluno["NIVEL"] = 2;
+            } else if (turma["ENSINO_MEDIO"]) {
+                aluno["NIVEL"] = 3;
+            } else {
+                aluno["NIVEL"] = 5;
+            }
+
+            if (turma["HORARIO_MATUTINO"]) {
+                aluno["TURNO"] = 1;
+            } else if (turma["HORARIO_VESPERTINO"]) {
+                aluno["TURNO"] = 2;
+            } else if (turma["HORARIO_INTEGRAL"]) {
+                aluno["TURNO"] = 3;
+            } else {
+                aluno["TURNO"] = 4; // Noite
+            }
+
+            baseDados[codEscola]["ALUNOS"][codAluno] = aluno
+            delete baseDados[codEscola]["PESSOAS"][codAluno]
+        }
+}
 }
 
 function parseBaseCenso(arq, cb) {
