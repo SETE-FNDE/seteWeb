@@ -366,10 +366,14 @@ div#hmbmenu {
         min-width: 0px !important;
     }
     
+    div#sidebar {
+        left: -700px !important;
+    }
+    
     div#sidebar.menuHamburguer {
         display: block;
         width: 100% !important;
-        right: 260px !important;
+        left: -260px !important;
     }
 
     .sidebar.menuHamburguer .sidebar-wrapper {
