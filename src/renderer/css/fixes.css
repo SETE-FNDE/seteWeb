@@ -1210,3 +1210,15 @@ select.swal2-select {
 .swal2-html-container ul li:before {
   content: '❌ ';
 }
+
+.form-control {
+    overflow-x: auto;
+}
+
+::-webkit-scrollbar{
+    max-height: 6px;
+}
+
+::-webkit-scrollbar-corner { 
+    background: rgba(0,0,0,0.5); 
+}
