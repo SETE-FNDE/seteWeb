@@ -81,12 +81,24 @@ img.menu-icon {
     display: none;
 }
 
-.preload {
-    width: 100px;
-    height: 100px;
-    position: fixed;
-    top: 50%;
-    left: 50%;
+@media only screen and (min-width: 601px) {
+    .preload {
+        width: 100px;
+        height: 100px;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .preload {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        min-height: 100vh;
+    }
 }
 
 .sidebar .user {
