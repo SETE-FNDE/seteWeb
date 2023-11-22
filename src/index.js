@@ -14,13 +14,10 @@ const { app, dialog, BrowserWindow, ipcMain, shell } = electron;
 const path = require("path");
 const fs = require("fs-extra");
 
-// Biblioteca para lidar com dados espaciais
-const osmtogeojson = require("osmtogeojson");
-
 // Menu Direito
 const contextMenu = require("electron-context-menu");
 
-// Importa biblioteca para baixar dados via http
+// Importa biblioteca para baixar dados via https
 const https = require("https");
 
 // Desabilita cache do http no electron
@@ -28,8 +25,11 @@ app.commandLine.appendSwitch("disable-http-cache");
 
 // Arquivo de configuração (variáveis básicas)
 const Store = require("electron-store");
-
 const appconfig = new Store();
+// Apaga cache da OD se tiver
+if (appconfig.has("OD")) {
+    appconfig.delete("OD");
+}
 
 // Bibliotecas para plotar logo do SETE e informações do sistema
 const figlet = require("figlet");
@@ -246,9 +246,9 @@ function handleSalvarMalhaOSM(event, latitude, longitude) {
 
         const arqMalha = fs.createWriteStream(arqDestino);
         https.get(url, (response) => {
-            // check if response is not a success
+            // Checa se a resposta deu erro
             if (response.statusCode !== 200) {
-                console.log("Response status was " + response.statusCode);
+                console.log("Status da resposta foi " + response.statusCode);
                 appWindow.webContents.send("renderer:finaliza-salvar-malha-osm", false);
             }
             response.pipe(arqMalha);
@@ -298,13 +298,6 @@ function onIniciaGeracaoRotas(event, routingArgs) {
         cost: {},
     });
 
-    
-    cachedODMatrix = {
-        nodes: {},
-        dist: {},
-        cost: {},
-    };
-
     const minNumVehicles = Math.max(routingArgs.numVehicles, Math.floor(routingArgs.stops.length / routingArgs.maxCapacity));
     routingArgs.numVehicles = minNumVehicles;
     routeOptimizer.optimize(cachedODMatrix, routingArgs);
@@ -334,12 +327,6 @@ function onIniciaGeracaoPontosDeParada(event, paramPontosDeParada) {
         cost: {},
     });
 
-    cachedODMatrix = {
-        nodes: {},
-        dist: {},
-        cost: {},
-    };
-    
     pontosDeParadaOptimizer.optimize(cachedODMatrix, paramPontosDeParada);
 }
 
