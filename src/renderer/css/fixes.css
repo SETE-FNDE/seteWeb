@@ -1119,13 +1119,6 @@ img#censoIcon {
     margin-left: 20px;
 }
 
-@media screen and (max-width: 767px) {
-    .btn-back {
-        margin-left: 0px;
-    }
-    
-}
-
 .btnApagar {
     height: 38px;
 }
@@ -1229,3 +1222,15 @@ select.swal2-select {
 ::-webkit-scrollbar-corner { 
     background: rgba(0,0,0,0.5); 
 }
+
+/* Fixes mobile */
+@media screen and (max-width: 767px) {
+    .btn-back {
+        margin-left: 0px;
+    }
+
+    .optlabel, .obrlabel {
+        -webkit-transform: none;
+    }
+}
+
