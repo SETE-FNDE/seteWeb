@@ -32,6 +32,54 @@ class PontosDeParadaOptimizationWorker {
         return Promise.all(this.graph.buildSpatialMatrix());
         // return await this.graph.buildSpatialVertexSync();
     }
+    
+    clusterPCD(parametros) {
+        let clustersDict = {};
+        let alunosSemClusters = [];
+        
+        for (let alunoPCD of parametros.alunosComDef) { 
+            clustersDict[alunoPCD.key] = {
+                "ALUNOS": [alunoPCD],
+                "CENTRO": {
+                    lat: alunoPCD.lat,
+                    lng: alunoPCD.lng
+                },
+                "PCD": true
+            }
+        }
+
+        for (let aluno of parametros.alunosSemDef) {
+            let pertoDePCD = false;
+            let menorDistancia = Number.MAX_SAFE_INTEGER;
+            let alunoPCDMaisPerto = null;
+            for (let alunoPCD of parametros.alunosComDef) {
+                let avertex = this.graph.getVertex(aluno.key);
+                let bvertex = this.graph.getVertex(alunoPCD.key);
+                let primeiraperna = avertex.get("distVertexOSM");
+                let distcorpo = avertex.get("spatialDistEdges").get(alunoPCD.key) || bvertex.get("spatialDistEdges").get(aluno.key);
+                let ultimaperna = bvertex.get("distVertexOSM");
+                let distancia = primeiraperna + distcorpo + ultimaperna;
+                console.log(aluno.nome, alunoPCD.nome, distancia);
+
+                if (distancia <= parametros.maxTravDist && distancia <= menorDistancia) {
+                    pertoDePCD = true;
+                    menorDistancia = distancia;
+                    alunoPCDMaisPerto = alunoPCD;
+                }
+            }
+            console.log("------")
+            console.log(aluno.nome, pertoDePCD, alunoPCDMaisPerto?.nome)
+            console.log("------")
+
+            if (pertoDePCD) {
+                clustersDict[alunoPCDMaisPerto.key]["ALUNOS"].push(aluno);
+            } else {
+                alunosSemClusters.push(aluno);
+            }
+        }
+
+        return { alunosSemClusters, clusters: Object.values(clustersDict) }
+    }
 
     runDBSCAN(dataset) {
         let maxTravDist = this.paramPontosDeParada["maxTravDist"];
@@ -57,6 +105,50 @@ class PontosDeParadaOptimizationWorker {
         return dbscanResult;
     }
 
+    async processDBSCAN(dbscanAlg, alunosSemClusters) {
+        let clusters = [];
+
+        // Primeiro, vamos processar os pontos outliers (noise)
+        for (let indexAlunoOutlier of dbscanAlg.noise) {
+            let alunoOutlier = alunosSemClusters[indexAlunoOutlier]
+            clusters.push({
+                "ALUNOS": [alunoOutlier],
+                "CENTRO": {
+                    "lat": alunoOutlier.lat,
+                    "lng": alunoOutlier.lng,
+                },
+                "PCD": false
+            })
+        }
+
+        // Demais alunos
+        for (let indexCluster of dbscanAlg.clusters) {
+            let alunosDoCluster = alunosSemClusters.filter((_, ix) => indexCluster.includes(ix));
+            let clat = 0;
+            let clng = 0;
+            for (let el of alunosDoCluster) {
+                clng = clng + Number(el.lng);
+                clat = clat + Number(el.lat);
+            }
+            clat = clat / alunosDoCluster.length;
+            clng = clng / alunosDoCluster.length;
+
+            let { dbNodeID, nodeGeoJSON } = await this.graph.getRawSpatialVertex(clat, clng);
+            let geoJSON = JSON.parse(nodeGeoJSON);
+            clusters.push({
+                "ALUNOS": [...alunosDoCluster],
+                "CENTRO": {
+                    "lat": geoJSON.coordinates[1],
+                    "lng": geoJSON.coordinates[0],
+                },
+                "PCD": false
+            })
+            console.log(dbNodeID, nodeGeoJSON);
+        }
+        
+        return clusters;
+    }
+
     optimize() {
         return new Promise((resolve, reject) => {
             // Activate spatial db
@@ -66,41 +158,15 @@ class PontosDeParadaOptimizationWorker {
                 }
 
                 await this.buildSpatialIndex();
-                this.buildSpatialMatrix().then(async () => {
-                    let dbscanResult = this.runDBSCAN(this.paramPontosDeParada["stops"]);
-                    let dbscanClusters = dbscanResult.clusters;
-                    let maxTravDist = this.paramPontosDeParada["maxTravDist"];
+                this.buildSpatialMatrix()
+                    .then(() => this.clusterPCD(this.paramPontosDeParada))
+                    .then(async ({ clusters, alunosSemClusters }) => {
+                        let dbscanAlg = this.runDBSCAN(alunosSemClusters);
+                        let dbscanClusters = await this.processDBSCAN(dbscanAlg, alunosSemClusters);
+                        let clusterFinais = clusters.concat(dbscanClusters);
 
-                    for (let c of dbscanClusters) {
-                        let cluster = this.paramPontosDeParada["stops"].filter((elt, ix) => c.includes(ix));
-                        let clat = 0;
-                        let clng = 0;
-                        for (let el of cluster) {
-                            clng = clng + Number(el.lng);
-                            clat = clat + Number(el.lat);
-                        }
-                        clat = clat / cluster.length;
-                        clng = clng / cluster.length;
-
-                        let { dbNodeID, nodeGeoJSON } = await this.graph.getRawSpatialVertex(clat, clng);
-                        for (let el of cluster) {
-                            let elVertex = this.graph.getVertex(el.key);
-                            let elNodeID = elVertex.get("dbNodeID");
-                            let distPrimeiraPerna = elVertex.get("distVertexOSM");
-                            let distPonto = await this.graph.getRawSpatialDistance(elNodeID, dbNodeID);
-                            let distanciaTotal = distPrimeiraPerna + distPonto;
-                            console.log(distanciaTotal, distPrimeiraPerna, distPonto);
-
-                            if (distanciaTotal > maxTravDist) {
-                                console.log(distanciaTotal, maxTravDist);
-                                console.log("Violou a distancia maxima permitida");
-                            }
-                            console.log("nodeGeoJSON", nodeGeoJSON);
-                        }
-                    }
-
-                    console.log("termino");
-                });
+                        resolve({ clusters: clusterFinais, matrix: this.graph.matrix });
+                    });
             });
         });
     }

@@ -330,21 +330,41 @@ function onIniciaGeracaoPontosDeParada(event, paramPontosDeParada) {
     pontosDeParadaOptimizer.optimize(cachedODMatrix, paramPontosDeParada);
 }
 
+// Evento chamado pelo nosso worker quando ele terminar de gerar os pontos de parada
+function onWorkerFinalizarGeracaoPontosDeParada({ clusters, matrix }) {
+    // Set new cache
+    appconfig.set("OD", matrix);
+
+    // Send generated pontos de parada
+    appWindow.webContents.send("renderer:sucesso-geracao-pontos-de-parada", clusters);
+}
+
+// Evento chamado pelo nosso worker quando ele encontra um erro ao gerar os pontos de parada
+function onWorkerObtemErroGeracaoPontosDeParada(err) {
+    appWindow.webContents.send("renderer:erro-geracao-pontos-de-parada", err);
+}
+
 // Registro dos listeners
 function createListeners() {
+    // Utils
     ipcMain.handle("main:pegar-versao-sete", () => app.getVersion());
     ipcMain.on("main:abrir-site", onAbrirSite);
+    
+    // Salvar e lidar com malha
     ipcMain.on("main:salvar-nova-malha", onSalvarNovaMalha);
-
     ipcMain.handle("main:salvar-planilha-modelo", handleSalvarPlanilhaModelo);
     ipcMain.handle("main:salvar-malha-osm", handleSalvarMalhaOSM);
     ipcMain.handle("main:abrir-malha", onAbrirMalha);
 
+    // Roteirização
     ipcMain.on("main:inicia-geracao-rotas", onIniciaGeracaoRotas);
-    ipcMain.on("main:inicia-geracao-pontos-de-parada", onIniciaGeracaoPontosDeParada);
-
     app.on("worker:finaliza-geracao-rotas", onWorkerFinalizarGeracaoRotas);
     app.on("worker:obtem-erro-geracao-rotas", onWorkerObtemErroGeracaoRotas);
+
+    // Pontos de parada
+    ipcMain.on("main:inicia-geracao-pontos-de-parada", onIniciaGeracaoPontosDeParada);
+    app.on("worker:finaliza-geracao-pontos-de-parada", onWorkerFinalizarGeracaoPontosDeParada);
+    app.on("worker:obtem-erro-geracao-pontos-de-parada", onWorkerObtemErroGeracaoPontosDeParada);
 }
 
 // /////////////////////////////////////////////////////////////////////////////
