@@ -165,7 +165,7 @@ class PontosDeParadaOptimizationWorker {
                         let dbscanClusters = await this.processDBSCAN(dbscanAlg, alunosSemClusters);
                         let clusterFinais = clusters.concat(dbscanClusters);
 
-                        resolve({ clusters: clusterFinais, matrix: this.graph.matrix });
+                        resolve({ clusters: clusterFinais, cachedODMatrix: this.graph.cachedODMatrix });
                     });
             });
         });

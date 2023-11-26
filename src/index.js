@@ -331,9 +331,9 @@ function onIniciaGeracaoPontosDeParada(event, paramPontosDeParada) {
 }
 
 // Evento chamado pelo nosso worker quando ele terminar de gerar os pontos de parada
-function onWorkerFinalizarGeracaoPontosDeParada({ clusters, matrix }) {
+function onWorkerFinalizarGeracaoPontosDeParada({ clusters, cachedODMatrix }) {
     // Set new cache
-    appconfig.set("OD", matrix);
+    appconfig.set("OD", cachedODMatrix);
 
     // Send generated pontos de parada
     appWindow.webContents.send("renderer:sucesso-geracao-pontos-de-parada", clusters);

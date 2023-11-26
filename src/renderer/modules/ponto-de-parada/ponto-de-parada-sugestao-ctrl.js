@@ -44,12 +44,6 @@ var alunosComDef = new Array();
 var alunosSemDef = new Array();
 var escolas = new Array();
 
-// Número da simulação
-var numSimulacao = userconfig.get("SIMULATION_COUNT");
-if (numSimulacao == undefined) {
-    userconfig.set("SIMULATION_COUNT", 0);
-    numSimulacao = 0;
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Promessas
@@ -353,6 +347,36 @@ function listaElementos() {
 // Rotinas de desenho no mapa
 ///////////////////////////////////////////////////////////////////////////////
 
+function drawClusters(arrClusters, mapa) {
+    let grupoDeCamadas = new Array();
+    let numPonto = 1;
+    for (let cluster of arrClusters) {
+        let ponto = "P" + numPonto++;
+        let camada = mapa["createLayer"](ponto, `Ponto: ${ponto}`, true);
+        camada["vectorSource"] = camada["source"];
+        camada["layer"].set("tipo", "CAMADA_PONTO_DE_PARADA");
+        
+        let clusterAlunosSemDef = cluster.ALUNOS.filter(a => a.temDef != "Sim");
+        let clusterAlunosComDef = cluster.ALUNOS.filter(a => a.temDef == "Sim");
+        drawAlunos(clusterAlunosSemDef, camada);
+        drawAlunos(clusterAlunosComDef, camada, "img/icones/aluno-marcador-v4.png");
+
+        let pontoDeParada = gerarMarcadorNumerico(Number(cluster.CENTRO.lat), Number(cluster.CENTRO.lng), ponto, tamanho_fonte = 0.6, x_offset = -15);
+        pontoDeParada.setId(ponto);
+        pontoDeParada.set("ID", ponto);
+        pontoDeParada.set("nome", `Ponto: ${ponto}`);
+        pontoDeParada.set("alunos", cluster.ALUNOS.length);
+        pontoDeParada.set("alunos_com_def", clusterAlunosComDef.length);
+        pontoDeParada.set("tipo", "ponto_parada")
+
+        camada["source"].addFeature(pontoDeParada);
+        grupoDeCamadas.unshift(camada["layer"]);
+    }
+    mapa["addGroupLayer"]("Pontos de Parada", grupoDeCamadas); 
+
+    return grupoDeCamadas;
+}
+
 function drawAlunos(arrAlunos, camada, imgAluno = "img/icones/aluno-marcador.png", imgOpacity = 1) {
     arrAlunos.forEach((a) => {
         let p = new ol.Feature({
@@ -415,6 +439,24 @@ var selectConfig = new ol.interaction.Select({
 });
 mapaConfig["map"].addInteraction(selectConfig);
 
+var selectGerado = new ol.interaction.Select({
+    hitTolerance: 5,
+    multi: false,
+    condition: ol.events.condition.singleClick,
+    filter: (feature, layer) => {
+        if (
+            (feature.getGeometry().getType() == "Point" &&
+                (feature.getProperties().tipo == "aluno" || feature.getProperties().tipo == "escola" || feature.getProperties().tipo == "ponto_parada")) ||
+            (feature.getGeometry().getType() == "LineString" && feature.getProperties().tipo == "rota")
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    },
+});
+mapaRotaGerada["map"].addInteraction(selectGerado);
+
 var popupConfig = new ol.Overlay.PopupFeature({
     popupClass: "default anim",
     select: selectConfig,
@@ -465,6 +507,104 @@ var popupConfig = new ol.Overlay.PopupFeature({
 });
 mapaConfig["map"].addOverlay(popupConfig);
 
+var popupGerado = new ol.Overlay.PopupFeature({
+    popupClass: "default anim",
+    select: selectGerado,
+    closeBox: true,
+    template: {
+        title: (elem) => {
+            return elem.get("nome") || elem.get("NOME");
+        },
+        attributes: {
+            nivel: {
+                title: "Série",
+                visible: (e) => e.getProperties().tipo == "aluno",
+            },
+            turno: {
+                title: "Turno",
+                visible: (e) => e.getProperties().tipo == "aluno",
+            },
+            temDef: {
+                title: "Deficiência",
+                visible: (e) => e.getProperties().tipo == "aluno",
+            },
+            tipoDef: {
+                title: "Tipo de Deficiência",
+                visible: (e) => e.getProperties().tipo == "aluno" && e.getProperties().temDef == "Sim",
+            },
+            escolaNome: {
+                title: "Escola",
+                visible: (e) => e.getProperties().tipo == "aluno",
+            },
+            escolaTemGPS: {
+                title: "Escola possui GPS?",
+                visible: (e) => e.getProperties().tipo == "aluno",
+            },
+            ensino: {
+                title: "Níveis",
+                visible: (e) => e.getProperties().tipo == "escola",
+            },
+            horario: {
+                title: "Horário de Funcionamento",
+                visible: (e) => e.getProperties().tipo == "escola",
+            },
+            localizacao: {
+                title: "Localização",
+                visible: (e) => e.getProperties().tipo == "escola",
+            },
+            alunos: {
+                title: "Número de Alunos",
+                visible: (e) => e.getProperties().tipo == "ponto_parada",
+            },
+            alunos_com_def: {
+                title: "Número de Alunos com Deficiência",
+                visible: (e) => e.getProperties().tipo == "ponto_parada",
+            },
+        },
+    },
+});
+mapaRotaGerada["map"].addOverlay(popupGerado);
+
+//////////////////////////////////////////////////////////////
+// Hover
+//////////////////////////////////////////////////////////////
+// Adaptado de 
+// https://viglino.github.io/ol-ext/examples/geom/map.cluster.convexhull.html
+
+// Add hover interaction that draw hull in a layer
+var vetorHover = new ol.layer.Vector({ source: new ol.source.Vector() });
+vetorHover.setMap(mapaRotaGerada["map"]);
+
+var hover = new ol.interaction.Hover({
+    cursor: "pointer",
+    layerFilter: function (l) {
+        return l.get("tipo") == "CAMADA_PONTO_DE_PARADA";
+    },
+});
+mapaRotaGerada["map"].addInteraction(hover);
+
+hover.on("enter", async function (e) {
+    var h = e.feature.get("convexHull");
+    
+    if (!h) {
+        var clusterElements = e.layer.getSource().getFeatures();
+        // calculate convex hull
+        if (clusterElements && clusterElements.length) {
+            var c = [];
+            for (var i = 0, f; (f = clusterElements[i]); i++) {
+                c.push(f.getGeometry().getCoordinates());
+            }
+            h = ol.coordinate.convexHull(c);
+        }
+        e.feature.set("convexHull", h);
+    }
+    vetorHover.getSource().clear();
+    vetorHover.getSource().addFeature(new ol.Feature(new ol.geom.Polygon([h])));
+});
+hover.on("leave", function (e) {
+    vetorHover.getSource().clear();
+});
+
 //////////////////////////////////////////////////////////////
 // Realiza a Simulação
 //////////////////////////////////////////////////////////////
@@ -476,11 +616,11 @@ function initSimulation() {
     // Juntar dados em um objeto
     let pontosDeParadaInputData = {
         maxTravDist: Number($("#maxDist").val()),
-        stops: alunos,
+        alunosSemDef,
+        alunosComDef,
+        stops: alunosTurno,
         schools: escolas,
     };
-
-    debugger
 
     window.sete.iniciaGeracaoPontosDeParada(pontosDeParadaInputData);
 }
@@ -488,12 +628,31 @@ function initSimulation() {
 // Renderers
 if (isElectron) {
     // Trigger para finalizar simulação
-    window.sete.onSucessoGeracaoRotas((evt, routesJSON) => {
+    window.sete.onSucessoGeracaoPontosDeParada((evt, clusters) => {
+        // Limpa
+        mapaRotaGerada.rmGroupLayer();
+        $(".sidebar-PontosParadaGerados .ol-layerswitcher ul .ol-layer-group").remove();
+        gSource.clear();
+        
+        // Desenha
+        drawEscolas(escolas, mapaRotaGerada);
+        drawClusters(clusters, mapaRotaGerada);
+        mapaRotaGerada["activateSidebarLayerSwitcher"](".sidebar-PontosParadaGerados");
+
+        setTimeout(() => {
+            mapaRotaGerada["map"].updateSize();
+            mapaRotaGerada["map"].getView().fit(mapaConfig["vectorSource"].getExtent(), {
+                padding: [40, 40, 40, 40],
+            });
+            Swal2.close();
+        }, 300);
     });
 
     // Trigger de erro
-    window.sete.onErroGeracaoRotas((evt, err) => {
+    window.sete.onErroGeracaoPontosDeParada((evt, err) => {
         criarModalErro("Erro no processo de simulação de rota!");
+        
+        Swal2.close();
     });
 }
 
@@ -623,12 +782,18 @@ $("input[type=radio][name=turno]").on("change", (evt) => {
     alunosTurno = new Map([...alunoMap].filter(([aID, a]) => a.turno == turno));
     alunosSemDef = new Map([...alunosTurno].filter(([aID, a]) => !a.DEF));
     alunosComDef = new Map([...alunosTurno].filter(([aID, a]) => a.DEF));
+
+    alunosTurno = mapeiaAlunosParaDadoEspacial(alunosTurno);
+    alunosSemDef = mapeiaAlunosParaDadoEspacial(alunosSemDef);
+    alunosComDef =mapeiaAlunosParaDadoEspacial(alunosComDef);
+
     let escolasSet = new Set([...alunosTurno.values()].filter(a => a.ESCOLA_ID).map(a => a.ESCOLA_ID));
     escolas = [...escolaMap].filter(e => escolasSet.has(e[1].ID));
-
-    drawAlunos(mapeiaAlunosParaDadoEspacial(alunosSemDef), mapaConfig);
-    drawAlunos(mapeiaAlunosParaDadoEspacial(alunosComDef), mapaConfig, "img/icones/aluno-marcador-v4.png");
-    drawEscolas(mapeiaEscolasParaDadoEspacial(escolas), mapaConfig);
+    escolas = mapeiaEscolasParaDadoEspacial(escolas);
+    
+    drawAlunos(alunosSemDef, mapaConfig);
+    drawAlunos(alunosComDef, mapaConfig, "img/icones/aluno-marcador-v4.png");
+    drawEscolas(escolas, mapaConfig);
     
     setTimeout(() => {
         mapaConfig["map"].getView().fit(vSource.getExtent(), {

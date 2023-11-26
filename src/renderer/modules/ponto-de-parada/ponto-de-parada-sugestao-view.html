@@ -1,7 +1,7 @@
 <div class="container-fluid">
     <div class="row justify-content-center mb-3">
         <img id="pageIcon" src="./img/icones/rota-sugestao2.png">
-        <p class="pageTitle">Sugestão de Rotas</p>
+        <p class="pageTitle">Sugestão de Pontos de Paradas</p>
     </div>
 
     <div class="row">
@@ -39,21 +39,6 @@
                                         Para tal, por favor especifique o público alvo e a a distância máxima de
                                         caminhada permitida.
                                     </h6>
-
-                                    <div class="alert alert-warning alert-with-icon w-90" data-notify="container">
-                                        <button type="button" aria-hidden="true" class="close" data-dismiss="alert">
-                                            <i class="nc-icon nc-simple-remove"></i>
-                                        </button>
-                                        <span data-notify="icon" class="fa fa-exclamation-circle"></span>
-                                        <span data-notify="message">
-                                            O SETE utiliza os parâmetros abaixo para guiar o processo de sugestão de
-                                            rotas. 
-                                            Entretanto, em casos de conflito de parâmetros, por exemplo, uma distância
-                                            de viagem permitido muito pequena e poucos veículos, o sistema irá
-                                            flexibilizar os parâmetros para atender os alunos escolhidos na sugestão de
-                                            rotas.
-                                        </span>
-                                    </div>
 
                                     <div class="col-12">
                                         <div class="form-group">
@@ -157,8 +142,9 @@
                                     </div>
                                 </div>
 
-                                <h6 class="mb-3 text-center text-space">O sistema sugere as seguintes rotas.
-                                    Por favor, escolha quais delas você deseja salvar.</h6>
+                                <h6 class="mb-3 text-center text-space">
+                                    O sistema sugere os seguintes pontos de parada.
+                                </h6>
 
                                 <div class="row justify-content-center">
                                     <div class="alert alert-info alert-with-icon w-90" data-notify="container">
@@ -173,27 +159,53 @@
                                         </span>
                                     </div>
                                 </div>
+
                                 <div class="sugpanel row justify-content-center">
-                                    <div class="col-4">
-                                        <div id="sidebar-RotasGeradas" class="external sidebar-RotasGeradas">
+                                    <div class="col-xs-12 col-md-4">
+                                        <div id="sidebar-PontosParadaGerados" class="external sidebar-PontosParadaGerados">
                                             <label class="control-label">
-                                                <b>Rotas geradas</b>
+                                                <b>Pontos gerados</b>
                                                 <star>*</star>
                                             </label>
                                             <br />
-                                            <img id="onibusMarcador" class="d-none"
-                                                src="./img/icones/onibus-marcador.png" />
-                                            <img id="lanchaMarcador" class="d-none"
-                                                src="./img/icones/lancha-marcador.png" />
                                         </div>
                                     </div>
-                                    <div class="col-8">
+                                    <div class="col-xs-12 col-md-8">
                                         <div class="row">
                                             <div id="mapaPontosDeParadasSugestaoGerados" class="mb-2 mapawiz"
                                                 style="width: 100%; height: 400px;"></div>
                                         </div>
                                     </div>
                                 </div>
+                                <div class="row col-12">
+                                    <div class="col-6">
+                                        <h6 class="text-space">
+                                            <img id="pageIcon" src="./img/icones/aluno-marcador.png" />
+                                            Alunos
+                                        </h6>
+                                    </div>
+                                    <div class="col-6">
+                                        <h6 class="text-space">
+                                            <img id="pageIcon" src="./img/icones/aluno-marcador-v4.png">
+                                            Alunos com Necessidades Especiais
+                                        </h6>
+                                    </div>
+                                </div>
+                                <div class="row col-12 mt-2">
+                                    <div class="col-6">
+                                        <h6 class="text-space">
+                                            <img id="pageIcon" src="./img/icones/ponto-de-parada-ok.png" />
+                                            Pontos de Parada
+                                        </h6>
+                                    </div>
+                                    <div class="col-6">
+                                        <h6 class="text-space">
+                                            <img id="pageIcon" src="./img/icones/ponto-de-parada-nep.png">
+                                            Pontos de Parada que possuem Alunos com Necessidades Especiais
+                                        </h6>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
 
