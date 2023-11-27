@@ -267,7 +267,18 @@ async function realizaImportacao(rawDados) {
 
         let tam_update = censoAlunos.length + censoEscolas.length;
         try {
-            await restImpl.dbPOST(DB_TABLE_CENSO, "", payload);
+            // Vamos mandar no máximo de 20 em 20 alunos para evitar timeout
+            // https://stackoverflow.com/questions/8495687/split-array-into-chunks
+            const chunkSize = 20;
+            for (let i = 0; i < censoAlunos.length; i += chunkSize) {
+                const chunk = censoAlunos.slice(i, i + chunkSize);
+                // do whatever
+                let novoPayload = {
+                    "alunos": chunk,
+                    "escolas": censoEscolas
+                }
+                await restImpl.dbPOST(DB_TABLE_CENSO, "", novoPayload);
+            }
             updateProgresso(tam_update)
         } catch (error) {
             console.log(error);

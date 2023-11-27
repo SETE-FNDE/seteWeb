@@ -189,8 +189,9 @@ function parseRegistro30(registro) {
         dadoPessoa["LOC_CEP"] = registro.data[41];
     }
 
-    if (registro.data[43] != null && registro.data[43] != "") {
-        dadoPessoa["MEC_TP_LOCALIZACAO"] = Number(registro.data[43]);
+    // Mudança para 42
+    if (registro.data[42] != null && registro.data[42] != "") {
+        dadoPessoa["MEC_TP_LOCALIZACAO"] = Number(registro.data[42]);
     }
 
     // Contato Email
