@@ -258,3 +258,16 @@ function truncateText(str, n = 50) {
 function typeOf(obj) {
     return {}.toString.call(obj).split(" ")[1].slice(0, -1).toLowerCase();
 }
+
+function getRequestParams()
+{
+    var $_GET = {},
+    args = location.search.substr(1).split(/&/);
+    for (var i=0; i<args.length; ++i) {
+        var tmp = args[i].split(/=/);
+        if (tmp[0] != "") {
+            $_GET[decodeURIComponent(tmp[0])] = decodeURIComponent(tmp.slice(1).join("").replace("+", " "));
+        }
+    }
+    return $_GET;
+}

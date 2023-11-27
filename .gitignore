@@ -6,6 +6,9 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
+# Config
+config.js
+
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
@@ -96,3 +99,8 @@ bin/sete-*
 .vscode/launch.json
 /nbproject/private/
 /nbproject/*
+webify.sh
+webify.ps1
+.vscode/settings.json
+webify.ps1
+webify.sh
