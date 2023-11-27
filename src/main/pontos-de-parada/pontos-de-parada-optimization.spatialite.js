@@ -56,7 +56,12 @@ class PontosDeParadaOptimizationWorker {
             let menorDistancia = Number.MAX_SAFE_INTEGER;
             let alunoPCDMaisPerto = null;
             for (let alunoPCD of parametros.alunosComDef) {
-                let distancia = haversine(aluno, alunoPCD);
+                let avertex = this.graph.getVertex(aluno.key);
+                let bvertex = this.graph.getVertex(alunoPCD.key);
+                let primeiraperna = avertex.get("distVertexOSM");
+                let distcorpo = avertex.get("spatialDistEdges").get(alunoPCD.key) || bvertex.get("spatialDistEdges").get(aluno.key);
+                let ultimaperna = bvertex.get("distVertexOSM");
+                let distancia = primeiraperna + distcorpo + ultimaperna;
                 console.log(aluno.nome, alunoPCD.nome, distancia);
 
                 if (distancia <= parametros.maxTravDist && distancia <= menorDistancia) {
@@ -70,7 +75,7 @@ class PontosDeParadaOptimizationWorker {
             console.log("------")
 
             if (pertoDePCD) {
-                aluno["distancia_ponto"] = Number(menorDistancia).toFixed(2);
+                aluno["distancia_ponto"] = menorDistancia;
                 clustersDict[alunoPCDMaisPerto.key]["ALUNOS"].push(aluno);
             } else {
                 alunosSemClusters.push(aluno);
@@ -80,11 +85,11 @@ class PontosDeParadaOptimizationWorker {
         // Calcula distancia media
         for (let alunoPCD of parametros.alunosComDef) {
             let cluster = clustersDict[alunoPCD.key];
-            let dist_media = cluster.ALUNOS.map((a) => Number(a.distancia_ponto)).reduce((acc, cur) => (acc = acc + cur), 0) / cluster.ALUNOS.length;
-            clustersDict[alunoPCD.key]["DISTANCIA_MEDIA"] = Number(dist_media).toFixed(2);
+            let dist_media = cluster.ALUNOS.map((a) => a.distancia_ponto).reduce((acc, cur) => (acc = acc + cur), 0) / cluster.ALUNOS.length;
+            clustersDict[alunoPCD.key]["DISTANCIA_MEDIA"] = dist_media;
         }
 
-        return Promise.resolve({ alunosSemClusters, clusters: Object.values(clustersDict) });
+        return { alunosSemClusters, clusters: Object.values(clustersDict) };
     }
 
     runDBSCAN(dataset) {
@@ -96,7 +101,13 @@ class PontosDeParadaOptimizationWorker {
             distanceFunction: (a, b) => {
                 let distancia = 0;
                 if (a.key != b.key) {
-                    distancia = haversine(a, b);
+                    let avertex = this.graph.getVertex(a.key);
+                    let bvertex = this.graph.getVertex(b.key);
+
+                    let primeiraperna = avertex.get("distVertexOSM");
+                    let distcorpo = avertex.get("spatialDistEdges").get(b.key) || bvertex.get("spatialDistEdges").get(a.key);
+                    let ultimaperna = bvertex.get("distVertexOSM");
+                    distancia = primeiraperna + distcorpo + ultimaperna;
                 }
                 return distancia;
             },
@@ -135,29 +146,36 @@ class PontosDeParadaOptimizationWorker {
             clat = clat / alunosDoCluster.length;
             clng = clng / alunosDoCluster.length;
 
-            // Calcula distancia até o ponto
-            let { nodeGeoJSON } = await this.graph.getClosestPointOnLine(clat, clng);
+            let { dbNodeID, nodeGeoJSON } = await this.graph.getRawSpatialVertex(clat, clng);
             let geoJSON = JSON.parse(nodeGeoJSON);
+            
+            // Calcula distancia até o ponto
             let distanciaMedia = 0;
             for (let el of alunosDoCluster) {
-                let distanciaAoPonto = haversine(el, {
-                    lat: geoJSON.coordinates[1],
-                    lng: geoJSON.coordinates[0],
-                });
+                let elVertex = this.graph.getVertex(el.key);
+                let elNodeID = elVertex.get("dbNodeID");
+                let distPrimeiraPerna = elVertex.get("distVertexOSM");
+                let distPonto = await this.graph.getRawSpatialDistance(elNodeID, dbNodeID);
+                let distanciaAoPonto = distPrimeiraPerna + distPonto;
+                console.log(distanciaAoPonto, distPrimeiraPerna, distPonto);
+                
                 el["distancia_ponto"] = Number(distanciaAoPonto).toFixed(2);
                 distanciaMedia = distanciaMedia + distanciaAoPonto;
             }
             distanciaMedia = distanciaMedia / alunosDoCluster.length;
 
             clusters.push({
-                ALUNOS: [...alunosDoCluster],
-                CENTRO: {
-                    lat: geoJSON.coordinates[1],
-                    lng: geoJSON.coordinates[0],
+                "ALUNOS": [...alunosDoCluster],
+                "CENTRO": {
+                    "lat": geoJSON.coordinates[1],
+                    "lng": geoJSON.coordinates[0],
                 },
-                PCD: false,
-                DISTANCIA_MEDIA: distanciaMedia,
-            });
+                "PCD": false,
+                "DISTANCIA_MEDIA": distanciaMedia
+            })
+            console.log(dbNodeID, nodeGeoJSON);
+
+            
         }
         
         return clusters;
@@ -171,14 +189,18 @@ class PontosDeParadaOptimizationWorker {
                     reject("ERRO AO ABRIR MALHA");
                 }
 
-                this.clusterPCD(this.paramPontosDeParada)
-                .then(async ({ clusters, alunosSemClusters }) => {
-                    let dbscanAlg = this.runDBSCAN(alunosSemClusters);
-                    let dbscanClusters = await this.processDBSCAN(dbscanAlg, alunosSemClusters);
-                    let clusterFinais = clusters.concat(dbscanClusters);
+                await this.buildSpatialIndex();
+                this.buildSpatialMatrix()
+                    .then(() => this.clusterPCD(this.paramPontosDeParada))
+                    .then(async ({ clusters, alunosSemClusters }) => {
+                        let dbscanAlg = this.runDBSCAN(alunosSemClusters);
+                        let dbscanClusters = await this.processDBSCAN(dbscanAlg, alunosSemClusters);
+                        let clusterFinais = clusters.concat(dbscanClusters);
 
-                    resolve({ clusters: clusterFinais, cachedODMatrix: this.graph.cachedODMatrix });
-                });
+
+
+                        resolve({ clusters: clusterFinais, cachedODMatrix: this.graph.cachedODMatrix });
+                    });
             });
         });
     }

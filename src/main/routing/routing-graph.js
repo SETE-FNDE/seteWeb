@@ -213,6 +213,36 @@ module.exports = class RoutingGraph {
         }
     }
 
+    getClosestPointOnLine(lat, lng) {
+        let sqlQuery = `SELECT
+                        ST_Distance(
+                            MakePoint(${lng}, ${lat}, 4326),
+                            ST_ClosestPoint(
+                                linha.geometry,
+                                MakePoint(${lng}, ${lat}, 4326)
+                            ),
+                            1
+                        ) as dist,
+                        AsGeoJSON(
+                            ST_ClosestPoint(
+                                linha.geometry,
+                                MakePoint(${lng}, ${lat}, 4326))
+                        ) as pontoGeoJSON
+                        FROM malha as linha
+                        ORDER BY dist
+                        LIMIT 1`;
+        return new Promise((resolve, reject) => {
+            this.spatialiteDB.get(sqlQuery, (err, row) => {
+                if (err) {
+                    reject();
+                }
+                let nodeGeoJSON = row["pontoGeoJSON"];
+                resolve({ nodeGeoJSON });
+            });
+        });
+                
+    }
+
     getRawSpatialDistance(cnodeID, dnodeID) {
         let sqlQuery = `SELECT *, ST_LENGTH(geometry, 1) AS dist
                         FROM malha_net
@@ -222,6 +252,7 @@ module.exports = class RoutingGraph {
                 if (err) {
                     reject();
                 }
+                console.log("RAW SPATIAL DISTANCE", row)
                 let cost = row["Cost"];
                 let dist = row["dist"];
 
@@ -266,7 +297,7 @@ module.exports = class RoutingGraph {
             let lng = c.get("lng");
             let lat = c.get("lat");
 
-            let sqlQuery = `SELECT ST_Distance(ST_GeomFromText('POINT(${lng} ${lat})', 4326), linha.geometry) AS dist, 
+            let sqlQuery = `SELECT ST_Distance(ST_GeomFromText('POINT(${lng} ${lat})', 4326), linha.geometry, 1) AS dist, 
                                    node_id
                             FROM malha_nodes AS linha
                             ORDER BY dist

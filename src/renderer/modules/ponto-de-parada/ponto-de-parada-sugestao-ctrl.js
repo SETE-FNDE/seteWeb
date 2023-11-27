@@ -367,6 +367,7 @@ function drawClusters(arrClusters, mapa) {
         pontoDeParada.set("nome", `Ponto: ${ponto}`);
         pontoDeParada.set("alunos", cluster.ALUNOS.length);
         pontoDeParada.set("alunos_com_def", clusterAlunosComDef.length);
+        pontoDeParada.set("distancia_media", Number(cluster.DISTANCIA_MEDIA).toFixed(2) + " metros")
         pontoDeParada.set("tipo", "ponto_parada")
 
         camada["source"].addFeature(pontoDeParada);
@@ -560,6 +561,14 @@ var popupGerado = new ol.Overlay.PopupFeature({
                 title: "Número de Alunos com Deficiência",
                 visible: (e) => e.getProperties().tipo == "ponto_parada",
             },
+            distancia_media: {
+                title: "Distância Média dos Alunos",
+                visible: (e) => e.getProperties().tipo == "ponto_parada",
+            },
+            distancia_ponto: {
+                title: "Distância ao Ponto de Parada",
+                visible: (e) => e.getProperties().tipo == "aluno",
+            }
         },
     },
 });
@@ -632,7 +641,7 @@ if (isElectron) {
         // Limpa
         mapaRotaGerada.rmGroupLayer();
         $(".sidebar-PontosParadaGerados .ol-layerswitcher ul .ol-layer-group").remove();
-        gSource.clear();
+        // gSource.clear();
         
         // Desenha
         drawEscolas(escolas, mapaRotaGerada);
