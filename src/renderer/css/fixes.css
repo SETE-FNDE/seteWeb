@@ -775,6 +775,10 @@ td.text-left.detalheValor {
     .btnAcoesBaixo button {
         width: 100%;
     }
+
+    .card-footer button {
+        width: 100%
+    }
 }
 
 .btnCancelar, .btnCancelar:focus {
