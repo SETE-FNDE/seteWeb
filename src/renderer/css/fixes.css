@@ -767,6 +767,16 @@ td.text-left.detalheValor {
     background: #457b6b;
 }
 
+@media screen and (max-width: 767px) {
+    .btnSalvar {
+        width: 100%;
+    }
+    
+    .btnAcoesBaixo button {
+        width: 100%;
+    }
+}
+
 .btnCancelar, .btnCancelar:focus {
     background: #ED2E3B;
     border: none;
