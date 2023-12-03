@@ -143,28 +143,32 @@
                                                 <div class="col-9">
                                                     <div class="form-check form-check-radio">
                                                         <label class="form-check-label">
-                                                            <input class="form-check-input" type="radio" name="vinculo" value="1">
+                                                            <input class="form-check-input" type="radio" name="vinculo"
+                                                                value="1">
                                                             <span class="form-check-sign"></span>
                                                             Servidor Efetivo
                                                         </label>
                                                     </div>
                                                     <div class="form-check form-check-radio">
                                                         <label class="form-check-label">
-                                                            <input class="form-check-input" type="radio" name="vinculo" value="2">
+                                                            <input class="form-check-input" type="radio" name="vinculo"
+                                                                value="2">
                                                             <span class="form-check-sign"></span>
                                                             Servidor Comissionado
                                                         </label>
                                                     </div>
                                                     <div class="form-check form-check-radio">
                                                         <label class="form-check-label">
-                                                            <input class="form-check-input" type="radio" name="vinculo" value="3">
+                                                            <input class="form-check-input" type="radio" name="vinculo"
+                                                                value="3">
                                                             <span class="form-check-sign"></span>
                                                             Terceirizado
                                                         </label>
                                                     </div>
                                                     <div class="form-check form-check-radio">
                                                         <label class="form-check-label">
-                                                            <input class="form-check-input" type="radio" name="vinculo" value="4">
+                                                            <input class="form-check-input" type="radio" name="vinculo"
+                                                                value="4">
                                                             <span class="form-check-sign"></span>
                                                             Outro
                                                         </label>
@@ -241,8 +245,11 @@
                                                 </label>
                                                 <div class="col-6 mt-2">
                                                     <input id="regdocpessoaispdf" name="regdocpessoaispdf" type="file"
-                                                        accept=".pdf" placeholder="Documento PDF"
-                                                        class="file-input form-control">
+                                                        accept="application/pdf" placeholder="Documento PDF"
+                                                        class="file-input form-control" />
+                                                    <span class="hint">
+                                                        Só anexo o documento se você quiser atualizar o documento, caso
+                                                        contrário não é necessário anexar o documento novamente.</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -265,8 +272,8 @@
                                                     O motorista atua em quais rotas?
                                                 </label>
                                                 <div class="col-5">
-                                                    <select id="tipoRota" name="tipoRota" class="selectpicker"
-                                                        multiple data-selected-text-format="count" data-size="10">
+                                                    <select id="tipoRota" name="tipoRota" class="selectpicker" multiple
+                                                        data-selected-text-format="count" data-size="10">
                                                         <option value="-1">Escolher rota depois</option>
                                                     </select>
                                                 </div>

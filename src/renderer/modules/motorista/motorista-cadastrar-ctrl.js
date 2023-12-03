@@ -132,15 +132,6 @@ $("#salvarmotorista").on('click', async () => {
                 "Por favor digite outro CPF ou exclua este motorista primeiro.",
                 '', "Ops... CPF duplicado")
         } else {
-            if ($("#regdocpessoaispdf")[0].files.length != 0) {
-                var oriFile = $("#regdocpessoaispdf")[0].files[0].path;
-                var dstFile = path.join(userDataDir, $("#regcpf").val() + ".pdf");
-                motoristaJSON["ARQUIVO_DOCPESSOAIS_ANEXO"] = dstFile;
-
-                fs.copySync(oriFile, dstFile);
-                console.log("Salvando arquivo do motorista", dstFile);
-            }
-
             if (estaEditando) {
                 try {
                     var novasRotas = new Set($("#tipoRota").val());
@@ -162,6 +153,13 @@ $("#salvarmotorista").on('click', async () => {
                             await restImpl.dbDELETEComParam(DB_TABLE_ROTA, `/${rID}/motoristas`, { "cpf_motorista": cpf });
                         }
                     }
+                    
+                    // Salvando arquivo se tiver
+                    if ($("#regdocpessoaispdf")[0].files.length) {
+                        let formData = new FormData();
+                        formData.append("file", $("#regdocpessoaispdf")[0].files[0]);
+                        await restImpl.dbPOST(DB_TABLE_MOTORISTA, `/${cpf}/file`, formData);
+                    }
                     completeForm()
                 } catch (err) {
                     errorFn("Erro ao atualizar o motorista.", err);
@@ -175,6 +173,13 @@ $("#salvarmotorista").on('click', async () => {
                                 await restImpl.dbPOST(DB_TABLE_ROTA, `/${rID}/motoristas`, { "cpf_motorista": cpf })
                             }
                         }
+                    }
+
+                    // Salvando arquivo se tiver
+                    if ($("#regdocpessoaispdf")[0].files.length) {
+                        let formData = new FormData();
+                        formData.append("file", $("#regdocpessoaispdf")[0].files[0]);
+                        await restImpl.dbPOST(DB_TABLE_MOTORISTA, `/${cpf}/file`, formData);
                     }
                     completeForm()
                 } catch (err) {
