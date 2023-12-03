@@ -26,12 +26,12 @@ var dataTablesNormas = $("#datatables").DataTable({
             { data: 'TITULO', width: "40%" },
             {
                 data: "ACOES",
-                width: "110px",
+                width: "140px",
                 sortable: false,
-                defaultContent: '<a href="#" class="btn btn-link btn-secondary normaViewPDF"><i class="fa fa-file-text"></i></a>' +
-                    '<a href="#" class="btn btn-link btn-primary normaView"><i class="fa fa-search"></i></a>' +
+                defaultContent: '<a href="#" class="btn btn-link btn-primary normaView"><i class="fa fa-search"></i></a>' +
                     '<a href="#" class="btn btn-link btn-warning normaEdit"><i class="fa fa-edit"></i></a>' +
-                    '<a href="#" class="btn btn-link btn-danger normaRemove"><i class="fa fa-times"></i></a>'
+                    '<a href="#" class="btn btn-link btn-danger normaRemove"><i class="fa fa-times"></i></a>' +
+                    '<a href="#" class="btn btn-link btn-info normaViewPDF"><i class="fa fa-file-text"></i></a>'
             }
         ],
         columnDefs: [
