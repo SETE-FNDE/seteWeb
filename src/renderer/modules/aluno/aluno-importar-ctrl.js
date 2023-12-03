@@ -64,7 +64,7 @@ var schema = {
 
 $("#baixarPlanilha").on("click", async () => {
     if (!isElectron) {
-        saveAs("/src/renderer/templates/FormatoImportacaoAluno.xlsx", "FormatoImportacaoAluno.xlsx");
+        saveAs("templates/FormatoImportacaoAluno.xlsx", "FormatoImportacaoAluno.xlsx");
     } else {
         let salvou = await window.sete.salvarPlanilhaModelo();
         if (salvou) {
@@ -381,47 +381,28 @@ async function parsePlanilha(arquivo) {
 }
 
 var dataTableImportar = $("#datatables").DataTable({
-    columns: [{ data: "SELECT", width: "80px" }, { data: "nome", width: "40%" }, { data: "data_nascimento", width: "20%" }, { data: "georef" }],
-    columnDefs: [
-        {
-            targets: 1,
-            type: "locale-compare",
-        },
-        {
-            targets: 0,
-            checkboxes: {
-                selectRow: true,
+    ...dtConfigPadrao("aluno"),
+    ...{
+        columns: [{ data: "SELECT", width: "80px" }, { data: "nome", width: "40%" }, { data: "data_nascimento", width: "20%" }, { data: "georef" }],
+        columnDefs: [
+            {
+                targets: 1,
+                type: "locale-compare",
             },
+            {
+                targets: 0,
+                checkboxes: {
+                    selectRow: true,
+                },
+            },
+        ],
+        order: [[1, "asc"]],
+        select: {
+            style: "multi",
+            info: false,
         },
-    ],
-    order: [[1, "asc"]],
-    select: {
-        style: "multi",
-        info: false,
-    },
-    autoWidth: false,
-    bAutoWidth: false,
-    lengthMenu: [
-        [10, 50, -1],
-        [10, 50, "Todas"],
-    ],
-    pagingType: "full_numbers",
-    language: {
-        search: "_INPUT_",
-        searchPlaceholder: "Procurar alunos",
-        lengthMenu: "Mostrar _MENU_ alunos por página",
-        zeroRecords: "Não encontrei nenhum aluno com este filtro",
-        info: "Mostrando página _PAGE_ de _PAGES_",
-        infoEmpty: "Sem registros disponíveis",
-        infoFiltered: "(Alunos filtrados a partir do total de _MAX_ alunos)",
-        paginate: {
-            first: "Primeira",
-            last: "Última",
-            next: "Próxima",
-            previous: "Anterior",
-        },
-    },
-    dom: "lfrtip",
+        dom: "lfrtip"
+    }
 });
 
 $("#importarAlunos").on("click", () => {
