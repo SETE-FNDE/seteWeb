@@ -50,24 +50,24 @@
                                     <div class="col-12 mt-1">
                                         <div class="form-group">
                                             <div class="row justify-content-center">
-                                                <div class="col-6 ">
+                                                <div class="col-sm-12 col-md-6 ">
                                                     <div class="row">
                                                         <div class="optlabel">
                                                             Optativo
                                                         </div>
-                                                        <label class="col-4 control-label latlon-label"><b>Latitude</b>
+                                                        <label class="col-sm-12 col-md-4 control-label latlon-label"><b>Latitude</b>
                                                         </label>
-                                                        <div class="col-5">
+                                                        <div class="col-sm-12 col-md-5">
                                                             <input class="form-control" type="text" id="reglat"
                                                                 name="reglat" placeholder="Latitude:" />
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-6">
+                                                <div class="col-sm-12 col-md-6">
                                                     <div class="row">
-                                                        <label class="col-4 control-label latlon-label"><b>Longitude</b>
+                                                        <label class="col-sm-12 col-md-4 control-label latlon-label"><b>Longitude</b>
                                                         </label>
-                                                        <div class="col-5">
+                                                        <div class="col-sm-12 col-md-5">
                                                             <input class="form-control" type="text" id="reglon"
                                                                 name="reglon" placeholder="Longitude:" />
                                                         </div>
@@ -85,11 +85,11 @@
                                                 <div class="obrlabel">
                                                     Obrigatório
                                                 </div>
-                                                <label class="col-2 control-label">
+                                                <label class="col-sm-12 col-md-2 control-label">
                                                     <b>Estado</b>
                                                     <star>*</star>
                                                 </label>
-                                                <div class="col-8">
+                                                <div class="col-sm-12 col-md-8">
                                                     <select id="regestado" name="regestado"
                                                         class="form-control"></select>
                                                 </div>
@@ -103,11 +103,11 @@
                                                 <div class="obrlabel">
                                                     Obrigatório
                                                 </div>
-                                                <label class="col-2 control-label">
+                                                <label class="col-sm-12 col-md-2 control-label">
                                                     <b>Cidade</b>
                                                     <star>*</star>
                                                 </label>
-                                                <div class="col-8">
+                                                <div class="col-sm-12 col-md-8">
                                                     <select id="regcidade" name="regcidade"
                                                         class="form-control"></select>
                                                 </div>
@@ -120,10 +120,10 @@
                                                 <div class="optlabel">
                                                     Optativo
                                                 </div>
-                                                <label class="col-3 control-label">
+                                                <label class="col-sm-12 col-md-3 control-label">
                                                     Endereço da Escola
                                                 </label>
-                                                <div class="col-7">
+                                                <div class="col-sm-12 col-md-7">
                                                     <input id="regend" name="regend" type="text"
                                                         placeholder="Digite o endereço da escola" class="form-control">
                                                 </div>
@@ -137,10 +137,10 @@
                                                 <div class="optlabel">
                                                     Optativo
                                                 </div>
-                                                <label class="col-2 control-label">
+                                                <label class="col-sm-12 col-md-2 control-label">
                                                     CEP
                                                 </label>
-                                                <div class="col-8 ">
+                                                <div class="col-sm-12 col-md-8 ">
                                                     <input id="regcep" name="regcep" type="text"
                                                         placeholder="Informe o CEP da Escola (caso possua)"
                                                         class="form-control cep">
@@ -159,21 +159,21 @@
                                                     <b>A escola está localizada em:</b>
                                                     <star>*</star>
                                                 </label>
-                                                <div class="form-check form-check-radio">
-                                                    <label class="form-check-label">
-                                                        <input class="form-check-input" type="radio" name="areaUrbana"
-                                                            type="checkbox" value="1">
-                                                        <span class="form-check-sign"></span>
-                                                        Área Urbana
-                                                    </label>
-                                                </div>
-                                                <div class="form-check form-check-radio">
-                                                    <label class="form-check-label">
-                                                        <input class="form-check-input" type="radio" name="areaUrbana"
-                                                            type="checkbox" value="2">
-                                                        <span class="form-check-sign"></span>
-                                                        Área Rural
-                                                    </label>
+                                                <div class="col-sm-12 col-md-6">
+                                                    <div class="form-check form-check-radio">
+                                                        <label class="form-check-label">
+                                                            <input class="form-check-input" type="radio" name="areaUrbana" type="checkbox" value="1">
+                                                            <span class="form-check-sign"></span>
+                                                            Área Urbana
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check form-check-radio">
+                                                        <label class="form-check-label">
+                                                            <input class="form-check-input" type="radio" name="areaUrbana" type="checkbox" value="2">
+                                                            <span class="form-check-sign"></span>
+                                                            Área Rural
+                                                        </label>
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -244,11 +244,11 @@
                                                 <div class="obrlabel">
                                                     Obrigatório
                                                 </div>
-                                                <label class="col-4 control-label">
+                                                <label class="col-sm-12 col-md-4 control-label">
                                                     <b>Nome da Escola</b>
                                                     <star>*</star>
                                                 </label>
-                                                <div class="col-6">
+                                                <div class="col-sm-12 col-md-6">
                                                     <input id="nomeEscola" name="nomeEscola" type="text"
                                                         placeholder="Informe o nome da Escola:" class="form-control">
                                                 </div>
@@ -262,11 +262,11 @@
                                                 <div class="obrlabel">
                                                     Obrigatório
                                                 </div>
-                                                <label class="col-4 control-label">
+                                                <label class="col-sm-12 col-md-4 control-label">
                                                     <b>Código INEP </b>
                                                     <star>*</star>
                                                 </label>
-                                                <div class="col-6">
+                                                <div class="col-sm-12 col-md-6">
                                                     <input id="inepEscola" name="inepEscola" type="text" minlength="8"
                                                         maxlength="8" placeholder="Código INEP da escola"
                                                         class="form-control">
@@ -282,10 +282,10 @@
                                                 <div class="optlabel">
                                                     Optativo
                                                 </div>
-                                                <label class="col-4 control-label">
+                                                <label class="col-sm-12 col-md-4 control-label">
                                                     Nome para contato
                                                 </label>
-                                                <div class="col-6">
+                                                <div class="col-sm-12 col-md-6">
                                                     <input id="nomeContato" name="nomeContato" type="text"
                                                         placeholder="Informe um nome para contato na Escola:"
                                                         class="form-control">
@@ -300,10 +300,10 @@
                                                 <div class="optlabel">
                                                     Optativo
                                                 </div>
-                                                <label class="col-4 control-label">
+                                                <label class="col-sm-12 col-md-4 control-label">
                                                     Telefone para contato
                                                 </label>
-                                                <div class="col-6">
+                                                <div class="col-sm-12 col-md-6">
                                                     <input id="telContato" name="telContato" type="text"
                                                         placeholder="Informe o telefone de contato da Escola:"
                                                         class="form-control telmask">
@@ -318,10 +318,10 @@
                                                 <div class="optlabel">
                                                     Optativo
                                                 </div>
-                                                <label class="col-4 control-label">
+                                                <label class="col-sm-12 col-md-4 control-label">
                                                     E-mail para contato
                                                 </label>
-                                                <div class="col-6">
+                                                <div class="col-sm-12 col-md-6">
                                                     <input id="emailContato" name="emailContato" type="text"
                                                         placeholder="Informe o e-mail de contato da Escola/Gestor:"
                                                         class="form-control email">
@@ -338,11 +338,11 @@
                                                 <div class="obrlabel">
                                                     Obrigatório
                                                 </div>
-                                                <label class="col-4 control-label">
+                                                <label class="col-sm-12 col-md-4 control-label">
                                                     <b>A escola é:</b>
                                                     <star>*</star>
                                                 </label>
-                                                <div class="col-6">
+                                                <div class="col-sm-12 col-md-6">
                                                     <div class="row">
                                                         <div class="form-check form-check-radio">
                                                             <label class="form-check-label">
@@ -400,11 +400,11 @@
                                                 <div class="obrlabel">
                                                     Obrigatório
                                                 </div>
-                                                <label class="col-4 control-label">
+                                                <label class="col-sm-12 col-md-4 control-label">
                                                     <b>Em relação ao regime, <br> a escola oferece ensino:</b>
                                                     <star>*</star>
                                                 </label>
-                                                <div class="col-6 mt-2">
+                                                <div class="col-sm-12 col-md-6 mt-2">
                                                     <div class="row">
                                                         <div class="form-check form-check-inline">
                                                             <label class="form-check-label from-check-inline">
@@ -449,11 +449,11 @@
                                                 <div class="obrlabel">
                                                     Obrigatório
                                                 </div>
-                                                <label class="col-4 control-label">
+                                                <label class="col-sm-12 col-md-4 control-label">
                                                     <b>Em relação ao nível, <br> a escola oferece ensino:</b>
                                                     <star>*</star>
                                                 </label>
-                                                <div class="col-6 mt-2 p-0">
+                                                <div class="col-sm-12 col-md-6 mt-2 p-0">
                                                     <div class="row">
                                                         <div class="form-check form-check-inline">
                                                             <label class="form-check-label from-check-inline">
@@ -502,12 +502,12 @@
                                                 <div class="obrlabel">
                                                     Obrigatório
                                                 </div>
-                                                <label class="col-6 control-label">
+                                                <label class="col-sm-12 col-md-6 control-label">
                                                     <b>Em relação ao horário de funcionamento, <br> a escola funciona no
                                                         período da:</b>
                                                     <star>*</star>
                                                 </label>
-                                                <div class="col-4 mt-2">
+                                                <div class="col-sm-12 col-md-4 mt-2">
                                                     <div class="row">
                                                         <div class="form-check form-check-inline">
                                                             <label class="form-check-label from-check-inline">
