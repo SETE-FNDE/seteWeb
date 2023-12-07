@@ -246,48 +246,6 @@ var preprocessarAlunos = (res) => {
     return listaDeAlunos;
 }
 
-// Preprocessa escolas tem aluno
-var preprocessarEscolasTemAlunos = (res) => {
-    for (let escolaRaw of res) {
-        let aID = escolaRaw["ID_ALUNO"];
-        let eID = escolaRaw["ID_ESCOLA"];
-        let eNome = escolaRaw["NOME"];
-        
-        let alunoJSON = listaDeAlunos.get(aID);
-        if (alunoJSON && eID != undefined && eID != "undefined" && eID != null && eNome != null && eNome != undefined) {
-            alunoJSON["ID_ESCOLA"] = eID;
-            alunoJSON["ESCOLA"] = eNome;
-            alunoJSON["ESCOLA_LOC_LATITUDE"] = escolaRaw["LOC_LATITUDE"];
-            alunoJSON["ESCOLA_LOC_LONGITUDE"] = escolaRaw["LOC_LONGITUDE"];
-            alunoJSON["ESCOLA_MEC_CO_UF"] = escolaRaw["MEC_CO_UF"];
-            alunoJSON["ESCOLA_MEC_CO_MUNICIPIO"] = escolaRaw["MEC_CO_MUNICIPIO"];
-            alunoJSON["ESCOLA_MEC_TP_LOCALIZACAO"] = escolaRaw["MEC_TP_LOCALIZACAO"];
-            alunoJSON["ESCOLA_MEC_TP_LOCALIZACAO_DIFERENCIADA"] = escolaRaw["MEC_TP_LOCALIZACAO_DIFERENCIADA"];
-            alunoJSON["ESCOLA_CONTATO_RESPONSAVEL"] = escolaRaw["CONTATO_RESPONSAVEL"];
-            alunoJSON["ESCOLA_CONTATO_TELEFONE"] = escolaRaw["CONTATO_TELEFONE"];
-    
-            listaDeAlunos.set(aID, alunoJSON);
-        }
-    }
-    return listaDeAlunos;
-};
-
-// Preprocessa rota tem aluno
-var preprocessarRotaTemAlunos = (res) => {
-    res.forEach((rota) => {
-        let aID = rota["ID_ALUNO"];
-        let rID = rota["ID_ROTA"];
-        let alunoJSON = listaDeAlunos.get(aID);
-
-        if (alunoJSON) {
-            alunoJSON["ROTA"] = "ROTA " + rota["NOME"];
-            alunoJSON["ID_ROTA"] = rID;
-            listaDeAlunos.set(aID, alunoJSON);
-        }
-    })
-    return listaDeAlunos;
-}
-
 // Adiciona dados na tabela
 adicionaDadosTabela = (res) => {
     let i = 0;

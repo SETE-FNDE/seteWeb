@@ -231,7 +231,6 @@ function mostraSeTemUpdate(modal = true) {
                     appVersion = currVersion;
                     let remoteVersion = pkg.version;
                     let remoteSemVer = Number(remoteVersion.split(".")[0] + "." + remoteVersion.split(".")[1]);
-                    debugger
                     if (currSemVer < remoteSemVer) {
                         $.notifyClose();
                         $.notify(
