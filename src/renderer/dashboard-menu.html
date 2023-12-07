@@ -489,6 +489,7 @@
         $("#logosete").click(() => {
             $(".activeLink").removeClass("activeLink");
             action = "dashboard";
+            desabilitaMenu();
             $("#content").load("./dashboard-main.html");
         });
 
