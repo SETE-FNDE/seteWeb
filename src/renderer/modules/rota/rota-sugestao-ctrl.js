@@ -41,6 +41,7 @@ var nomeRotaMap = new Map(); // Mapa que associa nome rota  -> dados da rota
 var alunos = new Array();
 var garagens = new Array();
 var escolas = new Array();
+var veiculos = [];
 
 // Número da simulação
 var numSimulacao = userconfig.get("SIMULATION_COUNT");
@@ -216,9 +217,10 @@ function plotMalha(osmGeoJSON) {
 
 // Preprocessa veículos
 async function preprocessarVeiculos() {
-    let veiculos = [];
     try {
-        veiculos = await restImpl.dbBuscarTodosDadosPromise(DB_TABLE_VEICULO);
+        let veiculosRaw = await restImpl.dbBuscarTodosDadosPromise(DB_TABLE_VEICULO);
+        veiculos = veiculosRaw.map(v => v.capacidade).sort().reverse().filter(v => Number(v) != 0);
+
     } catch (err) {
         veiculos = [];
     }
@@ -968,7 +970,18 @@ function initSimulation() {
         garage: garagens,
         stops: alunos,
         schools: escolas,
+        multiplePass: false,
     };
+
+    if ($("input[name='tipoFrota']:checked").val() == "veiculosFNDE") {
+        routeGenerationInputData["maxCapacity"] = 59;
+        routeGenerationInputData["numVehicles"] = 1;
+    } else if ($("input[name='tipoFrota']:checked").val() == "veiculosFrotaAtual") {
+        routeGenerationInputData["numVehicles"] = 1;
+        routeGenerationInputData["maxCapacity"] = Math.max(...veiculos)
+        routeGenerationInputData["multiplePass"] = true;
+        routeGenerationInputData["vehicles"] = veiculos;
+    }
 
     window.sete.iniciaGeracaoRotas(routeGenerationInputData);
 }
@@ -1034,6 +1047,17 @@ if (isElectron) {
 ////////////////////////////////////////////////////////////////////////////////
 // Validar Formulário
 ////////////////////////////////////////////////////////////////////////////////
+
+// Mostra e esconde o campo para especificar a frota com base no input do usuário
+$("input[name='tipoFrota']").on('click', (evt) => {
+    if ($("#veiculosCustomizados").is(":checked")) {
+        $("#divVeiculosCustomizados").show();
+    } else {
+        $("#divVeiculosCustomizados").hide();
+    }
+})
+
+
 var validadorFormulario = $("#wizardSugestaoRotaForm").validate({
     rules: {
         publico: {
@@ -1041,6 +1065,9 @@ var validadorFormulario = $("#wizardSugestaoRotaForm").validate({
         },
         turno: {
             required: true,
+        },
+        tipoFrota: {
+            required: true
         },
         maxTime: {
             required: true,
@@ -1070,7 +1097,7 @@ var validadorFormulario = $("#wizardSugestaoRotaForm").validate({
             required: true,
             number: true,
             min: 1,
-            max: 100,
+            max: 200,
         },
     },
     messages: {
@@ -1135,6 +1162,14 @@ function validaDadosEscolhidos() {
             `Não é possível realizar a sugestão de rotas. Para esta combinação de parâmetros não há nenhuma escola georeferenciada`,
             "",
             "Nenhuma escola georeferenciada neste caso"
+        );
+        formValido = false;
+    } else if ($("input[name='tipoFrota']:checked").val() == "veiculosFrotaAtual" && 
+                veiculos.reduce((a, b) => a + b, 0) < alunos.length) {
+        errorFn(
+            `Não é possível realizar a sugestão de rotas. O número de alunos é maior que a capacidade da frota`,
+            "",
+            "O número de alunos " + String(alunos.length) + " é maior que a capacidade da frota " + String(veiculos.reduce((a, b) => a + b, 0))
         );
         formValido = false;
     }
@@ -1267,7 +1302,7 @@ $("#rota-sugestao-saveBtnSim").on("click", () => {
             showCancelButton: true,
             cancelButtonText: "Cancelar",
             confirmButtonText: "Salvar",
-        }).then((res) => {
+        }).then(async (res) => {
             if (res.isConfirmed) {
                 Swal2.fire({
                     title: "Salvando as rotas...",
@@ -1310,7 +1345,7 @@ $("#rota-sugestao-saveBtnSim").on("click", () => {
                     }
                 });
 
-                var totalOperacoes = numAlunos + numAlunos + numEscolas + numRotas + 1;
+                var totalOperacoes = numRotas * 4; // um update pra inserir, um pra shape, outro pro alunos e outro para escolas
                 var progresso = 0;
 
                 function updateProgresso() {
@@ -1320,94 +1355,57 @@ $("#rota-sugestao-saveBtnSim").on("click", () => {
                     $(".progress-bar").text(progressoPorcentagem + "%");
                 }
 
-                // Promessas de Relações Antigas
-                var promiseArrayRelacoesAntigas = new Array();
-
-                // Remove das rotas atuais (se tiver vinculado)
-                for (r of rotasQueVamosSalvar) {
-                    for (a of r.alunos) {
-                        console.log("REMOVER ROTA", a.id);
-                        // Remove da escola atual (se tiver matriculado)
-                        remotedb
-                            .collection("municipios")
-                            .doc(codCidade)
-                            .collection("rotaatendealuno")
-                            .where("ID_ALUNO", "==", a.id)
-                            .get({ source: "cache" })
-                            .then((snapshotDocumentos) => {
-                                updateProgresso();
-                                snapshotDocumentos.forEach((doc) => {
-                                    promiseArrayRelacoesAntigas.push(doc.ref.delete());
-                                });
-                            });
-                    }
-                }
-
-                Promise.all(promiseArrayRelacoesAntigas)
-                    .then(() => {
-                        var promiseArrayRelacoes = new Array();
-
-                        // Adicionar as novas rotas
-                        for (r of rotasQueVamosSalvar) {
-                            r.alunos.forEach((a) =>
-                                promiseArrayRelacoes.push(
-                                    dbInserirPromise(DB_TABLE_ROTA_ATENDE_ALUNO, { ID_ROTA: r.id, ID_ALUNO: a.id }).then(() => updateProgresso())
-                                    // console.log("TABLE_ATENDE_ALUNO", r.id, a.id)
-                                )
-                            );
-
-                            r.escolas.forEach((e) =>
-                                promiseArrayRelacoes.push(
-                                    dbInserirPromise(DB_TABLE_ROTA_PASSA_POR_ESCOLA, { ID_ROTA: r.id, ID_ESCOLA: e.id }).then(() => updateProgresso())
-                                    // console.log("TABLE_PASSA_POR_ESCOLA", r.id, e.id)
-                                )
-                            );
-
-                            let rotaPayload = r.rota.payload;
-
-                            let rotaJSON = {
-                                TIPO: 1, // int
-                                NOME: r.id, // string
-                                KM: (rotaPayload.travDistance / 1000).toFixed(2), // text
-                                TEMPO: rotaPayload.estTime, // text
-                                TURNO_MATUTINO: $("#turnoManha").is(":checked"), // bool
-                                TURNO_VESPERTINO: $("#turnoTarde").is(":checked"), // bool
-                                TURNO_NOTURNO: $("#turnoNoite").is(":checked"), // bool
-                                SHAPE: new ol.format.GeoJSON().writeFeatures(r.rota.gjson),
-
-                                // campos default
-                                HORA_IDA_INICIO: "",
-                                HORA_IDA_TERMINO: "",
-                                HORA_VOLTA_INICIO: "",
-                                HORA_VOLTA_TERMINO: "",
-                                DA_PORTEIRA: false,
-                                DA_MATABURRO: false,
-                                DA_COLCHETE: false,
-                                DA_ATOLEIRO: false,
-                                DA_PONTERUSTICA: false,
-                            };
-                            promiseArrayRelacoes.push(dbInserirPromise(DB_TABLE_ROTA, rotaJSON, r.id).then(() => updateProgresso()));
-                            promiseArrayRelacoes.push(dbAtualizaVersao().then(() => updateProgresso()));
-                        }
-                        return Promise.all(promiseArrayRelacoes);
-                    })
-                    .then(() => {
-                        return Swal2.fire({
-                            title: "Rotas salvas com sucesso",
-                            icon: "success",
-                            showCancelButton: false,
-                            confirmButtonClass: "btn-success",
-                            confirmButtonText: "Retornar ao painel",
-                            closeOnConfirm: false,
-                            closeOnClickOutside: false,
-                            allowOutsideClick: false,
-                            showConfirmButton: true,
+                try {
+                    for (let r of rotasQueVamosSalvar) {
+                        let rotaPayload = r.rota.payload;
+                        let rotaJSON = {
+                            tipo: 1, // int
+                            nome: r.id, // string
+                            km: (rotaPayload.travDistance / 1000).toFixed(2), // text
+                            tempo: rotaPayload.estTime, // text
+                            turno_matutino: $("#turnoManha").is(":checked") ? "S" : "N",
+                            turno_vespertino: $("#turnoTarde").is(":checked") ? "S" : "N", 
+                            turno_noturno: $("#turnoNoite").is(":checked") ? "S" : "N", 
+                            da_porteira: "N",
+                            da_mataburro: "N",
+                            da_colchete: "N",
+                            da_atoleiro: "N",
+                            da_ponterustica: "N",
+                        };
+                        let resp = await restImpl.dbPOST(DB_TABLE_ROTA, "", rotaJSON);
+                        updateProgresso();
+                        
+                        let idRota = resp?.data?.data?.id;
+                        await restImpl.dbPUT(DB_TABLE_ROTA, `/${idRota}/shape`, JSON.parse(new ol.format.GeoJSON().writeFeatures(r.rota.gjson)))
+                        updateProgresso();
+    
+                        await restImpl.dbPOST(DB_TABLE_ROTA, `/${idRota}/alunos`, {
+                            "alunos": r.alunos.map(a => ({id_aluno: a.id}))
                         });
-                    })
-                    .then(() => {
+                        updateProgresso();
+    
+                        await restImpl.dbPOST(DB_TABLE_ROTA, `/${idRota}/escolas`, {
+                            "escolas": r.escolas.map(e => ({id_escola: e.id}))
+                        });
+                        updateProgresso();
+                    }
+    
+                    return Swal2.fire({
+                        title: "Rotas salvas com sucesso",
+                        icon: "success",
+                        showCancelButton: false,
+                        confirmButtonClass: "btn-success",
+                        confirmButtonText: "Retornar ao painel",
+                        closeOnConfirm: false,
+                        closeOnClickOutside: false,
+                        allowOutsideClick: false,
+                        showConfirmButton: true,
+                    }).then(() => {
                         navigateDashboard("./modules/rota/rota-listar-view.html");
                     })
-                    .catch((err) => errorFn("Erro ao salvar as rotas sugeridas", err));
+                } catch (error) {
+                    errorFn("Erro ao salvar a rota.", error)
+                }
             }
         });
     }

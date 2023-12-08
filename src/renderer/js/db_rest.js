@@ -37,6 +37,11 @@ restAPI.interceptors.request.use((request) => {
         let url = request.url;
         let dadoCache = readFromCache(url);
 
+        if (request?.responseType == "arraybuffer") {
+            // Se é pra baixar um arquivo, não faz cache
+            return request;
+        }
+
         if (dadoCache) {
             request.adapter = () => {
                 return Promise.resolve({

@@ -310,7 +310,7 @@ var gerarMarcador = (lat, lng, icon, anchorX = 12, anchorY = 37) => {
     return p;
 }
 
-var gerarMarcadorNumerico = (lat, lng, numero, tamanho_fonte = 0.8) => {
+var gerarMarcadorNumerico = (lat, lng, numero, tamanho_fonte = 0.8, x_offset = 0) => {
     let p = new ol.Feature({
         "geometry": new ol.geom.Point(ol.proj.fromLonLat([lng, lat]))
     });
@@ -325,7 +325,7 @@ var gerarMarcadorNumerico = (lat, lng, numero, tamanho_fonte = 0.8) => {
             fontSize: tamanho_fonte,
             fontStyle: "bold",
             radius: 25,
-            //offsetX: -15,
+            offsetX: x_offset,
             rotation: 0,
             rotateWithView: false,
             // offsetY: $("#offset").prop('checked') ? -Number($("#radius").val()) : 0,

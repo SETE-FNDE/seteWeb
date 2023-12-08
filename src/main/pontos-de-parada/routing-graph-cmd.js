@@ -1,15 +1,59 @@
 // Basic Routing Graph Data Structure Implementation
 
 var Heap = require("heap");
-var Saving = require("./saving.js");
 var haversine = require("haversine-distance");
 
-module.exports = class RoutingGraph {
-    constructor(cachedODMatrix, spatialiteDB, useSpatialDistance = false) {
+// CMD libs
+const path = require("path");
+const child_process = require("child_process");
+
+module.exports = class RoutingGraphCMD {
+    constructor(cachedODMatrix, spatialiteDB, appPath, dbPath, useSpatialDistance = false) {
         this.matrix = new Map();
         this.cachedODMatrix = cachedODMatrix;
         this.spatialiteDB = spatialiteDB;
+        this.appPath = appPath;
+        this.dbPath = dbPath;
         this.useSpatialDistance = useSpatialDistance;
+    }
+
+    executeSpatialVertexCMDQuery(sqlQuery) {
+        let scriptBin = "query_index.cmd";
+        let spatialiteBin = "spatialite.exe";
+        let envVariables = "";
+        let dbPath = this.dbPath;
+
+        if (process.platform == "linux") {
+            spatialiteBin = "spatialite";
+            envVariables = ".:" + path.join(app.getAppPath(), "..", "bin");
+        } else if (process.platform == "win32") {
+            spatialiteBin = "spatialite.exe";
+        } else {
+            spatialiteBin = "spatialite_mac";
+            envVariables = ".:" + path.join(app.getAppPath(), "..", "bin");
+        }
+
+        let scriptPath = path.join(this.appPath, "..", "bin", scriptBin);
+        let spatialiteBinPath = path.join(this.appPath, "..", "bin", spatialiteBin);
+        let args = [spatialiteBinPath, dbPath, sqlQuery];
+        console.log(args);
+
+        let queryCreation = child_process.spawn(scriptPath, args, { encoding: "utf-8", env: { LD_LIBRARY_PATH: envVariables } });
+
+        return new Promise((resolve, reject) => {
+            let dados = "";
+            queryCreation.on("close", (status) => {
+                if (status == 0) {
+                    resolve(dados);
+                } else {
+                    reject("Erro ao tentar criar a malha");
+                }
+            });
+
+            queryCreation.stdout.on("data", (data) => {
+                dados = dados + data.toString();
+            });
+        });
     }
 
     addGarageVertex(key, lat, lng) {
@@ -39,7 +83,6 @@ module.exports = class RoutingGraph {
         vertex.set("spatialCostEdges", new Map());
         vertex.set("spatialDistEdges", new Map());
         vertex.set("savings", new Map());
-        vertex.set("distVertexOSM", 0);
         this.matrix.set(key, vertex);
     }
 
@@ -49,12 +92,6 @@ module.exports = class RoutingGraph {
 
     setCachedODMatrix(cachedMatrix) {
         this.cachedODMatrix = cachedMatrix;
-    }
-
-    async buildSpatialVertexSync() {
-        for (let c of this.matrix.values()) {
-            await this.getSpatialVertex(c, this.spatialiteDB);
-        }
     }
 
     buildSpatialVertex() {
@@ -213,78 +250,6 @@ module.exports = class RoutingGraph {
         }
     }
 
-    getClosestPointOnLine(lat, lng) {
-        let sqlQuery = `SELECT
-                        ST_Distance(
-                            MakePoint(${lng}, ${lat}, 4326),
-                            ST_ClosestPoint(
-                                linha.geometry,
-                                MakePoint(${lng}, ${lat}, 4326)
-                            ),
-                            1
-                        ) as dist,
-                        AsGeoJSON(
-                            ST_ClosestPoint(
-                                linha.geometry,
-                                MakePoint(${lng}, ${lat}, 4326))
-                        ) as pontoGeoJSON
-                        FROM malha as linha
-                        ORDER BY dist
-                        LIMIT 1`;
-        return new Promise((resolve, reject) => {
-            this.spatialiteDB.get(sqlQuery, (err, row) => {
-                if (err) {
-                    reject();
-                }
-                let nodeGeoJSON = row["pontoGeoJSON"];
-                resolve({ nodeGeoJSON });
-            });
-        });
-                
-    }
-
-    getRawSpatialDistance(cnodeID, dnodeID) {
-        let sqlQuery = `SELECT *, ST_LENGTH(geometry, 1) AS dist
-                        FROM malha_net
-                        WHERE NodeFrom = ${cnodeID} AND NodeTo = ${dnodeID}`;
-        return new Promise((resolve, reject) => {
-            this.spatialiteDB.get(sqlQuery, (err, row) => {
-                if (err) {
-                    reject();
-                }
-                console.log("RAW SPATIAL DISTANCE", row)
-                let cost = row["Cost"];
-                let dist = row["dist"];
-
-                if (dist == null) {
-                    dist = 0;
-                }
-                if (cost == null) {
-                    cost = 0;
-                }
-
-                resolve(dist);
-            });
-        });
-    }
-
-    getRawSpatialVertex(lat, lng) {
-        let sqlQuery = `SELECT ST_Distance(ST_GeomFromText('POINT(${lng} ${lat})', 4326), linha.geometry, 1) AS dist, 
-                                node_id,
-                                AsGeoJSON(geometry) AS pontoGeoJSON
-                                FROM malha_nodes AS linha
-                                ORDER BY dist
-                                LIMIT 1`;
-        return new Promise((resolve, reject) => {
-            this.spatialiteDB.get(sqlQuery, (err, row) => {
-                if (err) { reject(); }
-                let dbNodeID = row["node_id"];
-                let nodeGeoJSON = row["pontoGeoJSON"];
-                resolve({ dbNodeID, nodeGeoJSON });
-            });
-        });
-    }
-
     getSpatialVertex(c, spatialiteDB) {
         let rawkey = c.get("rawkey");
 
@@ -297,23 +262,26 @@ module.exports = class RoutingGraph {
             let lng = c.get("lng");
             let lat = c.get("lat");
 
-            let sqlQuery = `SELECT ST_Distance(ST_GeomFromText('POINT(${lng} ${lat})', 4326), linha.geometry, 1) AS dist, 
-                                   node_id
-                            FROM malha_nodes AS linha
-                            ORDER BY dist
-                            LIMIT 1`;
+            let sqlQuery = `SELECT ST_Distance(ST_GeomFromText('POINT(${lng} ${lat})', 4326), linha.geometry) AS dist, node_id FROM malha_nodes AS linha ORDER BY dist LIMIT 1`;
+            // return this.executeSpatialVertexCMDQuery(sqlQuery)
+            //     .then((arg) => {
+            //         console.log(arg);
+            //     })
+            //     .catch((err) => {
+            //         console.log(err);
+            //     });
+
             return new Promise((resolve, reject) => {
                 spatialiteDB.get(sqlQuery, (err, row) => {
                     let dbNodeID = row["node_id"];
-                    let distVertexOSM = row["dist"];
 
                     // Setting in our matrix
-                    console.log("dbNodeID", c.get("key"), dbNodeID, distVertexOSM);
-                    console.log(sqlQuery);
-                    console.log(lng, lat);
-                    console.log("------------------------------->");
+                    console.log("dbNodeID", c.get("key"), dbNodeID);
                     c.set("dbNodeID", dbNodeID);
-                    c.set("distVertexOSM", distVertexOSM);
+
+                    console.log(sqlQuery);
+                    console.log("RESPOSTA ===>", dbNodeID);
+                    console.log("----------------");
 
                     // Caching if not a school key
                     if (rawkey != "school") {

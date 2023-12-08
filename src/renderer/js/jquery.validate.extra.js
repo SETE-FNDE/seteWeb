@@ -100,6 +100,10 @@ window.$.validator.addMethod("datavalida", function (value, element) {
     return moment(value, "DD/MM/YYYY", true).isValid();
 }, "Informe uma data válida (DD/MM/YYYY)");
 
+window.$.validator.addMethod("horavalida", function(value, element) {
+    return this.optional(element) || moment(value, "HH:mm", true).isValid();
+}, "Informe uma hora válida (HH:MM)");
+
 
 // Validar ano
 window.$.validator.addMethod("ano", function (value, element) {

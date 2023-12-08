@@ -214,10 +214,7 @@ helpTooltip = new ol.Overlay({
     positioning: 'center-left'
 });
 mapaOL.addOverlay(helpTooltip);
-// mapaOL.on('pointermove', pointerMoveHandler);
-// mapaOL.getViewport().addEventListener('mouseout', function () {
-//     helpTooltipElement.classList.add('hidden');
-// });
+
 
 if (measureTooltipElement) {
     measureTooltipElement.parentNode.removeChild(measureTooltipElement);
@@ -433,23 +430,10 @@ draw.on('drawend', function (drawEndEvent) {
     var malhaGeometry = malhaFeature.getGeometry();
     malhaFeature.set("estilo", modoSelecionado);
 
-    // Seta id e escreve para GeoJSON
-    // malhaFeature.setId(idRotaSelecionada);
-    /*malhaGeoJSON = geojson.writeFeatureObject(malhaFeature, {
-        dataProjection: 'EPSG:4326'
-    })*/
-
-    // Seta estilo de cada parte e depois o estilo global
-    // malhaFeature.setStyle(getGeomStyle(malhaGeometry));
-    // malhaSource.addFeature(malhaFeature);
-
     // Seta quilometragem
     $(measureTooltipElement).css("display", "none");
     let length = ol.sphere.getLength(drawEndEvent.feature.getGeometry());
     $("#regkm").val(formatLengthAll(length));
-    // measureTooltipElement.innerHTML = formatLengthAll();
-    // measureTooltipElement.className = 'ol-tooltip ol-tooltip-static';
-    // measureTooltip.setOffset([0, -7]);
 
     // Remove listener
     ol.Observable.unByKey(listener);
@@ -461,8 +445,6 @@ modify.on('modifyend', function (modifyEvent) {
     malhaFeature.setStyle(getGeomStyle(malhaFeature));
 
     $("#regkm").val(formatLengthAll());
-    // measureTooltipElement.className = 'ol-tooltip ol-tooltip-static';
-    // measureTooltip.setOffset([0, -7]);
 });
 
 // mapaOL.addInteraction(modify);
@@ -643,7 +625,7 @@ editbar.addControl(selectCtrl);
 var removeCtrl = new ol.control.Button({
     html: '<i class="fa fa-times"></i>',
     title: "Remover",
-    handleClick: function () {
+    handleClick: function (evt) {
         if (selectedFeatures.length != 0) {
             for (var i = 0; i < selectedFeatures.length; i++) {
                 mapaSource.removeFeature(selectedFeatures[i]);
@@ -651,7 +633,7 @@ var removeCtrl = new ol.control.Button({
             select.getFeatures().clear();
         } else {
             Swal2.fire(
-                "Escolha um objeto primeiro!",
+                "Selecione um objeto primeiro!",
                 "",
                 "error"
             )
@@ -776,12 +758,6 @@ restImpl.dbGETColecao(DB_TABLE_ROTA)
             $('#listarotas').append(`<option value="${rotaJSON["ID"]}">${rotaJSON["NOME"]}</option>`);
         }
     })
-    // .then(() => dbLeftJoinPromise(DB_TABLE_ROTA_ATENDE_ALUNO, "ID_ALUNO", DB_TABLE_ALUNO, "ID_ALUNO"))
-    // .then(res => processarAlunosPorRota(res))
-    // .then(() => dbLeftJoinPromise(DB_TABLE_ROTA_PASSA_POR_ESCOLA, "ID_ESCOLA", DB_TABLE_ESCOLA, "ID_ESCOLA"))
-    // .then(res => processarEscolasPorRota(res))
-    // .then(() => dbBuscarTodosDadosPromise(DB_TABLE_GARAGEM))
-    // .then(res => processarGaragem(res))
     .catch(err => errorFn("Erro ao listar as rotas", err))
 
 
@@ -795,7 +771,7 @@ var processarGaragem = (res) => {
         garagem = garagemRaw;
     }
     if (!mapaSource.isEmpty()) {
-        mapaOL.getView().fit(vSource.getExtent());
+        mapaOL.getView().fit(mapaSource.getExtent());
         mapaOL.updateSize();
     }
 }
@@ -882,7 +858,7 @@ $("#listarotas").on("change", async (evt) => {
                 });
 
                 // Acrescentando rota existente
-                var rawGeoJSON = JSON.parse(shapeDaRota.data.shape)
+                var rawGeoJSON = JSON.parse(shapeDaRota.data.shape);
                 var novoShape = turf.toWgs84(rawGeoJSON).features.map((a) => {
                     console.log(a)
                     if (a?.geometry?.type != "LineString") {
@@ -933,25 +909,10 @@ $("#listarotas").on("change", async (evt) => {
                 console.log("Erro ao buscar as escolas da Rota " + idRotaSelecionada, error);
             }
 
-            /*alunosRota = rotaSelect["ALUNOS"]
-            escolasRota = rotaSelect["ESCOLAS"]
-
-            alunosRota.forEach(aluno => {
-                if (aluno["LOC_LONGITUDE"] != null && aluno["LOC_LONGITUDE"] != undefined &&
-                    aluno["LOC_LATITUDE"] != null && aluno["LOC_LATITUDE"] != undefined) {
-                    plotarAluno(aluno);
-                }
-            })
-
-            escolasRota.forEach(escola => {
-                if (escola["LOC_LONGITUDE"] != null && escola["LOC_LONGITUDE"] != undefined &&
-                    escola["LOC_LATITUDE"] != null && escola["LOC_LATITUDE"] != undefined) {
-                    plotarEscola(escola);
-                }
-            })*/
-
             if (!mapaSource.isEmpty()) {
-                mapaOL.getView().fit(mapaSource.getExtent());
+                mapaOL.getView().fit(mapaSource.getExtent(), {
+                    padding: [40, 40, 40, 40]
+                });
                 mapaOL.updateSize();
             }
         } catch (error) {

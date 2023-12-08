@@ -3,3 +3,20 @@
     border: none !important;
 }
 
+.tab-wiz .form-group {
+    padding: 0px;
+}
+
+/* recuperação de email no mobile */
+@media screen and (max-width: 767px)  {
+    label.form-check-label {
+        max-width: 100%;
+        text-align: left!important;
+    }
+    
+    
+    div#swal2-html-container input {
+        font-size: 0.9em;
+        margin: 0.5em 0em;
+    }
+}

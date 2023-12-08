@@ -185,7 +185,7 @@
                                     <thead>
                                         <tr>
                                             <th></th>
-                                            <th>Nome da Escola</th>
+                                            <th>Escola</th>
                                             <th>Num. de alunos que usam o Transporte Escolar</th>
                                         </tr>
                                     </thead>
@@ -220,6 +220,13 @@
     </div>
 </div>
 </div>
+<style>
+    @media screen and (max-width: 767px) {
+        .dataTables_scrollBody thead tr {
+            display: none;
+        }
+    }
+</style>
 
 <script src="./modules/aluno/aluno-model.js" type="text/javascript"></script>
 <script src="./modules/censo/censo-importar-worker.js" type="text/javascript"></script>

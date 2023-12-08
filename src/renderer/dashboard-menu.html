@@ -247,6 +247,28 @@
         </li>
 
         <li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#pontoParadaMenu">
+                <img src="./img/icones/ponto-parada.png" class="menu-icon">
+                <p>
+                    Pontos de Parada
+                    <b class="caret"></b>
+                </p>
+            </a>
+            <div class="collapse " id="pontoParadaMenu">
+                <ul class="nav">
+                    <li class="nav-item ">
+                        <a name="ponto-de-parada/ponto-de-parada-sugestao-view" class="link-menu nav-link" href="#">
+                            <span class="sidebar-mini"></span>
+                            <span class="sidebar-normal">Sugerir</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
+
+
+        <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" href="#rotaMenu">
                 <img src="./img/icones/rotas.svg" class="menu-icon">
                 <p>
@@ -281,6 +303,12 @@
                         <a name="rota/rota-malha-view" class="link-menu nav-link" href="#">
                             <span class="sidebar-mini"></span>
                             <span class="sidebar-normal">Malha Viária</span>
+                        </a>
+                    </li>
+                    <li class="nav-item ">
+                        <a name="rota/rota-reaproveitamento-view" class="link-menu nav-link" href="#">
+                            <span class="sidebar-mini"></span>
+                            <span class="sidebar-normal">Reaproveitamento</span>
                         </a>
                     </li>
                     <li class="nav-item ">
@@ -461,6 +489,7 @@
         $("#logosete").click(() => {
             $(".activeLink").removeClass("activeLink");
             action = "dashboard";
+            desabilitaMenu();
             $("#content").load("./dashboard-main.html");
         });
 

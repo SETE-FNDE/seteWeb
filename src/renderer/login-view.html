@@ -21,9 +21,9 @@
     <link rel="stylesheet" href="css/bootstrap.min.css" />
     <link rel="stylesheet" href="css/light-bootstrap-dashboard.css?v=2.0.1" />
     <link rel="stylesheet" href="css/initconfig.css" />
-    <link rel="stylesheet" href="css/login.css" />
     <link rel="stylesheet" href="css/common.css" />
     <link rel="stylesheet" href="css/fixes.css" />
+    <link rel="stylesheet" href="css/login.css" />
 
     <!-- Icons -->
     <link rel="apple-touch-icon" sizes="76x76" href="img/icones/setelogosmall.png">
@@ -55,27 +55,27 @@
                                             <a id="login-tab" class="nav-link active" href="#login-body"
                                                 data-toggle="tab" role="tab">
                                                 <i class="fa fa-sign-in"></i>
-                                                <span>Login</span>
+                                                <span class="d-none d-md-block">Login</span>
                                             </a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" href="#recover-body" data-toggle="tab" role="tab">
                                                 <i class="fa fa-question-circle"></i>
-                                                <span>Recuperar Senha</span>
+                                                <span class="d-none d-md-block">Recuperar Senha</span>
                                             </a>
                                         </li>
                                         <li class="nav-item">
                                             <a id="registrar-tab" class="nav-link" href="#register-body"
                                                 data-toggle="tab" role="tab">
                                                 <i class="fa fa-registered"></i>
-                                                <span>Registrar</span>
+                                                <span class="d-none d-md-block">Registrar</span>
                                             </a>
                                         </li>
                                         <li class="nav-item">
                                             <a id="proxy-tab" class="nav-link" href="#proxy-body" data-toggle="tab"
                                                 role="tab">
                                                 <i class="fa fa-cogs"></i>
-                                                <span>Proxy</span>
+                                                <span class="d-none d-md-block">Proxy</span>
                                             </a>
                                         </li>
                                     </ul>
@@ -107,29 +107,33 @@
                                                             <p class="category text-muted"> Ou acesse com sua credencial abaixo:</p>
                                                         </div>
                                                         <div class="row pt-3">
-                                                            <label class="col-4 control-label">
+                                                            <div class="d-none d-md-block col-md-2"></div>
+                                                            <label class="col-sm-12 col-md-2 control-label">
                                                                 <b>E-mail:</b>
                                                             </label>
-                                                            <div class="col-6">
+                                                            <div class="col-sm-12 col-md-6">
                                                                 <input id="loginemail" name="loginemail"
                                                                     data-validation="email"
                                                                     placeholder="Endereço de e-mail:"
                                                                     class="form-control">
                                                             </div>
+                                                            <div class="d-none d-md-block col-2"></div>
                                                         </div>
                                                         <div class="row mt-2">
-                                                            <label class="col-4 control-label">
+                                                            <div class="d-none d-md-block col-md-2"></div>
+                                                            <label class="col-sm-12 col-md-2 control-label">
                                                                 <b>Senha:</b>
                                                             </label>
-                                                            <div class="col-6">
+                                                            <div class="col-sm-12 col-md-6">
                                                                 <input id="loginpassword" name="loginpassword"
                                                                     type="password" placeholder="Senha:"
                                                                     class="form-control">
                                                             </div>
+                                                            <div class="d-none d-md-block col-md-2"></div>
                                                         </div>
                                                         <div class="row mt-3 text-center">
-                                                            <div class="col-4"></div>
-                                                            <div class="form-check col-3">
+                                                            <div class="d-none d-md-block col-md-3"></div>
+                                                            <div class="form-check col-sm-12 col-md-3">
                                                                 <label class="form-check-label">
                                                                     <input id="loginlembrar" class="form-check-input"
                                                                         type="checkbox" value="" checked>
@@ -138,9 +142,11 @@
                                                                 </label>
                                                             </div>
                                                             <button id="loginsubmit"
-                                                                class="col-3 btn btn-fill btn-warning" type="button">
+                                                                class="col-sm-12 col-md-3 btn btn-fill btn-warning" type="button">
                                                                 Entrar no Sistema
                                                             </button>
+                                                            <div class="d-none d-md-block col-md-3"></div>
+
                                                         </div>
                                                     </div>
                                                 </form>
@@ -158,28 +164,30 @@
                                                 <form id="recoveryform">
                                                     <div class="form-group">
                                                         <div class="row pt-3">
-                                                            <label class="col-4 control-label">
+                                                            <div class="d-none d-md-block col-md-2"></div>
+                                                            <label class="col-sm-12 col-md-2 control-label">
                                                                 <b>E-mail:</b>
                                                             </label>
-                                                            <div class="col-6">
+                                                            <div class="col-sm-12 col-md-6">
                                                                 <input id="recoveremail" name="recoveremail"
                                                                     data-validation="email"
                                                                     placeholder="Endereço de e-mail:"
                                                                     class="form-control">
-
+                                                                </input>
                                                             </div>
+                                                            <div class="d-none d-md-block col-md-2"></div>
                                                         </div>
                                                         <div class="row mt-3 text-center">
-                                                            <div class="col-4"></div>
-                                                            <button id="recoversubmit" class="btn btn-fill btn-warning"
+                                                            <div class="d-none d-md-block col-md-4"></div>
+                                                            <button id="recoversubmit" class="col-sm-12 col-md-6 btn btn-fill btn-warning"
                                                                 type="button">
                                                                 Recuperar Senha
                                                             </button>
                                                         </div>
                                                         <div class="row mt-3 text-center">
-                                                            <div class="col-4"></div>
+                                                            <div class="d-none d-md-block col-md-4"></div>
                                                             <button id="inserirCodigoRecuperacaoSenha"
-                                                                class="btn btn-fill" type="button">
+                                                                class="col-sm-12 col-md-6 btn btn-fill" type="button">
                                                                 Inserir Código de Recuperação de Senha
                                                             </button>
                                                         </div>
@@ -208,12 +216,12 @@
                                                 <div class="col-12">
                                                     <div class="form-group reg-group">
                                                         <div class="row">
-                                                            <label class="col-4 control-label">
+                                                            <label class="col-sm-6 col-md-4 control-label">
                                                                 <b>Nome completo:</b>
                                                             </label>
-                                                            <div class="col-6">
+                                                            <div class="col-sm-4 col-md-6">
                                                                 <input id="regnome" name="regnome" type="text"
-                                                                    placeholder="Digite seu nome:" class="form-control">
+                                                                    placeholder="Digite seu nome:" class="form-control" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -222,13 +230,13 @@
                                                 <div class="col-12">
                                                     <div class="form-group reg-group">
                                                         <div class="row">
-                                                            <label class="col-4 control-label">
+                                                            <label class="col-sm-6 col-md-4 control-label">
                                                                 <b>CPF:</b>
                                                             </label>
-                                                            <div class="col-6">
+                                                            <div class="col-sm-4 col-md-6">
                                                                 <input id="regcpf" name="regcpf" type="text"
                                                                     placeholder="Digite seu CPF:"
-                                                                    class="form-control cpfmask">
+                                                                    class="form-control cpfmask" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -238,13 +246,13 @@
                                                 <div class="col-12">
                                                     <div class="form-group reg-group">
                                                         <div class="row">
-                                                            <label class="col-4 control-label">
+                                                            <label class="col-sm-6 col-md-4 control-label">
                                                                 <b>Telefone:</b>
                                                             </label>
-                                                            <div class="col-6">
+                                                            <div class="col-sm-4 col-md-6">
                                                                 <input id="regtel" name="regtel" type="text"
                                                                     placeholder="Digite seu Telefone:"
-                                                                    class="form-control telmask">
+                                                                    class="form-control telmask" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -253,13 +261,13 @@
                                                 <div class="col-12">
                                                     <div class="form-group reg-group">
                                                         <div class="row">
-                                                            <label class="col-4 control-label">
-                                                                <b>E-mail:</b>
+                                                            <label class="col-sm-6 col-md-4 control-label">
+                                                                <b>E-mail Institucional:</b>
                                                             </label>
-                                                            <div class="col-6">
+                                                            <div class="col-sm-4 col-md-6">
                                                                 <input id="regemail" name="regemail" type="email"
                                                                     placeholder="Endereço de e-mail:"
-                                                                    class="form-control">
+                                                                    class="form-control" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -268,13 +276,13 @@
                                                 <div class="col-12">
                                                     <div class="form-group reg-group">
                                                         <div class="row">
-                                                            <label class="col-4 control-label">
+                                                            <label class="col-sm-6 col-md-4 control-label">
                                                                 <b>Repetir E-mail:</b>
                                                             </label>
-                                                            <div class="col-6">
+                                                            <div class="col-sm-4 col-md-6">
                                                                 <input id="repetirEmail" name="repetirEmail"
                                                                     type="email" placeholder="Endereço de e-mail:"
-                                                                    class="form-control">
+                                                                    class="form-control" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -283,18 +291,18 @@
                                                 <div class="col-12">
                                                     <div class="form-group reg-group">
                                                         <div class="row">
-                                                            <label class="col-4 control-label">
+                                                            <label class="col-sm-6 col-md-4 control-label">
                                                                 <b>Senha:</b>
                                                             </label>
-                                                            <div class="col-6">
+                                                            <div class="col-sm-4 col-md-6">
                                                                 <input id="regpassword" name="regpassword"
                                                                     type="password" placeholder="Senha:"
-                                                                    class="form-control">
+                                                                    class="form-control" />
                                                             </div>
                                                         </div>
                                                         <div class="row">
-                                                            <div class="col-4"></div>
-                                                            <div class="col-6 regadditionalinfo">
+                                                            <div class="col-sm-6 col-md-4"></div>
+                                                            <div class="col-sm-12 col-md-6 regadditionalinfo">
                                                                 <span>
                                                                     Mínimo de seis caracteres
                                                                 </span>
@@ -306,20 +314,19 @@
                                                 <div class="col-12">
                                                     <div class="form-group reg-group">
                                                         <div class="row">
-                                                            <label class="col-4 control-label">
+                                                            <label class="col-sm-6 col-md-4 control-label">
                                                                 <b>Repetir Senha:</b>
                                                             </label>
-                                                            <div class="col-6">
+                                                            <div class="col-sm-4 col-md-6">
                                                                 <input id="regpasswordrepeat" name="regpasswordrepeat"
                                                                     type="password" placeholder="Senha:"
-                                                                    class="form-control">
+                                                                    class="form-control" />
 
                                                             </div>
                                                         </div>
                                                         <div class="row">
-                                                            <div class="col-4"></div>
-                                                            <div class="col-6 regadditionalinfo">
-                                                                <span>
+                                                            <div class="col-sm-6 col-md-4"></div>
+                                                            <div class="col-sm-12 col-md-6 regadditionalinfo">                                                                <span>
                                                                     Mínimo de seis caracteres
                                                                 </span>
                                                             </div>
@@ -336,10 +343,10 @@
                                                 <div class="col-12">
                                                     <div class="form-group reg-group">
                                                         <div class="row">
-                                                            <label class="col-4 control-label">
+                                                            <label class="col-sm-6 col-md-4 control-label">
                                                                 <b>Estado ou Distrito:</b>
                                                             </label>
-                                                            <div class="col-6">
+                                                            <div class="col-sm-4 col-md-6">
                                                                 <select id="regestado" name="regestado"
                                                                     class="form-control"></select>
 
@@ -351,10 +358,10 @@
                                                 <div class="col-12">
                                                     <div class="form-group reg-group">
                                                         <div class="row">
-                                                            <label class="col-4 control-label">
+                                                            <label class="col-sm-6 col-md-4 control-label">
                                                                 <b>Município:</b>
                                                             </label>
-                                                            <div class="col-6">
+                                                            <div class="col-sm-4 col-md-6">
                                                                 <select id="regcidade" name="regcidade"
                                                                     class="form-control"></select>
                                                             </div>
@@ -365,9 +372,9 @@
                                                 <div class="col-12">
                                                     <div class="form-group obr">
                                                         <div class="row mt-3 text-center">
-                                                            <div class="col-4"></div>
+                                                            <div class="col-sm-6 col-md-4"></div>
                                                             <button id="regsubmit"
-                                                                class="col-4 btn btn-fill btn-warning" type="button">
+                                                                class="col-sm-12 col-md-4 btn btn-fill btn-warning" type="button">
                                                                 Registrar
                                                             </button>
                                                         </div>
@@ -526,6 +533,9 @@
 <!-- SweetAlert (Alertas) e Axios (HTTP) -->
 <script src="../../node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
 <script src="../../node_modules/axios/dist/axios.min.js"></script>
+
+<!--  Notifications Plugin    -->
+<script src="js/plugins/bootstrap-notify.js"></script>
 
 <!-- Variáveis básicas do SETE (REST_URL, SUPORTE_URL, etc) -->
 <script src="../../config.js"></script>

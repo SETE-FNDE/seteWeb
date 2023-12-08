@@ -14,13 +14,10 @@ const { app, dialog, BrowserWindow, ipcMain, shell } = electron;
 const path = require("path");
 const fs = require("fs-extra");
 
-// Biblioteca para lidar com dados espaciais
-const osmtogeojson = require("osmtogeojson");
-
 // Menu Direito
 const contextMenu = require("electron-context-menu");
 
-// Importa biblioteca para baixar dados via http
+// Importa biblioteca para baixar dados via https
 const https = require("https");
 
 // Desabilita cache do http no electron
@@ -28,8 +25,11 @@ app.commandLine.appendSwitch("disable-http-cache");
 
 // Arquivo de configuração (variáveis básicas)
 const Store = require("electron-store");
-
 const appconfig = new Store();
+// Apaga cache da OD se tiver
+if (appconfig.has("OD")) {
+    appconfig.delete("OD");
+}
 
 // Bibliotecas para plotar logo do SETE e informações do sistema
 const figlet = require("figlet");
@@ -184,8 +184,14 @@ const MalhaUpdate = require("./main/malha/malha-update.js");
 // Rotina para otimização da malha
 const RouteOptimization = require("./main/routing/routing-optimization.js");
 
+// Rotina para otimização dos pontos de parada
+const PontosDeParadaOptimization = require("./main/pontos-de-parada/pontos-de-parada-optimization.js");
+
 // Worker que vai lidar com a parte de roteirização
 let routeOptimizer = new RouteOptimization(app, dbPath);
+
+// Worker que vai lidar com a parte de roteirização
+let pontosDeParadaOptimizer = new PontosDeParadaOptimization(app, dbPath);
 
 // /////////////////////////////////////////////////////////////////////////////
 // Funções para lidar com eventos do SETE
@@ -245,9 +251,9 @@ function handleSalvarMalhaOSM(event, latitude, longitude) {
 
         const arqMalha = fs.createWriteStream(arqDestino);
         https.get(url, (response) => {
-            // check if response is not a success
+            // Checa se a resposta deu erro
             if (response.statusCode !== 200) {
-                console.log("Response status was " + response.statusCode);
+                console.log("Status da resposta foi " + response.statusCode);
                 appWindow.webContents.send("renderer:finaliza-salvar-malha-osm", false);
             }
             response.pipe(arqMalha);
@@ -297,12 +303,6 @@ function onIniciaGeracaoRotas(event, routingArgs) {
         cost: {},
     });
 
-    cachedODMatrix = {
-        nodes: {},
-        dist: {},
-        cost: {},
-    };
-
     const minNumVehicles = Math.max(routingArgs.numVehicles, Math.floor(routingArgs.stops.length / routingArgs.maxCapacity));
     routingArgs.numVehicles = minNumVehicles;
     routeOptimizer.optimize(cachedODMatrix, routingArgs);
@@ -324,19 +324,52 @@ function onWorkerObtemErroGeracaoRotas(err) {
     appWindow.webContents.send("renderer:erro-geracao-rotas", err);
 }
 
+// Evento que inicia a geração de pontos de parada (feito de forma assíncrona para não bloquear o processo principal)
+function onIniciaGeracaoPontosDeParada(event, paramPontosDeParada) {
+    let cachedODMatrix = appconfig.get("OD", {
+        nodes: {},
+        dist: {},
+        cost: {},
+    });
+
+    pontosDeParadaOptimizer.optimize(cachedODMatrix, paramPontosDeParada);
+}
+
+// Evento chamado pelo nosso worker quando ele terminar de gerar os pontos de parada
+function onWorkerFinalizarGeracaoPontosDeParada({ clusters, cachedODMatrix }) {
+    // Set new cache
+    appconfig.set("OD", cachedODMatrix);
+
+    // Send generated pontos de parada
+    appWindow.webContents.send("renderer:sucesso-geracao-pontos-de-parada", clusters);
+}
+
+// Evento chamado pelo nosso worker quando ele encontra um erro ao gerar os pontos de parada
+function onWorkerObtemErroGeracaoPontosDeParada(err) {
+    appWindow.webContents.send("renderer:erro-geracao-pontos-de-parada", err);
+}
+
 // Registro dos listeners
 function createListeners() {
+    // Utils
     ipcMain.handle("main:pegar-versao-sete", () => app.getVersion());
     ipcMain.on("main:abrir-site", onAbrirSite);
+    
+    // Salvar e lidar com malha
     ipcMain.on("main:salvar-nova-malha", onSalvarNovaMalha);
-
     ipcMain.handle("main:salvar-planilha-modelo", handleSalvarPlanilhaModelo);
     ipcMain.handle("main:salvar-malha-osm", handleSalvarMalhaOSM);
     ipcMain.handle("main:abrir-malha", onAbrirMalha);
 
+    // Roteirização
     ipcMain.on("main:inicia-geracao-rotas", onIniciaGeracaoRotas);
     app.on("worker:finaliza-geracao-rotas", onWorkerFinalizarGeracaoRotas);
     app.on("worker:obtem-erro-geracao-rotas", onWorkerObtemErroGeracaoRotas);
+
+    // Pontos de parada
+    ipcMain.on("main:inicia-geracao-pontos-de-parada", onIniciaGeracaoPontosDeParada);
+    app.on("worker:finaliza-geracao-pontos-de-parada", onWorkerFinalizarGeracaoPontosDeParada);
+    app.on("worker:obtem-erro-geracao-pontos-de-parada", onWorkerObtemErroGeracaoPontosDeParada);
 }
 
 // /////////////////////////////////////////////////////////////////////////////

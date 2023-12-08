@@ -226,10 +226,12 @@ function mostraSeTemUpdate(modal = true) {
             if (typeof sete != 'undefined') {
                 if (sete?.isElectron) {
                     let currVersion = await sete.APP_VERSION();
+                    let currSemVer = Number(currVersion.split(".")[0] + "." + currVersion.split(".")[1]);
+                    
                     appVersion = currVersion;
                     let remoteVersion = pkg.version;
-    
-                    if (currVersion != remoteVersion) {
+                    let remoteSemVer = Number(remoteVersion.split(".")[0] + "." + remoteVersion.split(".")[1]);
+                    if (currSemVer < remoteSemVer) {
                         $.notifyClose();
                         $.notify(
                             {

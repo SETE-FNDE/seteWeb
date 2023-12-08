@@ -8,10 +8,13 @@ String.prototype.capitalize = function () {
     return this.charAt(0).toUpperCase() + this.slice(1);
 }
 
+// $.fn.DataTable.ext.pager.numbers_length = 4;
+
 // Função que retorna um dicionário contendo as opções mais comuns que utilizamos
 // para configurar o datatable. 
 function dtConfigPadrao(nomeDado) {
     return {
+        scrollX: window.innerWidth < 767,
         autoWidth: false,
         bAutoWidth: false,
         lengthMenu: [[10, 50, -1], [10, 50, "Todos"]],

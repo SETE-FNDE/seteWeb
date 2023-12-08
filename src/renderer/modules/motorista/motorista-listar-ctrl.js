@@ -27,11 +27,12 @@ var dataTablesMotoristas = $("#datatables").DataTable({
             // { data: 'ROTAS', width: "15%" },
             {
                 data: "ACOES",
-                width: "110px",
+                width: "150px",
                 sortable: false,
                 defaultContent: '<a href="#" class="btn btn-link btn-primary motoristaView"><i class="fa fa-search"></i></a>' +
                     '<a href="#" class="btn btn-link btn-warning motoristaEdit"><i class="fa fa-edit"></i></a>' +
-                    '<a href="#" class="btn btn-link btn-danger motoristaRemove"><i class="fa fa-times"></i></a>'
+                    '<a href="#" class="btn btn-link btn-danger motoristaRemove"><i class="fa fa-times"></i></a>' +
+                    '<a href="#" class="btn btn-link btn-info motoristaVerAnexo"><i class="fa fa fa-file-text"></i></a>'
             }
         ],
         columnDefs: [
@@ -153,6 +154,35 @@ var dataTablesMotoristas = $("#datatables").DataTable({
         ]
     }
 });
+
+dataTablesMotoristas.on("click", ".motoristaVerAnexo", async function () {
+    var $tr = getRowOnClick(this);
+
+    estadoMotorista = dataTablesMotoristas.row($tr).data();
+    action = "verAnexoMotorista";
+
+    criarModalLoading("Baixando o arquivo de antecedentes criminais");
+
+    debugger
+    restAPI
+        .get(`${BASE_URL}/motoristas/${codCidade}/${estadoMotorista.ID}/visualizar-pdf`, { responseType: "arraybuffer" })
+        .then((res) => {
+            if (res?.data?.byteLength == 0) {
+                throw new Error("Arquivo Vazio");
+            }
+            const url = window.URL.createObjectURL(new Blob([res.data]));
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("type", "application/pdf");
+            link.setAttribute("download", `Documento ${estadoMotorista.ID}.pdf`);
+            document.body.appendChild(link);
+            link.click();
+            criarModalSucesso("Parabéns", "Seu arquivo está pronto.");
+        })
+        .catch((err) => criarModalErro("O motorista não possui um arquivo de antecedentes criminais em anexo"));
+});
+
+
 
 dataTablesMotoristas.on('click', '.motoristaView', function () {
     var $tr = getRowOnClick(this);
