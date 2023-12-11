@@ -114,19 +114,18 @@ function processaUsuarios(usuarios) {
     let numUsuarios = 0;
 
     usuarios.forEach(usuario => {
-        if (usuario["is_ativo"] == "S") {
+        if (usuario["is_ativo"] == "S" && usuario["is_liberado"] == "S") {
             numUsuarios++;
+
+            if (String(usuario["id_usuario"]) == userconfig.get("ID") && usuario["nivel_permissao"] == "admin") {
+                papelAdmin = true;
+            }
+
+            usuario["ID"] = String(usuario["id_usuario"]);
+            usuario["PAPEL"] = usuario["nivel_permissao"]?.toUpperCase();
+
+            listaDeTodosOsUsuarios.set(String(usuario.id_usuario), usuario);
         }
-
-        if (String(usuario["id_usuario"]) == userconfig.get("ID") && 
-            usuario["nivel_permissao"] == "admin") {
-            papelAdmin = true;
-        }
-
-        usuario["ID"] = String(usuario["id_usuario"]);
-        usuario["PAPEL"] = usuario["nivel_permissao"]?.toUpperCase();
-
-        listaDeTodosOsUsuarios.set(String(usuario.id_usuario), usuario);
     });
 
     $("#totalNumUsuarios").text(numUsuarios);

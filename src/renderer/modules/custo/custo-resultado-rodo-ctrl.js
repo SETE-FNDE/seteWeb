@@ -334,85 +334,23 @@ function mostraInformacoesCusto() {
         let CUSTO_VARIAVEL_ANUAL_COM_CUSTORODAGEM = Number(Number(10 * det.CUSTO_DE_RODAGEM.valor * KM_ROTA_ANUAL).toFixed(2));
         let CUSTO_VARIAVEL_ANUAL_COM_PECASACESSORIOS = Number(Number(10 * det.CUSTO_PECAS_ACESSORIOS.valor * KM_ROTA_ANUAL).toFixed(2));
 
-        // var grafData = google.visualization.arrayToDataTable([
-        //     ['Custo', 'Valor (ano)'],
-        //     ['Motoristas', CUSTO_ANUAL_COM_MOTORISTA],
-        //     ['Monitor', CUSTO_ANUAL_COM_MONITOR],
-        //     ['Manutenção', CUSTO_ANUAL_COM_MANUTENCAO],
-        //     ['Administrativo', CUSTO_ANUAL_COM_ADM],
-        //     ['Depreciação', CUSTO_ANUAL_COM_DEPRECIACAO],
-        //     ['Combustível', CUSTO_VARIAVEL_ANUAL_COM_COMBUSTIVEL],
-        //     ['Óleo/Lubrificantes', CUSTO_VARIAVEL_ANUAL_COM_OLEOLUBRIFICANTES],
-        //     ['Rodagem', CUSTO_VARIAVEL_ANUAL_COM_CUSTORODAGEM],
-        //     ['Peças e Acessórios', CUSTO_VARIAVEL_ANUAL_COM_PECASACESSORIOS]
-        // ]);
-
-        // var formatter = new google.visualization.NumberFormat({ decimalSymbol: ',', groupingSymbol: '.', negativeColor: 'red', negativeParens: true, prefix: 'R$ ' });
-        // formatter.format(grafData, 1);
-
-        // var options = {
-        //     title: "Composição do custo da rota (ano)",
-        //     fontName: "Roboto",
-        //     fontSize: 10,
-        //     height: 500,
-        //     legend: {
-        //         position: "bottom",
-        //         maxLines: 2,
-        //     },
-        //     tooltip: {
-        //         ignoreBounds: true,
-        //     }
-        // };
-
-        // var chart = new google.visualization.PieChart(document.getElementById('graficoCusto'));
-        // chart.draw(grafData, options);
-
-        // Treemap
-        // var options = {
-        //     series: [
-        //         {
-        //             name: "Custos Fixos",
-        //             data: [
-        //                 { x: 'Custos com Motoristas', y: CUSTO_ANUAL_COM_MOTORISTA },
-        //                 { x: 'Custos com Monitores', y: CUSTO_ANUAL_COM_MONITOR },
-        //                 { x: 'Custos com Prof. Manutenção', y: CUSTO_ANUAL_COM_MANUTENCAO },
-        //                 { x: "Custo Administrativo do Veículo (IPVA, DPVAT, etc)", y: CUSTO_ANUAL_COM_ADM },
-        //                 { x: "Depreciação", y: CUSTO_ANUAL_COM_DEPRECIACAO },
-        //             ]
-        //         },
-        //         {
-        //             name: "Custos Variáveis",
-        //             data: [
-        //                 { x: "Combustível", y: CUSTO_VARIAVEL_ANUAL_COM_COMBUSTIVEL },
-        //                 { x: "Óleo/Lubrificantes", y: CUSTO_VARIAVEL_ANUAL_COM_OLEOLUBRIFICANTES },
-        //                 { x: "Rodagem", y: CUSTO_VARIAVEL_ANUAL_COM_CUSTORODAGEM },
-        //                 { x: "Peças e Acessórios", y: CUSTO_VARIAVEL_ANUAL_COM_PECASACESSORIOS },
-        //             ]
-        //         }
-        //     ],
-        //     legend: {
-        //         show: false
-        //     },
-        //     chart: {
-        //         height: 550,
-        //         type: 'treemap'
-        //     },
-        //     title: {
-        //         text: 'Basic Treemap'
-        //     }
-        // };
-
-        // var chart = new ApexCharts(document.querySelector("#graficoCusto"), options);
-        // chart.render();
 
         var options = {
-            series: [CUSTO_ANUAL_COM_MOTORISTA, CUSTO_ANUAL_COM_MONITOR,
-                CUSTO_ANUAL_COM_MANUTENCAO, CUSTO_ANUAL_COM_ADM, CUSTO_ANUAL_COM_DEPRECIACAO,
-                CUSTO_VARIAVEL_ANUAL_COM_COMBUSTIVEL, CUSTO_VARIAVEL_ANUAL_COM_OLEOLUBRIFICANTES,
-                CUSTO_VARIAVEL_ANUAL_COM_CUSTORODAGEM, CUSTO_VARIAVEL_ANUAL_COM_PECASACESSORIOS],
+            series: [
+                CUSTO_ANUAL_COM_MOTORISTA,
+                CUSTO_ANUAL_COM_MONITOR,
+                CUSTO_ANUAL_COM_MANUTENCAO,
+                CUSTO_ANUAL_COM_ADM,
+                CUSTO_ANUAL_COM_DEPRECIACAO,
+                CUSTO_VARIAVEL_ANUAL_COM_COMBUSTIVEL,
+                CUSTO_VARIAVEL_ANUAL_COM_OLEOLUBRIFICANTES,
+                CUSTO_VARIAVEL_ANUAL_COM_CUSTORODAGEM,
+                CUSTO_VARIAVEL_ANUAL_COM_PECASACESSORIOS,
+            ],
             chart: {
+                height: 400,
                 // width: '70%',
-                type: 'pie',
+                type: "pie",
                 // offsetX: 100,
                 // offsetX: 100,
                 toolbar: {
@@ -420,41 +358,51 @@ function mostraInformacoesCusto() {
                     offsetX: 0,
                     offsetY: 0,
                     tools: {
-                      download: true,
-                      selection: true,
-                      zoom: true,
-                      zoomin: true,
-                      zoomout: true,
-                      pan: true,
-                      reset: true | '<img src="/static/icons/reset.png" width="20">',
-                      customIcons: []
+                        download: true,
+                        selection: false,
+                        zoom: false,
+                        zoomin: false,
+                        zoomout: false,
+                        pan: true,
                     },
                     export: {
-                      csv: {
-                        filename: undefined,
-                        columnDelimiter: ',',
-                        headerCategory: 'category',
-                        headerValue: 'value',
-                        dateFormatter(timestamp) {
-                          return new Date(timestamp).toDateString()
-                        }
-                      },
-                      svg: {
-                        filename: undefined,
-                      },
-                      png: {
-                        filename: undefined,
-                      }
+                        csv: {
+                            filename: undefined,
+                            columnDelimiter: ",",
+                            headerCategory: "category",
+                            headerValue: "value",
+                            dateFormatter(timestamp) {
+                                return new Date(timestamp).toDateString();
+                            },
+                        },
+                        svg: {
+                            filename: "grafico",
+                        },
+                        png: {
+                            filename: "grafico",
+                        },
                     },
-                    autoSelected: 'zoom' 
-                  },
+                    autoSelected: "zoom",
+                },
             },
-            labels: ['Motoristas', 'Monitores', 'Pessoal de Manutenção', 'Administração',
-                'Depreciação', 'Combustível', 'Óleo/Lubrificantes', 'Rodagem', 'Peças e Acessórios'],
+            labels: [
+                "Motoristas",
+                "Monitores",
+                "Pessoal de Manutenção",
+                "Administração",
+                "Depreciação",
+                "Combustível",
+                "Óleo/Lubrificantes",
+                "Rodagem",
+                "Peças e Acessórios",
+            ],
+            legend: {
+                position: window.innerWidth < 767 ? "bottom" : "right"
+            },
             tooltip: {
                 y: {
                     formatter: function (value) {
-                        return Intl.NumberFormat("pt-BR", { style: 'currency', currency: 'BRL' }).format(value)
+                        return Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
                     }
                 }
             }
