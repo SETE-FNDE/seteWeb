@@ -108,3 +108,66 @@ div#datatables_filter {
     }
 
 }
+
+/* Melhora botões da tabela */
+.dt-buttons.btn-group.flex-wrap {
+    margin-bottom: 15px;
+    font-weight: 500;
+    font-size: 1.3em;
+    font-family: "Roboto Condensed";
+}
+
+table.dataTable tbody th,
+table.dataTable tbody td {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: normal;
+}
+
+.dataTable thead tr th {
+    font-weight: bold;
+    font-size: 12px;
+    border: #8a99a7 !important;
+    border-bottom-style: solid !important;
+    border-width: 4px !important;
+    min-height: 40px !important;
+    vertical-align: middle;
+}
+
+div.dataTables_info {
+    font-size: 12px;
+    font-weight: 300;
+}
+
+.detalheTitulo {
+    font-size: 20px !important;
+}
+
+
+td.text-right.detalheChave {
+    width: 25%;
+}
+
+td.text-left.detalheValor {
+    font-weight: 500 !important;
+}
+
+
+.card .dataTable tbody td:last-child,
+.card .dataTable thead th:last-child {
+    /* padding-right: 15px; */
+    /* display: table-cell; */
+    min-width: 100px;
+    text-align: center;
+}
+
+th.disabled-sorting.text-center.sorting_disabled {
+    display: table-cell !important;
+}
+
+.dataTables_wrapper .pagination .paginate_button.page-item.first .page-link,
+.dataTables_wrapper .pagination .paginate_button.page-item.previous .page-link,
+.dataTables_wrapper .pagination .paginate_button.page-item.next .page-link,
+.dataTables_wrapper .pagination .paginate_button.page-item.last .page-link {
+    border-radius: 25px;
+}

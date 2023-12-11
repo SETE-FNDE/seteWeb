@@ -33,6 +33,19 @@
                             <div class="tab-pane tab-wiz fade" id="tab-dados-basicos" role="tabpanel">
                                 <h6 class="mb-3 text-center text-space">Forneça as informações básicas a respeito da
                                     rota sendo cadastrada.</h6>
+                                    <div class="alert alert-warning alert-with-icon w-90" data-notify="container">
+                                        <button type="button" aria-hidden="true" class="close" data-dismiss="alert">
+                                            <i class="nc-icon nc-simple-remove"></i>
+                                        </button>
+                                        <span data-notify="icon" class="fa fa-exclamation-circle"></span>
+                                        <span data-notify="message">
+                                            O SETE compreende a rota como o conjunto alunos, escolas e trajeto. 
+                                            Se um ou mais destes valores mudarem, por exemplo, o trajeto da volta 
+                                            é diferente do da ida, recomenda-se criar duas rotas (uma de ida e uma de volta). 
+                                            Caso a rota sendo cadastrada compreenda apenas a ida ou a volta, não é 
+                                            necessário cadastrar os horários de partida de ida ou volta.
+                                        </span>
+                                    </div>
                                 <div class="row justify-content-center">
                                     <div class="col-12">
                                         <div class="form-group obr">
@@ -40,11 +53,11 @@
                                                 <div class="obrlabel">
                                                     Obrigatório
                                                 </div>
-                                                <label class="col-4 control-label">
+                                                <label class="col-sm-12 col-md-4 control-label">
                                                     <b>Tipo da Rota</b>
                                                     <star>*</star>
                                                 </label>
-                                                <div class="col-6">
+                                                <div class="col-sm-12 col-md-6">
                                                     <div class="form-check form-check-radio">
                                                         <label class="form-check-label">
                                                             <input class="form-check-input" type="radio" name="tipoRota"
@@ -80,11 +93,11 @@
                                                 <div class="obrlabel">
                                                     Obrigatório
                                                 </div>
-                                                <label class="col-4 control-label">
+                                                <label class="col-sm-12 col-md-4 control-label">
                                                     <b>Nome da Rota</b>
                                                     <star>*</star>
                                                 </label>
-                                                <div class="col-6">
+                                                <div class="col-sm-12 col-md-6">
                                                     <input id="regnome" name="regnome" type="text"
                                                         placeholder="Exemplo: Rota Gávea-Tijuca" class="form-control">
                                                 </div>
@@ -98,10 +111,10 @@
                                                 <div class="optlabel">
                                                     Optativo
                                                 </div>
-                                                <label class="col-5 control-label">
+                                                <label class="col-sm-12 col-md-5 control-label">
                                                     Informe o veículo (e placa) utilizado para realizar essa rota:
                                                 </label>
-                                                <div class="col-5 mt-2">
+                                                <div class="col-sm-12 col-md-5 mt-2">
                                                     <select id="tipoVeiculo" name="tipoVeiculo" class="form-control">
                                                         <option value="-1">Escolher veículo depois</option>
                                                     </select>
@@ -116,10 +129,10 @@
                                                 <div class="optlabel">
                                                     Optativo
                                                 </div>
-                                                <label class="col-5 control-label">
+                                                <label class="col-sm-12 col-md-5 control-label">
                                                     Informe os motoristas responsáveis por essa rota:
                                                 </label>
-                                                <div class="col-5">
+                                                <div class="col-sm-12 col-md-5">
                                                     <select id="tipoMotorista" name="tipoMotorista" class="selectpicker"
                                                         multiple data-selected-text-format="count">
                                                         <option value="-1">Escolher motorista depois</option>
@@ -127,7 +140,7 @@
                                                 </div>
                                             </div>
                                             <div class="row marcarTodosMotoristasLabel">
-                                                <div class="col-6"></div>
+                                                <div class="col-sm-12 col-md-6"></div>
                                                 <span class="ml-5 hint">Marque todos que se aplique</span>
                                             </div>
                                         </div>
@@ -139,10 +152,10 @@
                                                 <div class="optlabel">
                                                     Optativo
                                                 </div>
-                                                <label class="col-5 control-label">
+                                                <label class="col-sm-12 col-md-5 control-label">
                                                     Informe os monitores responsáveis por essa rota:
                                                 </label>
-                                                <div class="col-5">
+                                                <div class="col-sm-12 col-md-5">
                                                     <select id="tipoMonitor" name="tipoMonitor" class="monSelectPicker"
                                                         multiple>
                                                         <option value="-1">Escolher monitor depois</option>
@@ -150,7 +163,7 @@
                                                 </div>
                                             </div>
                                             <div class="row marcarTodosMonitoresLabel">
-                                                <div class="col-6"></div>
+                                                <div class="col-sm-12 col-md-6"></div>
                                                 <span class="ml-5 hint">Marque todos que se aplique</span>
                                             </div>
                                         </div>
@@ -162,12 +175,12 @@
                                                 <div class="obrlabel">
                                                     Obrigatório
                                                 </div>
-                                                <label class="col-6 control-label">
+                                                <label class="col-sm-12 col-md-6 control-label">
                                                     <b>Em relação ao horário de funcionamento, <br> a rota funciona no
                                                         período da:</b>
                                                     <star>*</star>
                                                 </label>
-                                                <div class="col-4 mt-2">
+                                                <div class="col-sm-12 col-md-4 mt-2">
                                                     <div class="row">
                                                         <div class="form-check form-check-inline">
                                                             <label class="form-check-label from-check-inline">
@@ -212,7 +225,7 @@
                                                 <div class="optlabel">
                                                     Optativo
                                                 </div>
-                                                <div class="col-10">
+                                                <div class="col-sm-12 col-md-10">
                                                     <div class="form-check form-check-inline">
                                                         <label class="form-check-label">
                                                             <input id="temPorteira" name="temPorteira" value="1"
@@ -263,10 +276,10 @@
                                                 <div class="obrlabel">
                                                     Obrigatório
                                                 </div>
-                                                <label class="col-4 control-label">
-                                                    Informe a quilometragem estimada para essa rota (IDA + VOLTA):
+                                                <label class="col-sm-12 col-md-4 control-label">
+                                                    Informe a quilometragem estimada para essa rota:
                                                 </label>
-                                                <div class="input-group col-6 mt-2">
+                                                <div class="input-group col-sm-12 col-md-6 mt-2">
                                                     <input id="regkm" name="regkm" type="text"
                                                         placeholder="Quilometragem estimada:"
                                                         class="form-control kmmask">
@@ -284,10 +297,10 @@
                                                 <div class="obrlabel">
                                                     Obrigatório
                                                 </div>
-                                                <label class="col-4 control-label">
-                                                    Informe o tempo estimado para essa rota (IDA + VOLTA):
+                                                <label class="col-sm-12 col-md-4 control-label">
+                                                    Informe o tempo estimado para essa rota:
                                                 </label>
-                                                <div class="input-group col-6 mt-2">
+                                                <div class="input-group col-sm-12 col-md-6 mt-2">
                                                     <input id="regtempo" name="regtempo" type="text"
                                                         placeholder="Tempo estimado:" class="form-control numbermask">
                                                     <div class="input-group-append">
@@ -307,28 +320,28 @@
                                                 </div>
                                             </div>
                                             <div class="row justify-content-center">
-                                                <div class="col-6 ">
+                                                <div class="col-sm-12 col-md-6 ">
                                                     <div class="row">
                                                         <div class="optlabel">
                                                             Optativo
                                                         </div>
-                                                        <label class="col-5 control-label latlon-label">
+                                                        <label class="col-sm-12 col-md-5 control-label latlon-label">
                                                             <b>Horário de Início <br />da Rota de Ida</b>
                                                             <star>*</star>
                                                         </label>
-                                                        <div class="col-4 mt-3">
+                                                        <div class="col-sm-12 col-md-4 mt-3">
                                                             <input class="form-control horamask" type="text"
                                                                 id="reginicioida" placeholder="09:00" />
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-6">
+                                                <div class="col-sm-12 col-md-6">
                                                     <div class="row">
-                                                        <label class="col-6 control-label latlon-label">
+                                                        <label class="col-sm-12 col-md-6 control-label latlon-label">
                                                             <b>Horário de Término<br /> da Rota de Ida</b>
                                                             <star>*</star>
                                                         </label>
-                                                        <div class="col-4 mt-3">
+                                                        <div class="col-sm-12 col-md-4 mt-3">
                                                             <input class="form-control horamask" type="text"
                                                                 id="regterminoida" placeholder="12:15" />
                                                         </div>
@@ -346,28 +359,28 @@
                                                 </div>
                                             </div>
                                             <div class="row justify-content-center">
-                                                <div class="col-6 ">
+                                                <div class="col-sm-12 col-md-6 ">
                                                     <div class="row">
                                                         <div class="optlabel">
                                                             Optativo
                                                         </div>
-                                                        <label class="col-5 control-label latlon-label">
+                                                        <label class="col-sm-12 col-md-5 control-label latlon-label">
                                                             <b>Horário de Início <br />da Rota de Volta</b>
                                                             <star>*</star>
                                                         </label>
-                                                        <div class="col-4 mt-3">
+                                                        <div class="col-sm-12 col-md-4 mt-3">
                                                             <input class="form-control horamask" type="text"
                                                                 id="reginiciovolta" placeholder="09:00" />
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-6">
+                                                <div class="col-sm-12 col-md-6">
                                                     <div class="row">
-                                                        <label class="col-6 control-label latlon-label">
+                                                        <label class="col-sm-12 col-md-6 control-label latlon-label">
                                                             <b>Horário de Término<br /> da Rota de Volta</b>
                                                             <star>*</star>
                                                         </label>
-                                                        <div class="col-4 mt-3">
+                                                        <div class="col-sm-12 col-md-4 mt-3">
                                                             <input class="form-control horamask" type="text"
                                                                 id="regterminovolta" name="regterminovolta"
                                                                 placeholder="12:15" />
@@ -403,15 +416,15 @@
                                     </ul>
                                 </div>
                                 <div class="row mb-2">
-                                    <div class="col-5">
+                                    <div class="col-sm-12 col-md-5">
                                         <h3 class="listaSelect">Lista de Escolas</h3>
                                         <input id="filtroEscolasNaoAtendidas" type="text" placeholder="Filtro"
                                             class="form-control">
                                     </div>
-                                    <div class="col-2">
+                                    <div class="col-sm-12 col-md-2">
 
                                     </div>
-                                    <div class="col-5">
+                                    <div class="col-sm-12 col-md-5">
                                         <h3 class="listaSelect">Escolas Atendidas pela Rota <span id="totalNumEscolas"
                                                 class="badge badge-success badge-total">0</span></h3>
                                         <input id="filtroEscolasAtendidas" type="text" placeholder="Filtro"
@@ -420,12 +433,12 @@
                                 </div>
 
                                 <div class="row mt-1 mb-3">
-                                    <div class="col-5">
+                                    <div class="col-sm-12 col-md-5">
                                         <select id="escolasNaoAtendidas" class="unselected form-control dual-list"
                                             multiple="">
                                         </select>
                                     </div>
-                                    <div class="col-2 mt-auto mb-auto">
+                                    <div class="col-sm-12 col-md-2 mt-auto mb-auto">
                                         <div class="row m-2">
                                             <button type="button" id="colocarEscola" class="btn col-12 btn-outline">
                                                 <i class="fa fa-arrow-right"></i>
@@ -437,7 +450,7 @@
                                             </button>
                                         </div>
                                     </div>
-                                    <div class="col-5">
+                                    <div class="col-sm-12 col-md-5">
                                         <select id="escolasAtentidas" name="escolasAtentidas"
                                             class="unselected form-control dual-list" multiple="">
                                         </select>
@@ -448,7 +461,7 @@
 
                             <div class="tab-pane tab-wiz fade" id="tab-dados-alunos" role="tabpanel">
                                 <div class="row">
-                                    <div class="col-12 tituloSecao">
+                                    <div class="col-sm-12 col-md-12 tituloSecao">
                                         <span class="mb-3">Alunos Atendidos</span>
                                     </div>
                                 </div>
@@ -466,15 +479,15 @@
                                     </ul>
                                 </div>
                                 <div class="row mb-2">
-                                    <div class="col-5">
+                                    <div class="col-sm-12 col-md-5">
                                         <h3 class="listaSelect">Lista de Alunos</h3>
                                         <input id="filtroAlunosNaoAtendidos" type="text" placeholder="Filtro"
                                             class="form-control">
                                     </div>
-                                    <div class="col-2">
+                                    <div class="col-sm-12 col-md-2">
 
                                     </div>
-                                    <div class="col-5">
+                                    <div class="col-sm-12 col-md-5">
                                         <h3 class="listaSelect">Alunos Atendidos pela Rota <span id="totalNumAlunos"
                                                 class="badge badge-success badge-total">0</span></h3>
                                         <input id="filtroAlunosAtendidos" type="text" placeholder="Filtro"
@@ -483,12 +496,12 @@
                                 </div>
 
                                 <div class="row mt-1 mb-3">
-                                    <div class="col-5">
+                                    <div class="col-sm-12 col-md-5">
                                         <select id="alunosNaoAtendidos" class="unselected form-control dual-list"
                                             multiple="">
                                         </select>
                                     </div>
-                                    <div class="col-2 mt-auto mb-auto">
+                                    <div class="col-sm-12 col-md-2 mt-auto mb-auto">
                                         <div class="row m-2">
                                             <button type="button" id="colocarAluno" class="btn col-12 btn-outline">
                                                 <i class="fa fa-arrow-right"></i>
@@ -500,7 +513,7 @@
                                             </button>
                                         </div>
                                     </div>
-                                    <div class="col-5">
+                                    <div class="col-sm-12 col-md-5">
                                         <select id="alunosAtendidos" name="alunosAtendidos"
                                             class="unselected form-control dual-list" multiple="">
                                         </select>

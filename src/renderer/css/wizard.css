@@ -1,0 +1,82 @@
+
+.card-wizard .nav-tabs .nav-item .nav-link {
+    vertical-align: middle;
+    background: #E5E5E5;
+    border-top-color: #7A7A7A;
+    border-top-style: solid;
+    border-top-width: 3px;
+    color: #808590;
+    height: 95px;
+    padding-top: 20px;
+    font-size: 17px;
+}
+
+.card-wizard .nav-tabs .nav-item .nav-link.active {
+    background: #ffffff;
+    border-top-color: #f1ce33;
+    border-top-style: solid;
+    border-top-width: 3px;
+    color: #2A2D33;
+}
+
+.card.card-wizard.wiz-fixes {
+    box-shadow: none;
+    /* border: none; */
+    border-radius: 20px;
+    border-color: #adadad;
+    border-top: none;
+    border-top-right-radius: 0px;
+    border-top-left-radius: 0px;
+}
+
+.wiz-fixes .card-body {
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-left: 14px;
+    padding-right: 16px;
+}
+
+.wiz-fixes .card-body .nav {
+    margin-top: 0px;
+}
+
+.wiz-fixes .tab-content {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+img.wiz-icon {
+    height: 50px;
+    filter: invert(0.7);
+    padding-right: 20px;
+}
+
+.card-wizard .nav-tabs .nav-item .nav-link.active .wiz-icon {
+    filter: invert(0);
+}
+
+.tab-wiz .form-group {
+    background: #f3f3f3;
+    padding: 20px;
+    padding-bottom: 20px;
+    border-radius: 5px;
+}
+
+.tab-wiz .form-group {
+    background: #fbfbfb;
+    border-style: solid;
+    border-color: #f9f9f9;
+}
+
+.tab-2-fix, .tab-3-fix {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.tab-3-fix a {
+    font-size: 12px
+}
+
+.tab-3-fix img.wiz-icon {
+    height: 40px;
+}

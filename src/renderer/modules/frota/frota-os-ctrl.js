@@ -12,11 +12,12 @@ var listaDeFornecedores = new Map();
 var dataTablesOS = $("#datatables").DataTable({
     ...dtConfigPadraoFem("ordem de serviço"),
     ...{
+        dom: 'rtilp<"clearfix m-2">B',
         select: {
             style: 'multi',
             info: false
         },
-        "order": [[1, "asc"]],
+        "order": [[ 1, "asc" ]],
         columns: [
             { data: 'SELECT', width: "60px" },
             { data: 'DATASTR', width: "90px" },
@@ -38,8 +39,15 @@ var dataTablesOS = $("#datatables").DataTable({
             { targets: 0, 'checkboxes': { 'selectRow': true } },
             { targets: 1, render: renderAtMostXCharacters(50) }
         ],
-        dom: 'r<"addOS">tilp<"clearfix m-2">B',
         buttons: [
+            {
+                text: "Cadastrar ordem de serviço",
+                className: 'btn-success',
+                action: function (e, dt, node, config) {
+                    action = "cadastrarOS";
+                    navigateDashboard("./modules/frota/frota-os-cadastrar-view.html");
+                }
+            },
             {
                 text: 'Remover ordem de serviço',
                 className: 'btnRemover',
@@ -152,16 +160,15 @@ var dataTablesOS = $("#datatables").DataTable({
     }
 });
 
-$("#addOS").on('click', () => {
-    action = "cadastrarOS";
-    navigateDashboard("./modules/frota/frota-os-cadastrar-view.html");
-});
+$("#datatables_filter input").on('keyup', function () {
+    dataTablesOS.search(jQuery.fn.dataTable.ext.type.search["locale-compare"](this.value)).draw()
+})
+
 
 dataTablesOS.on('click', '.osDone', function () {
     var $tr = getRowOnClick(this);
     var rowidx = dataTablesOS.row($tr).index();
     estadoOS = dataTablesOS.row($tr).data();
-    debugger
 
     var qtext = "Marcar ordem de serviço como concluída?";
 

@@ -1,0 +1,144 @@
+.sidebar li.nav-item {
+    border: 1.5px solid #414550;
+    border-collapse: collapse;
+    color: white;
+}
+
+.sidebar, .sidebar-wrapper {
+    background: #414550;
+}
+
+
+.sidebar .nav .nav-item .nav-link {
+    padding: 10px;
+    margin: 0px;
+    font-size: 1.1em;
+}
+
+
+span.sidebar-normal {
+    font-size: 0.8em;
+}
+
+.navbar-header {
+	text-align: center;
+	margin-top: 7px;
+	margin-bottom: 2px;
+}
+
+#logo {
+    width: 200px;
+    height: 75px;
+    border: 0px solid #676A73;
+    border-radius: 10px;
+    background-color: #676A73;
+}
+
+img.menu-icon {
+    margin-left: 22px;
+}
+
+span.sidebar-mini {
+    margin-left: 20px;
+}
+
+b.caret {
+    margin-right: 20px;
+}
+
+.sidebar li.nav-item {
+    border: 1.5px solid #414550;
+    border-collapse: collapse;
+    background-color: #464a56;
+    color: white;
+}
+
+.sidebar-wrapper {
+    background: #414550;
+}
+
+
+.sidebar .nav .nav-item .nav-link {
+    padding: 10px;
+    margin: 0px;
+    font-size: 1.1em;
+    /* border-radius: 0px; */
+}
+
+
+span.sidebar-normal {
+    font-size: 0.8em;
+}
+
+.navbar-header {
+	text-align: center;
+	margin-top: 7px;
+	margin-bottom: 2px;
+}
+
+#logo {
+    width: 200px;
+    height: 75px;
+    border: 0px solid #676A73;
+    border-radius: 10px;
+    background-color: #676A73;
+}
+
+img.menu-icon {
+    margin-left: 22px;
+    height: 28px;
+}
+
+span.sidebar-mini {
+    margin-left: 20px;
+}
+
+b.caret {
+    margin-right: 20px;
+}
+
+.sidebar-wrapper {
+    width: 270px !important;
+}
+
+div#sidebar {
+    width: 270px;
+    min-width: 270px;
+}
+
+.sidebar-wrapper {
+    width: 270px;
+}
+
+.sidebar-wrapper {
+    width: 270px !important;
+}
+
+div#sidebar {
+    width: 270px;
+    min-width: 270px;
+}
+
+.sidebar-wrapper {
+    width: 270px;
+}
+
+.sidebar .nav .nav-item .nav-link:hover {
+    background: #576071;
+}
+
+.sidebar .nav .nav-item a[aria-expanded="true"] {
+  background-color: #576071;
+} 
+
+.sidebar .sidebar-wrapper .nav .nav-item [data-toggle="collapse"]~div .nav .nav-item .nav-link:hover {
+    border: none;
+    border-right: white;
+    border-right-style: solid;
+    border-width: 5px;
+}
+
+.sidebar .sidebar-wrapper .nav .nav-item [data-toggle="collapse"]~div .nav .nav-item .nav-link {
+    font-size: 1em;
+    font-family: "Roboto Condensed";
+}
