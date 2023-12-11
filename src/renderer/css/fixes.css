@@ -757,3 +757,8 @@ select.swal2-select {
     }
 
 }
+
+/* Graficos */
+#grafico text, #grafico span {
+    font-family: 'Roboto Condensed' !important;
+}
