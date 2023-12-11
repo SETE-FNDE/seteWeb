@@ -15,9 +15,7 @@ function criarModalErro(mensagens, titulo = "Ops... tivemos um problema") {
         msgErro += `<li>${mensagens}</li>`;
     } else {
         for (const value of Object.values(mensagens)) {
-            if (value !== undefined && value !== null) {
-                msgErro += `<li>${value}</li>`;
-            }
+            msgErro += `<li>${value}</li>`;
         }
     }
 

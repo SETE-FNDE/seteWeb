@@ -238,81 +238,6 @@ $(() => {
     });
 
     // Ações para cada click
-    $("#govbr").on("click", () => {
-        govBr();
-
-    });
-
-    function abrirPopup(url) {
-
-        return new Promise(function(resolve, reject) {
-            var popup = window.open(url, 'Login GovBr', 'width=450,height=650');
-
-            // Adicione um event listener para receber mensagens
-            window.addEventListener('message', function(event) {
-                // Verifique se a mensagem vem da janela popup
-                if (event.source === popup) {
-                    // Use resolve para enviar dados de volta à Promise quando a mensagem é recebida
-                    resolve(event.data);
-                }
-            });
-        });
-    }
-
-    function govBr()
-    {
-        const paramsUrl = '?redirect_popup=' + true;
-        const url = GOVBR_URL + paramsUrl;
-
-        // Chame a função para abrir o popup e obter dados
-        abrirPopup(url).then(function(dados) {
-            const dataResponseJson = JSON.parse(dados)
-            console.log('passou: ', dataResponseJson);
-            if(dataResponseJson.login_error && dataResponseJson.login_error == 'user_not_found_sete') {
-                console.log('usuario não encontrado no sete');
-                throw new Error('Usuário não encontrado no SETE.');
-            } else {
-                setResponseLoginUserConfig(dataResponseJson)
-            }
-        }).then(() => {
-            document.location.href = "./dashboard.html";
-        }).catch((err) => {
-            if (err != null) {
-                criarModalErroComum(err);
-            }
-        });
-    }
-
-
-    function setResponseLoginUserConfig(response, email = null, password = null) {
-        let respUsuario = response.data.data.usuario;
-        let respToken = response.data.data.token.access_token;
-
-        userconfig.set("CIDADE", respUsuario.cidade);
-        userconfig.set("ESTADO", respUsuario.estado);
-        userconfig.set("COD_CIDADE", String(respUsuario.codigo_cidade));
-        userconfig.set("COD_ESTADO", (respUsuario.codigo_cidade + "").slice(0, 2));
-        userconfig.set("LATITUDE", Number(respUsuario.latitude));
-        userconfig.set("LONGITUDE", Number(respUsuario.longitude));
-        userconfig.set("ID", String(respUsuario.id_usuario));
-        userconfig.set("TIPO_PERMISSAO", String(respUsuario.tipo_permissao));
-        userconfig.set("NOME", respUsuario.nome);
-        userconfig.set("TOKEN", respToken);
-        dadoUsuario = {
-            ID: String(respUsuario.id_usuario),
-            NOME: respUsuario.nome,
-            EMAIL: respUsuario.email,
-            CPF: respUsuario.cpf,
-            TELEFONE: respUsuario.telefone,
-            CIDADE: respUsuario.cidade,
-            ESTADO: respUsuario.estado,
-            PASSWORD: password,
-            COD_CIDADE: Number(respUsuario.codigo_cidade),
-            COD_ESTADO: Number((respUsuario.codigo_cidade + "").slice(0, 2)),
-            TOKEN: respToken,
-        };
-        userconfig.set("DADO_USUARIO", JSON.stringify(dadoUsuario));
-    }
 
     // No caso de login iremos fazer o login do usuário no arquivo local (userconfig)
     $("#loginsubmit").on("click", () => {
@@ -340,7 +265,10 @@ $(() => {
                     senha: md5password,
                 })
                 .then((resposta) => {
-                            // Set local config
+                    let respUsuario = resposta.data.data.usuario;
+                    let respToken = resposta.data.data.token.access_token;
+
+                    // Set local config
                     if (lembrarlogin) {
                         userconfig.set("LEMBRAR", true);
                         userconfig.set("EMAIL", email);
@@ -350,7 +278,32 @@ $(() => {
                         userconfig.delete("EMAIL");
                         userconfig.delete("PASSWORD");
                     }
-                    setResponseLoginUserConfig(resposta, email, password);
+
+                    userconfig.set("CIDADE", respUsuario.cidade);
+                    userconfig.set("ESTADO", respUsuario.estado);
+                    userconfig.set("COD_CIDADE", String(respUsuario.codigo_cidade));
+                    userconfig.set("COD_ESTADO", (respUsuario.codigo_cidade + "").slice(0, 2));
+                    userconfig.set("LATITUDE", Number(respUsuario.latitude));
+                    userconfig.set("LONGITUDE", Number(respUsuario.longitude));
+                    userconfig.set("ID", String(respUsuario.id_usuario));
+                    userconfig.set("TIPO_PERMISSAO", String(respUsuario.tipo_permissao));
+                    userconfig.set("NOME", respUsuario.nome);
+                    userconfig.set("TOKEN", respToken);
+                    dadoUsuario = {
+                        ID: String(respUsuario.id_usuario),
+                        NOME: respUsuario.nome,
+                        EMAIL: respUsuario.email,
+                        CPF: respUsuario.cpf,
+                        TELEFONE: respUsuario.telefone,
+                        CIDADE: respUsuario.cidade,
+                        ESTADO: respUsuario.estado,
+                        PASSWORD: password,
+                        COD_CIDADE: Number(respUsuario.codigo_cidade),
+                        COD_ESTADO: Number((respUsuario.codigo_cidade + "").slice(0, 2)),
+                        TOKEN: respToken,
+                    };
+                    userconfig.set("DADO_USUARIO", JSON.stringify(dadoUsuario));
+
                     return dadoUsuario;
                 })
                 .then(() => {
@@ -498,22 +451,10 @@ $(() => {
                     password: md5password,
                     nivel_permissao: "admin",
                 })
-                .then( (response) => {
-                    console.log(response);
-                    let title = 'Solicitação Enviada!';
-                    let text = 'Sua conta foi criada com sucesso. Ela será analisada pela equipe do CECATE e em breve você já poderá realizar o login.';
-
-                    if (response.data && response.data.data) {
-                        let data = response.data.data;
-                        if (data.is_liberado == 'S') {
-                            title = 'Sucesso!';
-                            text = 'Sua conta foi criada com sucesso. Acesse a aba login e efetue seu primeiro acesso.';
-                        }
-                    }
-
+                .then(() => {
                     Swal2.fire({
-                        title: title,
-                        text: text,
+                        title: "Parabéns!",
+                        text: "Sua conta foi criada com sucesso. Ela será analisada pela equipe do CECATE e em breve você já poderá realizar o login.",
                         icon: "success",
                         type: "success",
                         button: "Fechar",
