@@ -79,6 +79,7 @@ install:
   # Mac-OS specific packages
   - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "macOS-BigSur"; then npm install --no-optional; fi
   - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "macOS-BigSur"; then npm install dmg-license; fi
+  - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "macOS-BigSur"; then npm install appdmg; fi
 
   # Webify
   - ps: .\webify.ps1
@@ -88,7 +89,7 @@ install:
   # Linux and MacOS Webify
   - sh: echo ${APPVEYOR_BUILD_WORKER_IMAGE}
   - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "Ubuntu2004"; then ./webify.sh; fi
-  # - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "macOS-BigSur"; then ./webify_macos.sh; fi
+  - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "macOS-BigSur"; then ./webify_macos.sh; fi
   
 build_script:
   - cmd: set PATH=C:\projects\seteWeb\node_modules\.bin;%PATH%
