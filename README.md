@@ -44,6 +44,7 @@ Semelhantemente, instale o gerenciador de pacotes Yarn v1.22. Você pode utiliza
 Caso queira compilar para o Windows, instale o [Wix Toolset 3.14](https://wixtoolset.org/docs/v3/releases/v3-14-0-6526/) e coloque o diretório `bin` do mesmo na variável PATH. Por exemplo, adicionando `C:\Program Files (x86)\WiX Toolset v3.14\bin` a variável de ambiente PATH.
 
 No caso da plataforma Windows, ainda é necessário instalar as [Ferramentas de build do Visual Studio (Visual Studio Community 2022)](https://visualstudio.microsoft.com/pt-br/thank-you-downloading-visual-studio/?sku=Community&channel=Release&version=VS2022&source=VSLandingPage&cid=2030&passive=false) para compilar os pacotes nativos. Ao instalar a ferramenta, é necessário marcar a caixa **Desenvolvimento em nodejs** para que o compilador consiga gerar módulos para o electron (veja a Figura abaixo).
+
 <img src="screenshots/visual_studio_installer.png" alt="Instalar Ferramentas de Build do Visual Studio" width="600" />
 
 Por fim, o Windows ainda requer que o `npm` (versão 8) especifique a versão do compilador do Visual Studio, por exemplo, 2022, e o caminho do binário do Python. Por exemplo, os comando abaixos especificam a versão 2022 e um caminho do Python (modifique para ser condizente com sua máquina). 
