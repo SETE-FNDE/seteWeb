@@ -46,11 +46,11 @@ Caso queira compilar para o Windows, instale o [Wix Toolset 3.14](https://wixtoo
 No caso da plataforma Windows, ainda é necessário instalar as [Ferramentas de build do Visual Studio (Visual Studio Community 2022)](https://visualstudio.microsoft.com/pt-br/thank-you-downloading-visual-studio/?sku=Community&channel=Release&version=VS2022&source=VSLandingPage&cid=2030&passive=false) para compilar os pacotes nativos. Ao instalar a ferramenta, é necessário marcar a caixa **Desenvolvimento em nodejs** para que o compilador consiga gerar módulos para o electron (veja a Figura abaixo).
 <img src="screenshots/visual_studio_installer.png" alt="Instalar Ferramentas de Build do Visual Studio" width="600" />
 
-Por fim, o Windows ainda requer que o `npm` especifique a versão do compilador do Visual Studio, por exemplo, 2022, e o caminho do binário do Python. Por exemplo, os comando abaixos especificam a versão 2022 e um caminho do Python (modifique para ser condizente com sua máquina). 
+Por fim, o Windows ainda requer que o `npm` (versão 8) especifique a versão do compilador do Visual Studio, por exemplo, 2022, e o caminho do binário do Python. Por exemplo, os comando abaixos especificam a versão 2022 e um caminho do Python (modifique para ser condizente com sua máquina). 
 
 ```sh
 npm install -g npm@^8
-npm config set msvs_version "2017"
+npm config set msvs_version "2022"
 npm config set python "C:\\Python35-x64\\pythonw.exe"
 ```
 
