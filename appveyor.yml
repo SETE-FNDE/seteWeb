@@ -82,14 +82,14 @@ install:
   - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "macOS-BigSur"; then npm install appdmg; fi
 
   # Webify
-  - ps: .\webify.ps1
-  - sh: chmod +x webify.sh
-  - sh: chmod +x webify_macos.sh
+  # - ps: .\webify.ps1
+  # - sh: chmod +x webify.sh
+  # - sh: chmod +x webify_macos.sh
 
   # Linux and MacOS Webify
-  - sh: echo ${APPVEYOR_BUILD_WORKER_IMAGE}
-  - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "Ubuntu2004"; then ./webify.sh; fi
-  - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "macOS-BigSur"; then ./webify_macos.sh; fi
+  # - sh: echo ${APPVEYOR_BUILD_WORKER_IMAGE}
+  # - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "Ubuntu2004"; then ./webify.sh; fi
+  # - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "macOS-BigSur"; then ./webify_macos.sh; fi
   
 build_script:
   - cmd: set PATH=C:\projects\seteWeb\node_modules\.bin;%PATH%
