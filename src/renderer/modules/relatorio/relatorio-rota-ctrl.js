@@ -4,29 +4,13 @@
 // Preenchimento da Tabela via SQL
 var relatorios = new Map();
 
-restImpl.dbGETEntidade(DB_TABLE_GRAFICOS, "/escolas")
+restImpl.dbGETEntidade(DB_TABLE_GRAFICOS, "/rotas")
     .then((res) => {
         for (let r of res.data) {
-            switch (r.nome) {
-                case "Localidade":
-                    r["tipo"] = "barra";
-                    break;
-                case "Dependência":
-                    r["tipo"] = "pizza";
-                    break;
-                case "Nível de Ensino":
-                    r["tipo"] = "pizza";
-                    break;
-                case "Tipo de Ensino":
-                    r["tipo"] = "pizza";
-                    break;
-                case "Horário de Funcionamento":
-                    r["tipo"] = "pizza";
-                    break;
-                default:
-                    r["tipo"] = "pizza"
-                    break;
+            if (r["titulo"].toLowerCase().includes("total") && !(r["nome"].toLowerCase().includes("total"))) {
+                r["nome"] += " Total"
             }
+            r["tipo"] = "barra";
             relatorios.set(r.nome, r);
 
             $("#menuRelatorio").append(
