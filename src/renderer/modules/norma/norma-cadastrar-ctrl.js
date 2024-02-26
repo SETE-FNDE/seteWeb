@@ -247,3 +247,31 @@ function verificaEdicao() {
 }
 
 action = "cadastrarNorma";
+
+
+function validateFileSize() {
+    var fileInput = document.getElementById('arqNorma');
+    var fileSize = fileInput.files[0].size; // Tamanho do arquivo em bytes
+    var maxSize = 5 * 1024 * 1024; // Limite de tamanho: 5 MB
+
+    if (fileSize > maxSize) {
+        Swal2.fire({
+            title: "Erro",
+            text: "O arquivo excede o tamanho máximo permitido (4 MB)",
+            icon: "warning",
+            showCancelButton: false,
+            confirmButtonClass: "btn-warning",
+            confirmButtonText: "Fechar",
+            closeOnConfirm: false,
+            closeOnClickOutside: false,
+            allowOutsideClick: false,
+            showConfirmButton: true
+        })
+
+      fileInput.value = ''; // Limpa o campo de input de arquivo
+
+      return false; // Impede o envio do formulário
+    }
+
+    return true; // Permite o envio do formulário
+  }

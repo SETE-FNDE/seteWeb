@@ -96,3 +96,8 @@ bin/sete-*
 .vscode/launch.json
 /nbproject/private/
 /nbproject/*
+webify.sh
+webify.ps1
+.vscode/settings.json
+config.js
+

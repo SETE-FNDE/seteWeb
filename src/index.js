@@ -34,6 +34,8 @@ if (appconfig.has("OD")) {
 // Bibliotecas para plotar logo do SETE e informações do sistema
 const figlet = require("figlet");
 
+const helper = require('./scripts/helper.js');
+const config = require('../config.js');
 // Plotando dados do sistema e SETE
 console.log(figlet.textSync("SETE"));
 console.log("SETE".padEnd(30), app.getVersion());
@@ -112,6 +114,9 @@ function createEntryWindow() {
         },
     });
 
+    if (config.DEV_TOOLS) {
+        appWindow.webContents.openDevTools();
+    }
     // Desabilita e esconde menu
     // appWindow.setMenu(null);
     appWindow.setMenuBarVisibility(false);
@@ -119,8 +124,8 @@ function createEntryWindow() {
     // Agora carrega a página de login do SETE
     // Vamos verificar se estamos usando proxy
     const usingProxy = appconfig.get("PROXY_USE");
-
     if (!usingProxy) {
+        let govUrl = config.GOVBR_URL;
         appWindow.loadURL(`file://${__dirname}/renderer/login-view.html`);
     } else {
         const proxyType = appconfig.get("PROXY_TYPE");

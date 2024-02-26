@@ -143,11 +143,11 @@ var restModule = {
             });
     },
 
-    dbPOST: (nomeColecao, path, dado) => {
+    dbPOST: (nomeColecao, path, dado, header = null) => {
         let caminho = nomeColecao + "/" + codCidade + path;
         if (DEBUG) { console.debug("POST REQUEST", caminho, dado) }
 
-        return restAPI.post(caminho, dado)
+        return restAPI.post(caminho, dado, header)
             .then((res) => {
                 if (DEBUG) { console.debug("POST REPLY", caminho, res) }
                 return Promise.resolve(res);
