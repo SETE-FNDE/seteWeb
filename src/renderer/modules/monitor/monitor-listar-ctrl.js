@@ -19,6 +19,7 @@ var dataTablesMonitores = $("#datatables").DataTable({
         "order": [[ 1, "asc" ]],
         columns: [
             { data: "SELECT", width: "60px" },
+            { data: 'CPF', width: "20%" },
             { data: 'NOME', width: "25%" },
             { data: 'TELEFONE', width: "25%" },
             { data: 'TURNOSTR', width: "25%" },
@@ -33,7 +34,7 @@ var dataTablesMonitores = $("#datatables").DataTable({
         ],
         columnDefs: [
             { targets: 0, 'checkboxes': { 'selectRow': true } },
-            { targets: 1,  render: renderAtMostXCharacters(50) }
+            { targets: 2,  render: renderAtMostXCharacters(50) },
         ],
         buttons: [
             {
@@ -114,7 +115,7 @@ var dataTablesMonitores = $("#datatables").DataTable({
                 title: appTitle,
                 text: 'Exportar para Planilha',
                 exportOptions: {
-                    columns: [ 1, 2, 3, 4, 5, 6]
+                    columns: [ 1, 2, 3, 4 ]
                 },
                 customize: function (xlsx) {
                     var sheet = xlsx.xl.worksheets['sheet1.xml'];
@@ -126,13 +127,13 @@ var dataTablesMonitores = $("#datatables").DataTable({
             {
                 extend: 'pdfHtml5',
                 orientation: "landscape",
-                title: "monitors cadastrados",
+                title: "Monitores Cadastrados",
                 text: "Exportar para PDF",
                 exportOptions: {
-                    columns: [1, 2, 3, 4, 5, 6]
+                    columns: [1, 2, 3, 4 ]
                 },
                 customize: function (doc) {
-                    doc.content[1].table.widths = ['25%', '15%', '10%', '20%', '15%', '15%'];
+                    doc.content[1].table.widths = ['20%', '20%', '20%', '40%' ];
                     doc = docReport(doc);
                     
                     // O datatable coloca o select dentro do header, vamos tirar isso
@@ -211,6 +212,7 @@ restImpl.dbGETColecao(DB_TABLE_MONITOR)
 var processarMonitores = (res) => {
     for (let monitorRaw of res) {
         let monitorJSON = parseMonitorREST(monitorRaw);
+        monitorJSON.TELEFONE = monitorJSON.TELEFONE || "Não Informado";
         listaDeMonitores.set(monitorJSON["ID"], monitorJSON);
     }
     return listaDeMonitores;
@@ -226,6 +228,9 @@ adicionaDadosTabela = (res) => {
 
     dataTablesMonitores.draw();
     dtInitFiltros(dataTablesMonitores, [3]);
+
+    // Mascara CPF
+    $("#datatables td:nth-child(2)").mask('000.000.000-00', { reverse: true });
 }
 
 
