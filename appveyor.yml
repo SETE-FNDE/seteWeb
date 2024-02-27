@@ -70,6 +70,7 @@ install:
   # Install Packages
   - cmd: npm install 
   - cmd: npm install exe-icon-extractor
+  - npm install execa
 
   # - sh: npm install --no-optional
   # Ubuntu specific
