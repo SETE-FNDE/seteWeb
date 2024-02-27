@@ -70,6 +70,8 @@ install:
   # Install Packages
   - cmd: npm install 
   - cmd: npm install exe-icon-extractor
+  - npm install execa
+
   # - sh: npm install --no-optional
   # Ubuntu specific
   - sh: if test ${APPVEYOR_BUILD_WORKER_IMAGE} = "Ubuntu2004"; then npm install; fi
