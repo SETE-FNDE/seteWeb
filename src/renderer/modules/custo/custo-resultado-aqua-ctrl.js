@@ -353,7 +353,19 @@ function mostraInformacoesCusto() {
                         return Intl.NumberFormat("pt-BR", { style: 'currency', currency: 'BRL' }).format(value)
                     }
                 }
-            }
+            },
+            colors: [
+                "#167288",
+                "#8cdaec",
+                "#b45248",
+                "#d48c84",
+                "#a89a49",
+                "#d6cfa2",
+                "#3cb464",
+                "#9bddb1",
+                "#643c6a",
+                "#836394"   
+            ]
         };
 
         var chart = new ApexCharts(document.querySelector("#graficoCusto"), options);
