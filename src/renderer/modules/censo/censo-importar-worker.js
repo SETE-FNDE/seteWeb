@@ -192,11 +192,15 @@ function parseRegistro30(registro) {
     // Mudança para 42
     if (registro.data[42] != null && registro.data[42] != "") {
         dadoPessoa["MEC_TP_LOCALIZACAO"] = Number(registro.data[42]);
+    } else if (registro.data[43] != null && registro.data[43] != "") {
+        dadoPessoa["MEC_TP_LOCALIZACAO"] = Number(registro.data[43]);
+    } else {
+        dadoPessoa["MEC_TP_LOCALIZACAO"] = 2;
     }
 
     // Contato Email
-    if ((registro.data[97] != null && registro.data[97] != "") || 
-        (registro.data[94] != null && registro.data[94] != "")) {
+    if ((registro.data[97] != null && registro.data[97] != "" && registro.data[97] != "0") || 
+        (registro.data[94] != null && registro.data[94] != "" && registro.data[94] != "0")) {
         dadoPessoa["EMAIL"] = registro.data[94] || registro.data[97];
     }
 
