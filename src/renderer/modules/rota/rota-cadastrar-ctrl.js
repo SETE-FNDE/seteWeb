@@ -12,12 +12,9 @@ if (action == "editarRota") {
     estaEditando = true;
 }
 
-// Listas utilizadas para armazenar veículos, motoristas
-// e posteriormente vincular com a rota sendo cadastrada
-var listaDeVeiculos = new Map();
-var listaDeFornecedores = new Map();
-var listaDeEscolas = new Map();
-var listaDeAlunos = new Map();
+// Listas utilizadas para armazenar todos os alunos e escolas
+var todasAsEscolas = new Array();
+var todosOsAlunos = new Array();
 
 // Conjunto de escolas e alunos atendidos (agora e novo)
 var novasEscolas = new Set();
@@ -73,11 +70,45 @@ var validadorFormulario = $("#wizardCadastrarRotaForm").validate({
     }
 });
 
+function limitaAlunosAEscolaEscolhida() {
+    let nomeEscolasEscolhidas = new Set(todasAsEscolas.filter(esc => novasEscolas.has(String(esc.id_escola))).map(e => e.nome));
+    let todosAlunosDasEscolasEscolhidas = todosOsAlunos.filter(a => nomeEscolasEscolhidas.has(a.escola));
+    
+    todosAlunosDasEscolasEscolhidas.sort((a, b) => a["nome"].localeCompare(b["nome"]))
+    $("#alunosNaoAtendidos").empty();
+    $("#alunosAtendidos").empty();
+
+    // Alunos não atendidos
+    todosAlunosDasEscolasEscolhidas.forEach(alunoRaw => {
+        let alunoJSON = parseAlunoREST(alunoRaw);
+        let alunoSTR = alunoJSON["NOME"]; // + " (" + alunoJSON["CPF"] + ")";
+        let alunoID = String(alunoJSON["ID"]);
+
+        if (!novosAlunos.has(alunoID)) {
+            $('#alunosNaoAtendidos').append(`<option value="${alunoID}">${alunoSTR}</option>`);
+        }
+    })
+
+    // Alunos atendidos
+    let todosAlunosAtendidos = todosOsAlunos.filter(a => novosAlunos.has(String(a.id_aluno)))
+    todosAlunosAtendidos.forEach(alunoRaw => {
+        let alunoJSON = parseAlunoREST(alunoRaw);
+        let alunoSTR = alunoJSON["NOME"]; // + " (" + alunoJSON["CPF"] + ")";
+        let alunoID = String(alunoJSON["ID"]);
+
+        $('#alunosAtendidos').append(`<option value="${alunoID}">${alunoSTR}</option>`);
+    })
+}
+
 $('.card-wizard').bootstrapWizard({
     // Configura ações básica do wizard (ver função em common.js)
     ...configWizardBasico('#wizardCadastrarRotaForm'),
     ...{
         onTabShow: function (tab, navigation, index) {
+            // aba escolas
+            if (index == 2) {
+                limitaAlunosAEscolaEscolhida();
+            }
             var $total = navigation.find('li').length;
             var $current = index + 1;
 
@@ -456,6 +487,8 @@ restImpl.dbGETColecao(DB_TABLE_MONITOR)
 restImpl.dbGETColecao(DB_TABLE_ALUNO)
     .then(async (alunos) => {
         // Processando alunos
+        todosOsAlunos = alunos;
+
         if (alunos.length != 0) {
             let alunosAtendidos = new Map();
             try {
@@ -488,7 +521,8 @@ restImpl.dbGETColecao(DB_TABLE_ALUNO)
 // Adicionando as escolas na tela de rotas
 restImpl.dbGETColecao(DB_TABLE_ESCOLA)
     .then(async (escolas) => {
-        // Processando alunos
+        // Processando escolas
+        todasAsEscolas = escolas;
         if (escolas.length != 0) {
             let escolasAtendidas = new Map();
             try {
