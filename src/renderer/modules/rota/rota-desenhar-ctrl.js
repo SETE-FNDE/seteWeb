@@ -910,10 +910,19 @@ $("#listarotas").on("change", async (evt) => {
             }
 
             if (!mapaSource.isEmpty()) {
-                mapaOL.getView().fit(mapaSource.getExtent(), {
-                    padding: [40, 40, 40, 40]
-                });
-                mapaOL.updateSize();
+                setTimeout(() => {
+                    mapa["map"].getView().fit(mapaSource.getExtent(), {
+                        padding: [40, 40, 40, 40],
+                    });
+                    mapa["map"].updateSize();
+                }, 500);
+            } else if (!vectorSource.isEmpty()) {
+                setTimeout(() => {
+                    mapa["map"].getView().fit(vectorSource.getExtent(), {
+                        padding: [40, 40, 40, 40],
+                    });
+                    mapa["map"].updateSize();
+                }, 500);
             }
         } catch (error) {
             debugger
