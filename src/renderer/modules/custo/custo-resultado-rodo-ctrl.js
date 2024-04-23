@@ -208,7 +208,7 @@ function formataOutputParametro(nomeParametro, casasDecimais = 2) {
         return "\\textrm{ERRO}";
     }
 
-    if (det[nomeParametro].result) {
+    if (det[nomeParametro].result && (det[nomeParametro].valor != null || det[nomeParametro].valor != undefined)) {
         if (!isNaN(det[nomeParametro].result)) {
             return det[nomeParametro].valor.toFixed(casasDecimais);
         } else {
